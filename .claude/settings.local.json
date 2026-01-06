@@ -15,7 +15,8 @@
       "Bash(./scripts/run-migrations.sh:*)",
       "Bash(npx supabase:*)",
       "Bash(cat:*)",
-      "Bash(./scripts/run-migrations-cli.sh:*)"
+      "Bash(./scripts/run-migrations-cli.sh:*)",
+      "Bash(git add:*)"
     ]
   }
 }

@@ -198,3 +198,217 @@ export async function deleteTaskCompletion(approvalId: string) {
     return { success: false, error: 'An unexpected error occurred' };
   }
 }
+
+// Task CRUD Operations
+
+type TaskData = {
+  name: string;
+  category: string;
+  description?: string;
+  points: number;
+  approval_type: string;
+  is_trust_task?: boolean;
+  child_id?: string | null;
+  recurrence?: {
+    type: string;
+  };
+};
+
+export async function createTask(data: TaskData) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    const { data: userData } = await supabase
+      .from('users')
+      .select('family_id')
+      .eq('id', user.id)
+      .single();
+
+    if (!userData?.family_id) {
+      return { success: false, error: 'Family not found' };
+    }
+
+    const { error } = await supabase.from('tasks').insert({
+      family_id: userData.family_id,
+      ...data,
+      is_active: true,
+    });
+
+    if (error) {
+      console.error('Error creating task:', error);
+      return { success: false, error: 'Failed to create task' };
+    }
+
+    revalidatePath('/[locale]/tasks', 'page');
+    revalidatePath('/[locale]/dashboard', 'page');
+
+    return { success: true };
+  } catch (error) {
+    console.error('Unexpected error creating task:', error);
+    return { success: false, error: 'An unexpected error occurred' };
+  }
+}
+
+export async function updateTask(taskId: string, data: Partial<TaskData>) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    const { data: task } = await supabase
+      .from('tasks')
+      .select('family_id')
+      .eq('id', taskId)
+      .single();
+
+    if (!task) {
+      return { success: false, error: 'Task not found' };
+    }
+
+    const { data: userData } = await supabase
+      .from('users')
+      .select('family_id')
+      .eq('id', user.id)
+      .single();
+
+    if (!userData || userData.family_id !== task.family_id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const { error } = await supabase
+      .from('tasks')
+      .update(data)
+      .eq('id', taskId);
+
+    if (error) {
+      console.error('Error updating task:', error);
+      return { success: false, error: 'Failed to update task' };
+    }
+
+    revalidatePath('/[locale]/tasks', 'page');
+    revalidatePath('/[locale]/dashboard', 'page');
+
+    return { success: true };
+  } catch (error) {
+    console.error('Unexpected error updating task:', error);
+    return { success: false, error: 'An unexpected error occurred' };
+  }
+}
+
+export async function toggleTaskActive(taskId: string) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    const { data: task } = await supabase
+      .from('tasks')
+      .select('family_id, is_active')
+      .eq('id', taskId)
+      .single();
+
+    if (!task) {
+      return { success: false, error: 'Task not found' };
+    }
+
+    const { data: userData } = await supabase
+      .from('users')
+      .select('family_id')
+      .eq('id', user.id)
+      .single();
+
+    if (!userData || userData.family_id !== task.family_id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const { error } = await supabase
+      .from('tasks')
+      .update({ is_active: !task.is_active })
+      .eq('id', taskId);
+
+    if (error) {
+      console.error('Error toggling task:', error);
+      return { success: false, error: 'Failed to toggle task' };
+    }
+
+    revalidatePath('/[locale]/tasks', 'page');
+    revalidatePath('/[locale]/dashboard', 'page');
+
+    return { success: true };
+  } catch (error) {
+    console.error('Unexpected error toggling task:', error);
+    return { success: false, error: 'An unexpected error occurred' };
+  }
+}
+
+export async function deleteTask(taskId: string) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    const { data: task } = await supabase
+      .from('tasks')
+      .select('family_id')
+      .eq('id', taskId)
+      .single();
+
+    if (!task) {
+      return { success: false, error: 'Task not found' };
+    }
+
+    const { data: userData } = await supabase
+      .from('users')
+      .select('family_id')
+      .eq('id', user.id)
+      .single();
+
+    if (!userData || userData.family_id !== task.family_id) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const { error } = await supabase
+      .from('tasks')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', taskId);
+
+    if (error) {
+      console.error('Error deleting task:', error);
+      return { success: false, error: 'Failed to delete task' };
+    }
+
+    revalidatePath('/[locale]/tasks', 'page');
+    revalidatePath('/[locale]/dashboard', 'page');
+
+    return { success: true };
+  } catch (error) {
+    console.error('Unexpected error deleting task:', error);
+    return { success: false, error: 'An unexpected error occurred' };
+  }
+}
