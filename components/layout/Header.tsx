@@ -29,6 +29,12 @@ export function Header() {
               {t('tasks')}
             </Link>
             <Link
+              href="/rewards"
+              className="text-gray-700 hover:text-quest-purple transition-colors"
+            >
+              Rewards
+            </Link>
+            <Link
               href="/store"
               className="text-gray-700 hover:text-quest-purple transition-colors"
             >
