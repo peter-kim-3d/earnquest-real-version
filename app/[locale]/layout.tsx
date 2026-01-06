@@ -3,6 +3,7 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { locales } from '@/lib/i18n/config';
 import { PostHogProvider } from '@/components/PostHogProvider';
+import { Toaster } from '@/components/ui/toaster';
 import '../globals.css';
 
 export function generateStaticParams() {
@@ -29,7 +30,10 @@ export default async function LocaleLayout({
     <html lang={locale}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <PostHogProvider>{children}</PostHogProvider>
+          <PostHogProvider>
+            {children}
+            <Toaster />
+          </PostHogProvider>
         </NextIntlClientProvider>
       </body>
     </html>
