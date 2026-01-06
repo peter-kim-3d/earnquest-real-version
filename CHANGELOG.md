@@ -7,13 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned for Week 3-4
-- OAuth authentication implementation (Google, Apple)
-- Family creation flow
-- Database migration execution
-- Protected route middleware
-- Onboarding wizard
-
 ### Planned for Week 5-6
 - Task management system
 - Points calculation
@@ -25,6 +18,139 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Purchase history
 - Weekly summaries
 - Analytics dashboard
+
+---
+
+## [0.2.0] - Phase 2: OAuth & Family Creation - 2026-01-06
+
+### Added
+
+#### Database Schema
+- **17 migration files** covering complete EarnQuest data model
+- Executed `migration-ordered.sql` (832 lines) to Supabase
+- Created 16 tables: families, users, children, tasks, task_completions, rewards, reward_purchases, kindness_cards, kindness_badges, app_integrations, app_integration_events, weekly_summaries, point_transactions, family_values, task_templates, reward_templates
+- Created 4 database views: v_child_today_tasks, v_pending_approvals, v_weekly_screen_usage, v_child_dashboard
+- Created 6 database functions: add_points(), auto_approve_tasks(), get_weekly_screen_usage(), can_purchase_reward(), update_updated_at_column(), set_auto_approve_at()
+- Created 17 triggers for auto-timestamps and business logic
+- Implemented Row Level Security (RLS) policies on all tables
+- Seeded task and reward templates (12 tasks, 9 rewards)
+
+#### OAuth Authentication
+- Google OAuth integration (login button with icon)
+- Apple OAuth integration (login button with icon)
+- OAuth callback handler with session management
+- Auto-redirect for new users → onboarding
+- Auto-redirect for existing users → dashboard
+- Error handling with user feedback
+- Loading states during auth flow
+
+#### Protected Routes Middleware
+- Enhanced middleware.ts with Supabase auth
+- Protected routes: /dashboard, /tasks, /store, /settings
+- Public routes: /login, /signup, /auth/callback
+- Semi-protected routes: /onboarding (requires auth)
+- Auto-redirect unauthenticated users to login
+- Auto-redirect authenticated users away from public pages
+- Session refresh on each request
+
+#### Family Creation Wizard
+- **3-step wizard component** with progress indicator
+- **Step 1: Family Info**
+  - Family name input (required)
+  - Timezone selection (6 US timezones)
+  - Auto-approval hours (1-168)
+  - Weekly screen time budget
+  - Real-time validation
+- **Step 2: Add Children**
+  - Add up to 6 children
+  - Avatar picker (12 emoji options)
+  - Name and age group
+  - Starting points (optional)
+  - Remove children
+  - Validation for required fields
+- **Step 3: Select Tasks & Rewards**
+  - Tabbed interface (Tasks / Rewards)
+  - Load templates from database
+  - Visual selection with checkboxes
+  - Category grouping (Learning, Life, Health, Creativity, Screen, Experience, Autonomy, Items)
+  - Pre-select popular options
+  - Selection counter
+- Server action to create complete family setup
+- Atomic database operations with error handling
+
+#### Server Actions
+- `createFamily()` action in lib/actions/family.ts
+- Creates family, user, children, tasks, rewards in single transaction
+- Point transaction records for starting balances
+- Comprehensive error handling and logging
+
+#### Documentation
+- `docs/OAUTH-SETUP-GUIDE.md` - Complete OAuth configuration guide
+- `PHASE2-AUTH-COMPLETE.md` - OAuth implementation summary
+- `FAMILY-CREATION-COMPLETE.md` - Family creation flow summary
+- `supabase/MIGRATION_INSTRUCTIONS.md` - Database migration guide
+- `supabase/QUICK-START-MIGRATION.md` - Quick migration reference
+
+### Changed
+- Updated `app/[locale]/(auth)/login/page.tsx` to functional OAuth
+- Updated `app/[locale]/auth/callback/page.tsx` with onboarding logic
+- Updated `app/[locale]/onboarding/page.tsx` to use wizard
+- Enhanced middleware.ts with authentication layer
+- Integrated Supabase auth with next-intl routing
+
+### Fixed
+- Resolved migration dependency order (families → users → RLS policies)
+- Fixed ESLint useEffect warning in SelectTasksRewardsStep
+- Combined all migrations into single ordered file
+
+### Technical Details
+
+#### Components Created
+- `components/onboarding/FamilyCreationWizard.tsx` - Main wizard (13.4 kB)
+- `components/onboarding/steps/FamilyInfoStep.tsx` - Step 1
+- `components/onboarding/steps/AddChildrenStep.tsx` - Step 2
+- `components/onboarding/steps/SelectTasksRewardsStep.tsx` - Step 3
+
+#### Build Status
+- ✅ Build successful (3.0s compile time)
+- ✅ All TypeScript checks passing
+- ✅ No ESLint errors
+- ✅ Onboarding page: 13.4 kB (reasonable for wizard)
+
+#### Database Tables
+- **Core**: families, users, children
+- **Tasks**: tasks, task_completions, task_templates
+- **Rewards**: rewards, reward_purchases, reward_templates
+- **Social**: kindness_cards, kindness_badges
+- **System**: point_transactions, weekly_summaries, app_integrations, family_values
+
+#### Authentication Flow
+1. User clicks OAuth button (Google/Apple)
+2. Redirects to provider authentication
+3. Returns to /auth/callback with code
+4. Exchange code for session
+5. Check if user has family
+6. Redirect to /onboarding (new) or /dashboard (existing)
+
+#### Family Creation Flow
+1. Step 1: Enter family name and settings
+2. Step 2: Add children with avatars
+3. Step 3: Select tasks and rewards
+4. Submit: Create all records in database
+5. Redirect to dashboard
+
+### Security
+- Row Level Security enabled on all tables
+- RLS policies for family-based data isolation
+- Server-side validation in createFamily action
+- OAuth state verification
+- CSRF protection via Supabase
+
+### Performance
+- Migration file optimized for single execution
+- Database indexes on foreign keys and common queries
+- Lazy loading of task/reward templates
+- Efficient batch inserts for children and tasks
 
 ---
 
@@ -192,23 +318,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Phase Status
 - ✅ **Phase 1 (Week 1-2)**: Foundation - COMPLETE
-- ⏳ **Phase 2 (Week 3-4)**: Core Data & Auth - PENDING
+- ✅ **Phase 2 (Week 3-4)**: OAuth & Family Creation - COMPLETE
 - ⏳ **Phase 3 (Week 5-6)**: Task System - PENDING
 - ⏳ **Phase 4 (Week 7-8)**: Reward System - PENDING
 
-### Manual Steps Required Before Week 3
-1. Create Supabase project at https://supabase.com/dashboard
-2. Update `.env.local` with actual Supabase credentials
-3. (Optional) Create PostHog project and add API key
-4. Convert logo SVG to PNG icons (192x192, 512x512)
-5. Initialize Git repository and push to GitHub
-6. Connect repository to Vercel
-7. Add environment variables to Vercel
-8. Deploy to production
+### Manual Steps Required Before Testing
+1. ✅ Create Supabase project (DONE)
+2. ✅ Update `.env.local` with actual Supabase credentials (DONE)
+3. ✅ Execute database migrations (DONE)
+4. ⏳ Configure Google OAuth in Supabase Dashboard
+5. ⏳ (Optional) Configure Apple OAuth
+6. ⏳ Test family creation flow locally
+7. ⏳ Deploy to Vercel production
+8. (Optional) Create PostHog project and add API key
+9. (Optional) Convert logo SVG to PNG icons
 
 ### Known Limitations
-- Database migrations prepared but not executed
-- OAuth authentication not implemented (buttons disabled)
-- No actual data persistence yet
+- Dashboard shows placeholder data (real data display in Phase 3)
+- Only one age group supported (8-11 years)
+- Cannot customize task/reward points during setup
+- Maximum 6 children per family
 - PWA icons are placeholders
 - Analytics requires PostHog account setup

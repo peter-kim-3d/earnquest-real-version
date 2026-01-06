@@ -9,7 +9,13 @@
       "Bash(npm install @supabase/supabase-js @supabase/ssr next-intl zustand @tanstack/react-query @radix-ui/react-slot class-variance-authority clsx tailwind-merge @phosphor-icons/react react-hook-form @hookform/resolvers zod posthog-js)",
       "Bash(npm install:*)",
       "Bash(npx shadcn@latest add button card input label dialog dropdown-menu avatar badge tabs toast --yes --overwrite)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npx supabase db push:*)",
+      "Bash(chmod:*)",
+      "Bash(./scripts/run-migrations.sh:*)",
+      "Bash(npx supabase:*)",
+      "Bash(cat:*)",
+      "Bash(./scripts/run-migrations-cli.sh:*)"
     ]
   }
 }
