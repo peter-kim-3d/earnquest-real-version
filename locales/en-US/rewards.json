@@ -1,0 +1,22 @@
+{
+  "title": "Rewards Store",
+  "purchase": "Purchase",
+  "points": "points",
+  "balance": "Your Balance",
+  "balancePoints": "{points} points",
+  "empty": "No rewards available",
+  "purchased": "Purchased!",
+  "notEnoughPoints": "Not enough points",
+  "categories": {
+    "screenTime": "Screen Time",
+    "experiences": "Experiences",
+    "autonomy": "Autonomy",
+    "treats": "Treats"
+  },
+  "createReward": "Create Reward",
+  "editReward": "Edit Reward",
+  "deleteReward": "Delete Reward",
+  "rewardDetails": "Reward Details",
+  "pointsCost": "Points Cost",
+  "description": "Description"
+}

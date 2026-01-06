@@ -1,0 +1,36 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6C5CE7"/>
+      <stop offset="100%" stop-color="#A29BFE"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDCB6E"/>
+      <stop offset="100%" stop-color="#F8B500"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00B894"/>
+      <stop offset="100%" stop-color="#55EFC4"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="108" fill="url(#bgGradient)"/>
+  
+  <!-- Flag pole -->
+  <rect x="140" y="160" width="24" height="240" rx="12" fill="white" fill-opacity="0.95"/>
+  
+  <!-- Flag -->
+  <path d="M164 100 L380 100 L340 170 L380 240 L164 240 Z" fill="white" fill-opacity="0.95"/>
+  
+  <!-- Star on flag -->
+  <path d="M272 130 L292 175 L342 180 L305 215 L316 264 L272 238 L228 264 L239 215 L202 180 L252 175 Z" fill="url(#goldGrad)"/>
+  
+  <!-- Small decorative stars -->
+  <circle cx="380" cy="350" r="16" fill="url(#goldGrad)" fill-opacity="0.6"/>
+  <circle cx="400" cy="400" r="10" fill="url(#goldGrad)" fill-opacity="0.4"/>
+  <circle cx="120" cy="380" r="12" fill="url(#greenGrad)" fill-opacity="0.5"/>
+  
+  <!-- Base/Ground hint -->
+  <ellipse cx="152" cy="410" rx="50" ry="16" fill="white" fill-opacity="0.3"/>
+</svg>

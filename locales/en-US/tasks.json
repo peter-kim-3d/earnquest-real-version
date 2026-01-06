@@ -1,0 +1,21 @@
+{
+  "title": "Tasks",
+  "empty": "No tasks yet",
+  "complete": "Complete Task",
+  "completed": "Completed",
+  "pending": "Pending Approval",
+  "approved": "Approved",
+  "categories": {
+    "learning": "Learning",
+    "life": "Life Skills",
+    "health": "Health & Fitness",
+    "creativity": "Creativity",
+    "kindness": "Kindness"
+  },
+  "createTask": "Create Task",
+  "editTask": "Edit Task",
+  "deleteTask": "Delete Task",
+  "taskDetails": "Task Details",
+  "pointsValue": "Points Value",
+  "description": "Description"
+}
