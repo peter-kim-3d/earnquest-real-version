@@ -5,14 +5,18 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FamilyInfoStep } from './steps/FamilyInfoStep';
 import { AddChildrenStep } from './steps/AddChildrenStep';
+import { FamilyValuesStep } from './steps/FamilyValuesStep';
+import { SelectStyleStep } from './steps/SelectStyleStep';
 import { SelectTasksRewardsStep } from './steps/SelectTasksRewardsStep';
+import { ReadyStep } from './steps/ReadyStep';
 
 export type FamilyData = {
   name: string;
   timezone: string;
-  language: string;
   autoApprovalHours: number;
   screenBudgetWeeklyMinutes: number;
+  values?: string[];
+  parentingStyle?: 'easy' | 'balanced' | 'learning';
 };
 
 export type ChildData = {
@@ -48,7 +52,7 @@ export type WizardData = {
   selectedRewards: string[];
 };
 
-type WizardStep = 'family' | 'children' | 'tasks-rewards' | 'complete';
+type WizardStep = 'family' | 'values' | 'children' | 'style' | 'tasks-rewards' | 'complete';
 
 export function FamilyCreationWizard() {
   const [currentStep, setCurrentStep] = useState<WizardStep>('family');
@@ -56,9 +60,10 @@ export function FamilyCreationWizard() {
     family: {
       name: '',
       timezone: 'America/New_York',
-      language: 'en',
       autoApprovalHours: 24,
       screenBudgetWeeklyMinutes: 300,
+      values: [],
+      parentingStyle: 'balanced',
     },
     children: [],
     selectedTasks: [],
@@ -86,8 +91,12 @@ export function FamilyCreationWizard() {
 
   const handleNext = () => {
     if (currentStep === 'family') {
+      setCurrentStep('values');
+    } else if (currentStep === 'values') {
       setCurrentStep('children');
     } else if (currentStep === 'children') {
+      setCurrentStep('style');
+    } else if (currentStep === 'style') {
       setCurrentStep('tasks-rewards');
     } else if (currentStep === 'tasks-rewards') {
       setCurrentStep('complete');
@@ -95,10 +104,14 @@ export function FamilyCreationWizard() {
   };
 
   const handleBack = () => {
-    if (currentStep === 'children') {
+    if (currentStep === 'values') {
       setCurrentStep('family');
-    } else if (currentStep === 'tasks-rewards') {
+    } else if (currentStep === 'children') {
+      setCurrentStep('values');
+    } else if (currentStep === 'style') {
       setCurrentStep('children');
+    } else if (currentStep === 'tasks-rewards') {
+      setCurrentStep('style');
     }
   };
 
@@ -106,12 +119,16 @@ export function FamilyCreationWizard() {
     switch (currentStep) {
       case 'family':
         return 1;
-      case 'children':
+      case 'values':
         return 2;
+      case 'children':
+        return 3;
+      case 'style':
+        return 4;
       case 'tasks-rewards':
-        return 3;
+        return 5;
       default:
-        return 3;
+        return 5;
     }
   };
 
@@ -124,20 +141,32 @@ export function FamilyCreationWizard() {
             <StepIndicator number={1} label="Family Info" active={currentStep === 'family'} completed={getStepNumber() > 1} />
             <div className="flex-1 h-1 bg-gray-200 mx-2">
               <div
-                className={`h-full bg-quest-purple transition-all duration-300 ${
-                  getStepNumber() >= 2 ? 'w-full' : 'w-0'
-                }`}
+                className={`h-full bg-quest-purple transition-all duration-300 ${getStepNumber() >= 2 ? 'w-full' : 'w-0'
+                  }`}
               />
             </div>
-            <StepIndicator number={2} label="Add Children" active={currentStep === 'children'} completed={getStepNumber() > 2} />
+            <StepIndicator number={2} label="Values" active={currentStep === 'values'} completed={getStepNumber() > 2} />
             <div className="flex-1 h-1 bg-gray-200 mx-2">
               <div
-                className={`h-full bg-quest-purple transition-all duration-300 ${
-                  getStepNumber() >= 3 ? 'w-full' : 'w-0'
-                }`}
+                className={`h-full bg-quest-purple transition-all duration-300 ${getStepNumber() >= 3 ? 'w-full' : 'w-0'
+                  }`}
               />
             </div>
-            <StepIndicator number={3} label="Tasks & Rewards" active={currentStep === 'tasks-rewards'} completed={false} />
+            <StepIndicator number={3} label="Children" active={currentStep === 'children'} completed={getStepNumber() > 3} />
+            <div className="flex-1 h-1 bg-gray-200 mx-2">
+              <div
+                className={`h-full bg-quest-purple transition-all duration-300 ${getStepNumber() >= 4 ? 'w-full' : 'w-0'
+                  }`}
+              />
+            </div>
+            <StepIndicator number={4} label="Style" active={currentStep === 'style'} completed={getStepNumber() > 4} />
+            <div className="flex-1 h-1 bg-gray-200 mx-2">
+              <div
+                className={`h-full bg-quest-purple transition-all duration-300 ${getStepNumber() >= 5 ? 'w-full' : 'w-0'
+                  }`}
+              />
+            </div>
+            <StepIndicator number={5} label="Tasks & Rewards" active={currentStep === 'tasks-rewards'} completed={false} />
           </div>
         </div>
 
@@ -146,8 +175,19 @@ export function FamilyCreationWizard() {
           {currentStep === 'family' && (
             <FamilyInfoStep data={wizardData.family} onUpdate={updateFamilyData} onNext={handleNext} />
           )}
+          {currentStep === 'values' && (
+            <FamilyValuesStep
+              data={wizardData.family}
+              onUpdate={updateFamilyData}
+              onNext={handleNext}
+              onBack={handleBack}
+            />
+          )}
           {currentStep === 'children' && (
             <AddChildrenStep data={wizardData.children} onUpdate={updateChildren} onNext={handleNext} onBack={handleBack} />
+          )}
+          {currentStep === 'style' && (
+            <SelectStyleStep data={wizardData.family} onUpdate={updateFamilyData} onNext={handleNext} onBack={handleBack} />
           )}
           {currentStep === 'tasks-rewards' && (
             <SelectTasksRewardsStep
@@ -155,8 +195,12 @@ export function FamilyCreationWizard() {
               selectedRewards={wizardData.selectedRewards}
               onUpdate={updateTasksRewards}
               onBack={handleBack}
+              onNext={handleNext}
               wizardData={wizardData}
             />
+          )}
+          {currentStep === 'complete' && (
+            <ReadyStep data={wizardData} />
           )}
         </div>
       </Card>
@@ -178,13 +222,12 @@ function StepIndicator({
   return (
     <div className="flex flex-col items-center">
       <div
-        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mb-2 transition-all ${
-          active
-            ? 'bg-quest-purple text-white ring-4 ring-quest-purple/20'
-            : completed
+        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mb-2 transition-all ${active
+          ? 'bg-quest-purple text-white ring-4 ring-quest-purple/20'
+          : completed
             ? 'bg-growth-green text-white'
             : 'bg-gray-200 text-gray-500'
-        }`}
+          }`}
       >
         {completed ? '✓' : number}
       </div>

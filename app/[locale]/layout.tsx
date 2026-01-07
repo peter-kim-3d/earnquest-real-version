@@ -1,6 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import Head from 'next/head';
 import { locales } from '@/lib/i18n/config';
 import { PostHogProvider } from '@/components/PostHogProvider';
 import { Toaster } from '@/components/ui/toaster';
@@ -28,6 +29,9 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale}>
+      <head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+      </head>
       <body>
         <NextIntlClientProvider messages={messages}>
           <PostHogProvider>

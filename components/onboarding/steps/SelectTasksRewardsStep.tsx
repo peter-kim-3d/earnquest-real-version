@@ -15,6 +15,7 @@ type Props = {
   selectedRewards: string[];
   onUpdate: (tasks: string[], rewards: string[]) => void;
   onBack: () => void;
+  onNext: () => void;
   wizardData: WizardData;
 };
 
@@ -38,8 +39,8 @@ type RewardTemplate = {
   icon: string;
 };
 
-export function SelectTasksRewardsStep({ selectedTasks, selectedRewards, onUpdate, onBack, wizardData }: Props) {
-  const router = useRouter();
+export function SelectTasksRewardsStep({ selectedTasks, selectedRewards, onUpdate, onBack, onNext, wizardData }: Props) {
+  // const router = useRouter(); // No longer needed for redirect, but maybe for refresh? No, just next step.
   const [taskTemplates, setTaskTemplates] = useState<TaskTemplate[]>([]);
   const [rewardTemplates, setRewardTemplates] = useState<RewardTemplate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,7 +114,7 @@ export function SelectTasksRewardsStep({ selectedTasks, selectedRewards, onUpdat
       const result = await createFamily(wizardData);
 
       if (result.success) {
-        router.push('/en-US/dashboard');
+        onNext();
       } else {
         setError(result.error || 'Failed to create family');
       }
@@ -184,11 +185,10 @@ export function SelectTasksRewardsStep({ selectedTasks, selectedRewards, onUpdat
                   <Card
                     key={task.id}
                     onClick={() => toggleTask(task.id)}
-                    className={`p-3 cursor-pointer transition ${
-                      selectedTasks.includes(task.id)
+                    className={`p-3 cursor-pointer transition ${selectedTasks.includes(task.id)
                         ? 'border-quest-purple bg-quest-purple/5 ring-2 ring-quest-purple/20'
                         : 'hover:border-gray-400'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -201,11 +201,10 @@ export function SelectTasksRewardsStep({ selectedTasks, selectedRewards, onUpdat
                         </div>
                       </div>
                       <div
-                        className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                          selectedTasks.includes(task.id)
+                        className={`w-5 h-5 rounded border-2 flex items-center justify-center ${selectedTasks.includes(task.id)
                             ? 'bg-quest-purple border-quest-purple'
                             : 'border-gray-300'
-                        }`}
+                          }`}
                       >
                         {selectedTasks.includes(task.id) && (
                           <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -244,11 +243,10 @@ export function SelectTasksRewardsStep({ selectedTasks, selectedRewards, onUpdat
                   <Card
                     key={reward.id}
                     onClick={() => toggleReward(reward.id)}
-                    className={`p-3 cursor-pointer transition ${
-                      selectedRewards.includes(reward.id)
+                    className={`p-3 cursor-pointer transition ${selectedRewards.includes(reward.id)
                         ? 'border-star-gold bg-star-gold/5 ring-2 ring-star-gold/20'
                         : 'hover:border-gray-400'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -266,11 +264,10 @@ export function SelectTasksRewardsStep({ selectedTasks, selectedRewards, onUpdat
                         </div>
                       </div>
                       <div
-                        className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                          selectedRewards.includes(reward.id)
+                        className={`w-5 h-5 rounded border-2 flex items-center justify-center ${selectedRewards.includes(reward.id)
                             ? 'bg-star-gold border-star-gold'
                             : 'border-gray-300'
-                        }`}
+                          }`}
                       >
                         {selectedRewards.includes(reward.id) && (
                           <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
