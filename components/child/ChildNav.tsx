@@ -1,0 +1,218 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { Trophy, Gift, Medal, Ticket, List, X, User, SignOut, CaretDown, Sword, Star, Eye, Target } from '@phosphor-icons/react';
+import BetaBadge from '@/components/BetaBadge';
+import AvatarDisplay from '@/components/profile/AvatarDisplay';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import ConfirmDialog from '@/components/ui/confirm-dialog';
+import { ModeToggle } from '@/components/ModeToggle';
+
+interface ChildNavProps {
+  childName?: string;
+  childId?: string;
+  avatarUrl?: string | null;
+  points?: number;
+  isParentView?: boolean;
+}
+
+export default function ChildNav({ childName = 'A', childId, avatarUrl = null, points = 0, isParentView = false }: ChildNavProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const performLogout = async () => {
+    try {
+      // Clear child session
+      await fetch('/api/auth/child-logout', { method: 'POST' });
+      router.push('/en-US/child-login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  const navItems = [
+    { href: '/en-US/child/dashboard', label: 'Quests', icon: Trophy },
+    { href: '/en-US/child/store', label: 'Rewards', icon: Gift },
+    { href: '/en-US/child/goals', label: 'Goals', icon: Target },
+    { href: '/en-US/child/tickets', label: 'My Tickets', icon: Ticket },
+    { href: '/en-US/child/badges', label: 'Badges', icon: Medal, isKindness: true },
+  ];
+
+  return (
+    <header className="sticky top-0 z-50 w-full flex flex-col">
+      {isParentView && (
+        <div className="bg-blue-600 text-white px-4 py-2 text-sm font-medium flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-2">
+            <Eye className="w-4 h-4" />
+            <span>Viewing as {childName}</span>
+          </div>
+          <button
+            onClick={() => {
+              // Clear cookies and go back to parent dashboard
+              document.cookie = 'parent_view=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+              fetch('/api/auth/child-logout', { method: 'POST' }).then(() => {
+                window.location.href = '/en-US/dashboard';
+              });
+            }}
+            className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-xs font-bold transition-colors"
+          >
+            Exit View
+          </button>
+        </div>
+      )}
+      <div className="w-full border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm print:hidden">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="flex h-16 items-center justify-between">
+            {/* Logo */}
+            <Link href="/en-US/child/dashboard" className="flex items-center gap-2" aria-label="EarnQuest home - Go to dashboard">
+              <div className="flex items-center gap-2">
+                <Sword size={32} weight="duotone" className="text-primary" />
+                <span className="text-xl font-black text-text-main dark:text-white">
+                  EarnQuest
+                </span>
+                <BetaBadge />
+              </div>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href || pathname.startsWith(item.href);
+                const activeColor = item.isKindness ? 'bg-primary-kindness/10 text-primary-kindness' : 'bg-primary/10 text-primary';
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`
+                      flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-all
+                      ${isActive
+                        ? `${activeColor} font-bold`
+                        : 'font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      }
+                    `}
+                  >
+                    <Icon className="h-5 w-5" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Right side - XP Badge & Avatar */}
+            <div className="flex items-center gap-4">
+              {/* Mode Toggle */}
+              <div className="hidden sm:flex">
+                <ModeToggle />
+              </div>
+
+              {/* XP Badge */}
+              <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800">
+                <Star size={20} weight="fill" className="text-yellow-600 dark:text-yellow-500" />
+                <span className="text-sm font-bold text-yellow-900 dark:text-yellow-100">
+                  {points} XP
+                </span>
+              </div>
+
+              {/* Profile Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 hover:opacity-80 transition-opacity" aria-label={`Profile menu for ${childName}`}>
+                    <AvatarDisplay
+                      avatarUrl={avatarUrl}
+                      userName={childName}
+                      size="sm"
+                      editable={false}
+                      mode="child"
+                      childId={childId}
+                    />
+                    <CaretDown className="h-4 w-4 text-gray-500 hidden sm:block" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="px-2 py-1.5 text-sm font-semibold text-text-main dark:text-white">
+                    {childName}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/en-US/child/profile" className="flex items-center gap-2 cursor-pointer">
+                      <User size={18} />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogoutClick} className="flex items-center gap-2 cursor-pointer text-red-600 dark:text-red-400">
+                    <SignOut size={18} />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Mobile menu button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden h-12 w-12 flex items-center justify-center text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              >
+                {mobileMenuOpen ? <X size={24} /> : <List size={24} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Navigation */}
+          {mobileMenuOpen && (
+            <nav className="md:hidden py-4 border-t border-gray-200 dark:border-gray-800">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href || pathname.startsWith(item.href);
+                const activeColor = item.isKindness
+                  ? 'bg-primary-kindness/10 text-primary-kindness border-l-4 border-primary-kindness'
+                  : 'bg-primary/10 text-primary border-l-4 border-primary';
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`
+                      flex items-center gap-3 px-4 py-3 font-semibold text-base transition-all
+                      ${isActive
+                        ? `${activeColor} font-bold`
+                        : 'font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      }
+                    `}
+                  >
+                    <Icon className="h-5 w-5" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
+        </div>
+      </div>
+      <ConfirmDialog
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={performLogout}
+        title="Log Out?"
+        description="Are you sure you want to log out?"
+        confirmLabel="Log Out"
+        cancelLabel="Cancel"
+      />
+    </header>
+  );
+}

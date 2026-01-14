@@ -10,7 +10,7 @@ export interface LocaleConfig {
   currencySymbol: string;
   dateFormat: string;
   timeFormat: '12h' | '24h';
-  weekStartsOn: 0 | 1;
+  weekStartsOn: 0 | 1; // 0 = Sunday, 1 = Monday
   direction: 'ltr' | 'rtl';
 }
 

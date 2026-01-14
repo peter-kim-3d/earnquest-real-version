@@ -2,47 +2,110 @@
 
 > Growing habits, shining rewards
 
-**Status**: Phase 1 Week 1-2 ✅ Complete | MVP Development in Progress
+A gamified task and reward system for families to help children develop good habits through motivation, trust, and positive reinforcement.
 
----
+## 🎯 Project Status
 
-## Project Overview
+**Phase 1: Foundation & Setup** ✅ COMPLETE
 
-EarnQuest is a family rewards platform that motivates children to build good habits through a points-based system where tasks earn points and points purchase rewards (screen time, experiences, autonomy).
+## 🚀 Tech Stack
 
-**Target Users**: US families with 8-11 year old children (MVP)
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v3 + shadcn/ui
+- **Backend**: Supabase (PostgreSQL + Auth + Realtime)
+- **i18n**: next-intl (en-US, ko-KR support)
+- **State Management**: Zustand + TanStack Query
+- **Forms**: React Hook Form + Zod
+- **Icons**: Lucide React, Phosphor Icons, Material Symbols
 
----
+## 📂 Project Structure
 
-## Current Status
+```
+earnquest/
+├── app/
+│   ├── [locale]/              # i18n routes (en-US, ko-KR)
+│   │   ├── layout.tsx         # Locale-specific layout
+│   │   └── page.tsx           # Home page
+│   ├── layout.tsx             # Root layout
+│   └── globals.css            # Global styles + design system
+├── components/
+│   └── ui/                    # shadcn/ui components (10 components)
+├── lib/
+│   ├── supabase/
+│   │   ├── client.ts          # Browser client
+│   │   ├── server.ts          # Server client
+│   │   ├── middleware.ts      # Auth middleware
+│   │   └── types.ts           # Database types (placeholder)
+│   ├── services/
+│   │   └── auth.ts            # Auth helper functions
+│   ├── i18n/
+│   │   ├── config.ts          # Locale configuration
+│   │   ├── request.ts         # next-intl request config
+│   │   └── navigation.ts      # i18n-aware navigation
+│   └── utils.ts               # Utility functions (cn)
+├── locales/
+│   └── en-US/
+│       └── common.json        # English translations
+├── supabase/
+│   ├── migrations/
+│   │   ├── 001_create_families.sql
+│   │   ├── 002_create_users.sql
+│   │   ├── 003_create_children.sql
+│   │   └── TODO.md            # Remaining migrations
+│   └── README.md              # Supabase setup guide
+├── docs/
+│   ├── earnquest-proposal-v1.0-final.md
+│   ├── earnquest-prd-final.md
+│   ├── earnquest-data-model.md
+│   └── earnquest-setup-guide.md
+├── .stitch_child_s_task_list/ # Google Stitch UI designs
+├── .env.local                 # Environment variables (gitignored)
+├── .env.example               # Environment template
+└── package.json
+```
 
-### ✅ Phase 1 Week 1-2: Foundation (Complete)
-- Next.js 15 with App Router and TypeScript
-- i18n with next-intl (en-US primary, ko-KR prepared)
-- Tailwind CSS with EarnQuest brand design system
-- shadcn/ui component library (10 components)
-- Supabase client configuration
-- Auth page structure (login, signup, callback)
-- PostHog analytics integration
-- PWA manifest
-- Production build successful
+## 🎨 Design System (Stitch)
 
-### ⏳ Next: Phase 2 (Week 3-4) - Core Data & Auth
-- OAuth authentication implementation
-- Family creation flow
-- Database migration execution
-- Protected route middleware
-- Onboarding wizard
+### Colors
 
----
+```css
+/* Primary (Main Theme) */
+--primary: #37ec13 (bright green)
 
-## Quick Start
+/* Kindness Features */
+--primary-kindness: #f49d25 (warm orange)
+
+/* Backgrounds */
+--background-light: #f6f8f6
+--background-dark: #132210
+--card-light: #ffffff
+--card-dark: #1c3018
+
+/* Text */
+--text-main: #121811
+--text-muted: #688961
+```
+
+### Typography
+
+- **Display Font**: Lexend (headings)
+- **Body Font**: Noto Sans (body text)
+- **Kindness Font**: Plus Jakarta Sans (kindness features)
+
+### Border Radius
+
+- `rounded-xl`: 1.5rem
+- `rounded-2xl`: 2rem
+- `rounded-full`: 9999px
+
+## 🛠️ Development
 
 ### Prerequisites
-- Node.js 18.17+
+
+- Node.js 18+
 - npm or yarn
-- Supabase account
-- (Optional) PostHog account
+- Supabase account (for database)
 
 ### Installation
 
@@ -53,157 +116,177 @@ npm install
 # Set up environment variables
 cp .env.example .env.local
 # Edit .env.local with your Supabase credentials
-
-# Run development server
-npm run dev
 ```
 
-Visit http://localhost:3000 (redirects to `/en-US`)
-
-### Build for Production
+### Running Locally
 
 ```bash
+# Development server
+npm run dev
+
+# Open http://localhost:3000/en-US
+```
+
+### Building
+
+```bash
+# Production build
 npm run build
-npm run start
+
+# Start production server
+npm start
 ```
 
----
+## 🗄️ Database Setup
 
-## Tech Stack
+### Option 1: Quick Setup (Recommended for Development)
 
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| **Framework** | Next.js 15 (App Router) | React framework with server components |
-| **Language** | TypeScript | Type-safe development |
-| **Styling** | Tailwind CSS + shadcn/ui | Utility-first CSS + component library |
-| **Backend** | Supabase | PostgreSQL + Auth + Realtime |
-| **Hosting** | Vercel | Deployment platform |
-| **Auth** | Supabase Auth | OAuth (Google, Apple) |
-| **i18n** | next-intl | Internationalization |
-| **State** | Zustand + TanStack Query | State management + data fetching |
-| **Forms** | React Hook Form + Zod | Form handling + validation |
-| **Icons** | Phosphor Icons + Lucide | Icon libraries |
-| **Analytics** | PostHog | Privacy-friendly analytics |
+1. Create a Supabase project at [supabase.com/dashboard](https://supabase.com/dashboard)
+2. Copy the Project URL and anon key to `.env.local`
+3. Go to SQL Editor in Supabase Dashboard
+4. Run the migration files in `supabase/migrations/` in order
 
----
+See detailed instructions in `supabase/README.md`
 
-## Documentation
+### Option 2: Using Supabase CLI
 
-### Development Guides
-- [DEVELOPMENT.md](./DEVELOPMENT.md) - Complete development guide
-- [CHANGELOG.md](./CHANGELOG.md) - Version history and changes
+```bash
+# Link to your project
+npx supabase link --project-ref your-project-ref
 
-### Specification Documents
-- [Product Requirements](./docs/earnquest-prd-final.md) - Complete PRD with features and specs
-- [Setup Guide](./docs/earnquest-setup-guide.md) - Technical stack and configuration
-- [Data Model](./docs/earnquest-data-model.md) - Database schema and SQL
-- [Brand Guidelines](./docs/earnquest-brand-guidelines.md) - Design system and colors
-- [Project Proposal](./docs/earnquest-proposal-v1.0-final.md) - Detailed planning notes
+# Push migrations
+npx supabase db push
 
----
-
-## Project Structure
-
-```
-earnquest-real-version/
-├── app/                    # Next.js App Router
-│   ├── [locale]/          # Internationalized routes
-│   ├── globals.css        # Global styles
-│   └── manifest.ts        # PWA manifest
-├── components/            # React components
-│   ├── ui/               # shadcn/ui components
-│   └── layout/           # Layout components
-├── lib/                   # Utility functions
-│   ├── supabase/         # Supabase clients
-│   ├── i18n/             # i18n configuration
-│   └── posthog/          # Analytics
-├── locales/              # Translation files
-│   ├── en-US/           # English (US)
-│   └── ko-KR/           # Korean (prepared)
-├── docs/                 # Documentation
-├── assets/               # Logo and icon files
-├── middleware.ts         # Next.js middleware
-└── next.config.ts       # Next.js configuration
+# Generate TypeScript types
+npx supabase gen types typescript --project-id=your-project-ref > lib/supabase/types.ts
 ```
 
+### Database Migrations
+
+**Completed:**
+- ✅ 001_create_families.sql
+- ✅ 002_create_users.sql
+- ✅ 003_create_children.sql
+
+**To Create:** (See `supabase/migrations/TODO.md`)
+- 📝 Tasks, Rewards, Kindness systems
+- 📝 Functions, Triggers, RLS Policies
+- 📝 Seed data
+
+## 🌍 Internationalization (i18n)
+
+Currently supports:
+- 🇺🇸 English (en-US) - Default
+- 🇰🇷 Korean (ko-KR) - Phase 2
+
+### Adding Translations
+
+1. Add translations to `locales/{locale}/common.json`
+2. Use `useTranslations` hook in components:
+
+```tsx
+import { useTranslations } from 'next-intl';
+
+export default function MyComponent() {
+  const t = useTranslations();
+  return <h1>{t('app.name')}</h1>;
+}
+```
+
+## 📦 Included Components (shadcn/ui)
+
+- Button
+- Card
+- Input
+- Label
+- Dialog
+- Dropdown Menu
+- Avatar
+- Badge
+- Tabs
+- Sonner (Toast notifications)
+
+## 🔐 Authentication
+
+Configured for:
+- ✅ Google OAuth
+- ✅ Apple OAuth
+- ✅ Email/Password
+
+See `lib/services/auth.ts` for helper functions.
+
+## 📋 Next Steps
+
+### Phase 2: Onboarding Flow (Week 3-4)
+
+- [ ] Create auth pages (login, signup, callback)
+- [ ] Implement OAuth flows
+- [ ] Build onboarding wizard:
+  - [ ] Add child
+  - [ ] Select style (Easy Start / Balanced / Learning Focus)
+  - [ ] Family values (optional)
+  - [ ] Ready to start
+- [ ] Populate default tasks and rewards
+
+### Phase 3: Child Dashboard & Task List (Week 5)
+
+- [ ] Child layout and navigation
+- [ ] Task card components
+- [ ] Task completion flow
+- [ ] Stats sidebar
+- [ ] Motivational banners
+
+## 📖 Documentation
+
+- `docs/earnquest-proposal-v1.0-final.md` - Original proposal
+- `docs/earnquest-prd-final.md` - Product requirements
+- `docs/earnquest-data-model.md` - Database schema
+- `docs/earnquest-setup-guide.md` - Setup instructions
+- `supabase/README.md` - Database setup guide
+
+## 🎨 UI Design Files
+
+Google Stitch designs are in `.stitch_child_s_task_list/`:
+- 28 views across 7 categories
+- Onboarding, Child views, Parent views, Kindness features
+- HTML + PNG for each view
+
+## 🚢 Deployment
+
+### Vercel (Recommended)
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+
+# Add environment variables in Vercel Dashboard
+```
+
+### Environment Variables for Production
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+NEXT_PUBLIC_APP_URL=https://your-domain.vercel.app
+```
+
+## 🐛 Known Issues
+
+- ⚠️ Custom fonts warning (cosmetic, doesn't affect functionality)
+- ⚠️ Supabase Edge Runtime warnings in middleware (normal, doesn't affect functionality)
+
+## 📄 License
+
+Private project - All rights reserved
+
+## 🤝 Contributing
+
+This is a private project. Refer to the implementation plan for development guidelines.
+
 ---
 
-## Implementation Roadmap
-
-### ✅ Phase 1 (Week 1-2): Foundation - COMPLETE
-- Next.js project setup
-- i18n configuration (en-US)
-- Tailwind + shadcn/ui
-- Supabase client setup
-- Auth page structure
-- Basic layouts
-- Production build
-
-### ⏳ Phase 2 (Week 3-4): Core Data & Auth
-- OAuth implementation (Google, Apple)
-- Authentication pages
-- Family creation flow
-- Child profiles
-- Database migrations
-- Onboarding wizard
-
-### 📋 Phase 3 (Week 5-6): Task System
-- Task list views
-- Task completion flow
-- Parent approval UI
-- Auto-approval system
-- Points calculation
-
-### 📋 Phase 4 (Week 7-8): Reward System
-- Rewards store
-- Purchase flow
-- Reward history
-- Screen time budget
-- Weekly summaries
-- MVP completion
-
----
-
-## Manual Setup Required
-
-Before continuing to Phase 2, complete these steps:
-
-1. **Create Supabase Project**
-   - Visit https://supabase.com/dashboard
-   - Create new project in us-east-1 region
-   - Save project URL and API keys
-
-2. **Update Environment Variables**
-   - Copy credentials to `.env.local`
-   - Add to Vercel environment variables
-
-3. **(Optional) Set Up PostHog**
-   - Create project at https://posthog.com
-   - Add API key to `.env.local`
-
-4. **Create PWA Icons**
-   - Convert `assets/earnquest-icon.svg` to PNG
-   - Create 192x192, 512x512, and maskable versions
-   - Place in `public/icons/`
-
-5. **Deploy to Vercel**
-   - Push code to GitHub
-   - Import repository in Vercel
-   - Add environment variables
-   - Deploy
-
----
-
-## Development
-
-See [DEVELOPMENT.md](./DEVELOPMENT.md) for detailed development instructions.
-
----
-
-## License
-
-Private - All rights reserved
-
----
-
-*Growing habits, shining rewards* ✨
+**Built with ❤️ using Next.js, Supabase, and Tailwind CSS**

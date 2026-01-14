@@ -2,9 +2,6 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { locales } from '@/lib/i18n/config';
-import { PostHogProvider } from '@/components/PostHogProvider';
-import { Toaster } from '@/components/ui/toaster';
-import '../globals.css';
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -24,18 +21,12 @@ export default async function LocaleLayout({
     notFound();
   }
 
+  // Providing all messages to the client side is the easiest way to get started
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
-      <body>
-        <NextIntlClientProvider messages={messages}>
-          <PostHogProvider>
-            {children}
-            <Toaster />
-          </PostHogProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider messages={messages}>
+      {children}
+    </NextIntlClientProvider>
   );
 }

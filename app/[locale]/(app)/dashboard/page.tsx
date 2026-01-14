@@ -1,277 +1,186 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ChildStatsCard } from '@/components/dashboard/ChildStatsCard';
-import { PendingApprovals } from '@/components/dashboard/PendingApprovals';
-import { QuickActions } from '@/components/dashboard/QuickActions';
+import ActionCenter from '@/components/parent/ActionCenter';
+import ChildCard from '@/components/parent/ChildCard';
+import ActivityFeed from '@/components/parent/ActivityFeed';
+import PendingTicketsSection from '@/components/dashboard/PendingTicketsSection';
+import DashboardStats from '@/components/dashboard/DashboardStats';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import TransactionHistory from '@/components/parent/TransactionHistory';
 
-export default async function DashboardPage() {
+export default async function ParentDashboardPage() {
   const supabase = await createClient();
 
-  // Get current user
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  // Get authenticated user
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     redirect('/en-US/login');
   }
 
-  // Get user's family info
-  const { data: userData } = await supabase
+  // Get user's family
+  const { data: userProfile } = await supabase
     .from('users')
-    .select('family_id, name')
+    .select('family_id, full_name')
     .eq('id', user.id)
-    .single();
+    .single() as { data: { family_id: string; full_name: string } | null };
 
-  if (!userData?.family_id) {
-    redirect('/en-US/onboarding');
+  if (!userProfile?.family_id) {
+    redirect('/en-US/onboarding/add-child');
   }
 
-  // Get family data
-  const { data: family } = await supabase
-    .from('families')
-    .select('*')
-    .eq('id', userData.family_id)
-    .single();
-
-  // Get children with stats
+  // Get children
   const { data: children } = await supabase
-    .from('v_child_dashboard')
-    .select('*')
-    .eq('family_id', userData.family_id)
-    .order('name');
+    .from('children')
+    .select('id, name, age_group, points_balance, avatar_url, pin_code, settings')
+    .eq('family_id', userProfile.family_id)
+    .order('created_at', { ascending: true }) as { data: any[] | null };
 
-  // Get pending approvals count
-  const { data: pendingApprovals } = await supabase
-    .from('v_pending_approvals')
-    .select('*')
-    .eq('family_id', userData.family_id)
-    .order('requested_at', { ascending: false });
+  // Get pending task completions for approval
+  const { data: pendingCompletions } = await supabase
+    .from('task_completions')
+    .select(`
+      *,
+      tasks(*),
+      children(*)
+    `)
+    .eq('family_id', userProfile.family_id)
+    .eq('status', 'pending')
+    .order('requested_at', { ascending: true }) as { data: any[] | null };
 
-  // Get task count
-  const { count: taskCount } = await supabase
+  // Get recent activity
+  const { data: recentCompletions } = await supabase
+    .from('task_completions')
+    .select(`
+      *,
+      tasks(name),
+      children(name)
+    `)
+    .eq('family_id', userProfile.family_id)
+    .in('status', ['approved', 'auto_approved'])
+    .order('completed_at', { ascending: false })
+    .eq('family_id', userProfile.family_id)
+    .in('status', ['approved', 'auto_approved'])
+    .order('completed_at', { ascending: false })
+    .limit(10) as { data: any[] | null };
+
+  // Get active tasks for child cards
+  const { data: activeTasks } = await supabase
     .from('tasks')
-    .select('*', { count: 'exact', head: true })
-    .eq('family_id', userData.family_id)
-    .eq('is_active', true);
+    .select('*')
+    .eq('family_id', userProfile.family_id)
+    .eq('is_active', true)
+    .is('deleted_at', null) as { data: any[] | null };
 
-  // Get reward count
-  const { count: rewardCount } = await supabase
-    .from('rewards')
-    .select('*', { count: 'exact', head: true })
-    .eq('family_id', userData.family_id)
-    .eq('is_active', true);
+  // Get task overrides
+  const { data: overrides } = await supabase
+    .from('child_task_overrides')
+    .select('task_id, child_id, is_enabled')
+    .eq('is_enabled', false) as { data: any[] | null };
 
-  const totalPoints = children?.reduce((sum, child) => sum + (child.points_balance || 0), 0) || 0;
-  const totalTasksToday = children?.reduce((sum, child) => sum + (child.tasks_completed_today || 0), 0) || 0;
+  // Get pending ticket use requests
+  const { data: pendingTickets } = await supabase
+    .from('reward_purchases')
+    .select(`
+      *,
+      reward:rewards(id, name, description, category, icon, screen_minutes),
+      children(name, avatar_url)
+    `)
+    .eq('family_id', userProfile.family_id)
+    .eq('status', 'use_requested')
+    .order('purchased_at', { ascending: true }) as { data: any[] | null };
+
+  // Get active non-screen tickets (item/experience) that need fulfillment
+  // We'll get all active tickets and filter them
+  const { data: allActiveTickets } = await supabase
+    .from('reward_purchases')
+    .select(`
+      *,
+      reward:rewards(id, name, description, category, icon, screen_minutes),
+      children(name, avatar_url)
+    `)
+    .eq('family_id', userProfile.family_id)
+    .eq('status', 'active')
+    .order('purchased_at', { ascending: true }) as { data: any[] | null };
+
+  // Filter for non-screen rewards (item/experience) that need parent fulfillment
+  const activeTickets = (allActiveTickets || []).filter((ticket: any) => {
+    const category = ticket.reward?.category;
+    return category === 'item' || category === 'experience';
+  });
+
+  // Calculate Weekly XP (Proxy using points balance for now, ideally sum up weekly logs)
+  const totalWeeklyXP = children?.reduce((acc, child) => acc + (child.points_balance || 0), 0) || 0;
 
   return (
-    <div>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Welcome back, {userData.name || 'Parent'}! 👋
-        </h1>
-        <p className="text-gray-600">{family?.name || 'Your Family'}</p>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-4 mb-8">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Children</p>
-                <p className="text-3xl font-bold text-quest-purple">{children?.length || 0}</p>
-              </div>
-              <div className="text-4xl">👨‍👩‍👧‍👦</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Total Points</p>
-                <p className="text-3xl font-bold text-star-gold">{totalPoints}</p>
-              </div>
-              <div className="text-4xl">⭐</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Pending Approvals</p>
-                <p className="text-3xl font-bold text-orange-500">{pendingApprovals?.length || 0}</p>
-              </div>
-              <div className="text-4xl">⏳</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Tasks Today</p>
-                <p className="text-3xl font-bold text-growth-green">{totalTasksToday}</p>
-              </div>
-              <div className="text-4xl">✅</div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-3">
-        {/* Main Content - 2 columns */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Children Stats */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">Children</h2>
-              {children && children.length === 0 && (
-                <Badge variant="secondary">No children yet</Badge>
-              )}
-            </div>
-
-            {children && children.length > 0 ? (
-              <div className="grid gap-4 md:grid-cols-2">
-                {children.map((child) => (
-                  <ChildStatsCard key={child.child_id} child={child} />
-                ))}
-              </div>
-            ) : (
-              <Card>
-                <CardContent className="py-8 text-center">
-                  <p className="text-gray-600 mb-4">No children in your family yet</p>
-                  <p className="text-sm text-gray-500">
-                    Add children in your family settings to get started
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+    <DashboardLayout
+      header={
+        <div>
+          <h1 className="text-3xl font-black text-text-main dark:text-white mb-2">
+            Welcome back{userProfile.full_name ? `, ${userProfile.full_name.split(' ')[0]}` : ''}! 👋
+          </h1>
+          <p className="text-lg text-text-muted dark:text-gray-400">
+            The family has {children?.length || 0} {children?.length === 1 ? 'child' : 'children'} on their quest journey
+          </p>
+        </div>
+      }
+      stats={
+        <DashboardStats
+          activeTasksCount={activeTasks?.length || 0}
+          pendingApprovalsCount={pendingCompletions?.length || 0}
+          totalWeeklyXP={totalWeeklyXP}
+        />
+      }
+      actionCenter={
+        <ActionCenter
+          pendingCompletions={pendingCompletions || []}
+          familyId={userProfile.family_id}
+        />
+      }
+      pendingTickets={
+        <PendingTicketsSection
+          pendingTickets={pendingTickets || []}
+          activeTickets={activeTickets}
+        />
+      }
+      activityFeed={
+        <ActivityFeed completions={recentCompletions || []} />
+      }
+      transactionHistory={
+        <TransactionHistory limit={20} />
+      }
+      childrenList={
+        <div>
+          <h2 className="text-xl font-bold text-text-main dark:text-white mb-4">
+            Your Children
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4">
+            {children?.map((child) => (
+              <ChildCard
+                key={child.id}
+                child={child}
+                tasks={activeTasks
+                  ?.filter(t => t.child_id === child.id || t.child_id === null)
+                  .map(t => {
+                    const isDisabled = overrides?.some(o =>
+                      o.task_id === t.id &&
+                      o.child_id === child.id &&
+                      o.is_enabled === false
+                    );
+                    return { ...t, isDisabled };
+                  })
+                  .filter(t => {
+                    // For one-time tasks: remove completely if disabled
+                    // For recurring tasks: keep but show as disabled
+                    if (t.frequency === 'one_time' && t.isDisabled) {
+                      return false; // Remove from list
+                    }
+                    return true; // Keep in list
+                  }) || []}
+              />
+            ))}
           </div>
-
-          {/* Pending Approvals */}
-          {pendingApprovals && pendingApprovals.length > 0 && (
-            <PendingApprovals approvals={pendingApprovals} />
-          )}
-
-          {/* Family Stats */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Family Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                  <div className="text-2xl">📋</div>
-                  <div>
-                    <p className="text-sm text-gray-600">Active Tasks</p>
-                    <p className="text-xl font-bold text-blue-600">{taskCount || 0}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
-                  <div className="text-2xl">🎁</div>
-                  <div>
-                    <p className="text-sm text-gray-600">Active Rewards</p>
-                    <p className="text-xl font-bold text-yellow-600">{rewardCount || 0}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
-                  <div className="text-2xl">⏰</div>
-                  <div>
-                    <p className="text-sm text-gray-600">Auto-Approval</p>
-                    <p className="text-xl font-bold text-purple-600">
-                      {family?.settings?.autoApprovalHours || 24}h
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl">📱</div>
-                  <div>
-                    <p className="text-sm text-gray-600">Screen Budget</p>
-                    <p className="text-xl font-bold text-green-600">
-                      {Math.floor((family?.settings?.screenBudgetWeeklyMinutes || 0) / 60)}h/week
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
-
-        {/* Sidebar - 1 column */}
-        <div className="space-y-6">
-          <QuickActions />
-
-          {/* Getting Started */}
-          {(!children || children.length === 0 || !taskCount) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">🚀 Getting Started</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 text-sm">
-                  {(!children || children.length === 0) && (
-                    <div className="flex items-start gap-2">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-quest-purple text-white flex items-center justify-center text-xs font-bold mt-0.5">
-                        1
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">Add children</p>
-                        <p className="text-gray-600">Create profiles for your kids</p>
-                      </div>
-                    </div>
-                  )}
-                  {!taskCount && (
-                    <div className="flex items-start gap-2">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-quest-purple text-white flex items-center justify-center text-xs font-bold mt-0.5">
-                        2
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">Set up tasks</p>
-                        <p className="text-gray-600">Add tasks for your children to complete</p>
-                      </div>
-                    </div>
-                  )}
-                  {!rewardCount && (
-                    <div className="flex items-start gap-2">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-quest-purple text-white flex items-center justify-center text-xs font-bold mt-0.5">
-                        3
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">Add rewards</p>
-                        <p className="text-gray-600">Create rewards they can redeem</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Tips */}
-          <Card className="bg-gradient-to-br from-quest-purple/5 to-star-gold/5 border-quest-purple/20">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                💡 <span>Tip of the Day</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-700">
-                Set up a consistent routine by scheduling tasks for the same time each day. This helps children build habits!
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
+      }
+    />
   );
 }
