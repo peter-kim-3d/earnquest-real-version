@@ -1,0 +1,49 @@
+{
+  "app": {
+    "name": "EarnQuest",
+    "tagline": "Growing habits, shining rewards"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "tasks": "Tasks",
+    "rewards": "Rewards",
+    "store": "Store",
+    "badges": "Badges",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Log in",
+    "signup": "Sign up",
+    "loginWithGoogle": "Continue with Google",
+    "loginWithApple": "Continue with Apple",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "createAccount": "Create account"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Finish",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More"
+  },
+  "points": {
+    "balance": "Balance",
+    "earned": "Earned",
+    "spent": "Spent",
+    "total": "Total",
+    "qp": "QP"
+  }
+}

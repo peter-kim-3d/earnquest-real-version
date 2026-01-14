@@ -1,0 +1,213 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+
+/**
+ * GET /api/family/invite/[token]
+ * Get invitation details by token
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ token: string }> }
+) {
+  try {
+    const { token } = await params;
+    const supabase = await createClient();
+
+    // Get invitation
+    const { data: invitation, error } = await supabase
+      .from('family_invitations')
+      .select(`
+        id,
+        invited_email,
+        status,
+        expires_at,
+        family_id,
+        families (
+          id,
+          family_name
+        ),
+        invited_by_user:users!family_invitations_invited_by_fkey (
+          full_name
+        )
+      `)
+      .eq('invite_token', token)
+      .single();
+
+    if (error || !invitation) {
+      return NextResponse.json(
+        { error: 'Invitation not found' },
+        { status: 404 }
+      );
+    }
+
+    // Check if expired
+    const now = new Date();
+    const expiresAt = new Date(invitation.expires_at);
+
+    if (now > expiresAt) {
+      // Mark as expired
+      await supabase
+        .from('family_invitations')
+        .update({ status: 'expired' })
+        .eq('id', invitation.id);
+
+      return NextResponse.json(
+        { error: 'Invitation has expired' },
+        { status: 410 }
+      );
+    }
+
+    // Check if already accepted
+    if (invitation.status === 'accepted') {
+      return NextResponse.json(
+        { error: 'Invitation has already been accepted' },
+        { status: 410 }
+      );
+    }
+
+    // Check if cancelled
+    if (invitation.status === 'cancelled') {
+      return NextResponse.json(
+        { error: 'Invitation has been cancelled' },
+        { status: 410 }
+      );
+    }
+
+    const family = (invitation.families as unknown) as { id: string; family_name: string } | null;
+    const invitedByUser = (invitation.invited_by_user as unknown) as { full_name: string } | null;
+
+    return NextResponse.json({
+      invitation: {
+        id: invitation.id,
+        email: invitation.invited_email,
+        familyName: family?.family_name || 'Family',
+        invitedBy: invitedByUser?.full_name || 'A family member',
+        expiresAt: invitation.expires_at,
+      },
+    });
+  } catch (error: any) {
+    console.error('Get invitation error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * POST /api/family/invite/[token]/accept
+ * Accept an invitation and join the family
+ */
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ token: string }> }
+) {
+  try {
+    const { token } = await params;
+    const supabase = await createClient();
+
+    // Check authentication
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get invitation
+    const { data: invitation, error: inviteError } = await supabase
+      .from('family_invitations')
+      .select('*')
+      .eq('invite_token', token)
+      .single();
+
+    if (inviteError || !invitation) {
+      return NextResponse.json(
+        { error: 'Invitation not found' },
+        { status: 404 }
+      );
+    }
+
+    // Check if expired
+    const now = new Date();
+    const expiresAt = new Date(invitation.expires_at);
+
+    if (now > expiresAt) {
+      await supabase
+        .from('family_invitations')
+        .update({ status: 'expired' })
+        .eq('id', invitation.id);
+
+      return NextResponse.json(
+        { error: 'Invitation has expired' },
+        { status: 410 }
+      );
+    }
+
+    // Check if already accepted
+    if (invitation.status !== 'pending') {
+      return NextResponse.json(
+        { error: 'Invitation is no longer valid' },
+        { status: 410 }
+      );
+    }
+
+    // Verify email matches
+    if (user.email?.toLowerCase() !== invitation.invited_email.toLowerCase()) {
+      return NextResponse.json(
+        { error: 'This invitation was sent to a different email address' },
+        { status: 403 }
+      );
+    }
+
+    // Check if user already belongs to a family
+    const { data: userProfile } = await supabase
+      .from('users')
+      .select('family_id')
+      .eq('id', user.id)
+      .single();
+
+    if (userProfile?.family_id) {
+      return NextResponse.json(
+        { error: 'You already belong to a family. Please contact support to switch families.' },
+        { status: 400 }
+      );
+    }
+
+    // Update user's family_id
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ family_id: invitation.family_id })
+      .eq('id', user.id);
+
+    if (updateError) {
+      console.error('Update user family error:', updateError);
+      return NextResponse.json(
+        { error: 'Failed to join family' },
+        { status: 500 }
+      );
+    }
+
+    // Mark invitation as accepted
+    await supabase
+      .from('family_invitations')
+      .update({
+        status: 'accepted',
+        accepted_by: user.id,
+        accepted_at: new Date().toISOString(),
+      })
+      .eq('id', invitation.id);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Successfully joined the family!',
+    });
+  } catch (error: any) {
+    console.error('Accept invitation error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EarnQuest Unified Dashboard - Wireframe Redesign</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive;
+      background: #f5f5f5;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border: 3px solid #333;
+      box-shadow: 4px 4px 0 #aaa;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      border-bottom: 3px solid #333;
+      padding-bottom: 10px;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    .badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      z-index: 10;
+      color: white;
+    }
+    .badge-reuse {
+      background: #4CAF50;
+    }
+    .badge-new {
+      background: #FF9800;
+    }
+    .wireframe-section {
+      position: relative;
+      margin-bottom: 40px;
+    }
+    .header {
+      border: 2px solid #333;
+      padding: 15px;
+      margin-bottom: 20px;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+    .nav {
+      border: 2px solid #333;
+      padding: 15px;
+      margin-bottom: 20px;
+      background: #fafafa;
+      position: relative;
+    }
+    .nav-items {
+      display: flex;
+      gap: 15px;
+    }
+    .nav-item {
+      border: 2px solid #333;
+      padding: 8px 15px;
+      background: white;
+      cursor: pointer;
+    }
+    .nav-item.active {
+      background: #37ec13;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .card {
+      border: 2px solid #333;
+      padding: 15px;
+      background: white;
+      position: relative;
+      min-height: 100px;
+    }
+    .card-header {
+      font-weight: bold;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 5px;
+    }
+    .stat-card {
+      border: 2px solid #333;
+      padding: 20px;
+      background: #f9f9f9;
+      text-align: center;
+      position: relative;
+    }
+    .stat-number {
+      font-size: 48px;
+      font-weight: bold;
+      color: #37ec13;
+    }
+    .stat-label {
+      color: #666;
+      margin-top: 5px;
+    }
+    .button {
+      border: 2px solid #333;
+      padding: 10px 20px;
+      background: #37ec13;
+      display: inline-block;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .button-secondary {
+      background: #eee;
+    }
+    .table {
+      width: 100%;
+      border: 2px solid #333;
+      border-collapse: collapse;
+    }
+    .table th,
+    .table td {
+      border: 1px solid #333;
+      padding: 10px;
+      text-align: left;
+    }
+    .table th {
+      background: #ddd;
+      font-weight: bold;
+    }
+    .icon-placeholder {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #333;
+      background: #eee;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+    }
+    .avatar {
+      width: 60px;
+      height: 60px;
+      border: 2px solid #333;
+      border-radius: 50%;
+      background: #ddd;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      border: 2px solid #333;
+      background: #eee;
+      position: relative;
+      margin: 10px 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #37ec13;
+    }
+    .sidebar {
+      border: 2px solid #333;
+      padding: 15px;
+      background: #fafafa;
+      position: relative;
+    }
+    .main-content {
+      border: 2px solid #333;
+      padding: 20px;
+      background: white;
+      position: relative;
+    }
+    .layout-2col {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+    }
+    .quick-action {
+      border: 2px solid #333;
+      padding: 12px;
+      margin: 8px 0;
+      background: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .alert {
+      border: 2px solid #ff9800;
+      background: #fff3cd;
+      padding: 12px;
+      margin: 10px 0;
+    }
+    .child-selector {
+      display: flex;
+      gap: 10px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+    .child-chip {
+      border: 2px solid #333;
+      padding: 8px 15px;
+      background: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .child-chip.active {
+      background: #37ec13;
+    }
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .layout-2col {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>EarnQuest Unified Dashboard - Wireframe Redesign</h1>
+    <p class="subtitle">Improved parent dashboard with at-a-glance family overview, streamlined navigation, and contextual actions</p>
+
+    <!-- HEADER -->
+    <!-- REUSABLE: ParentNav from components/parent/ParentNav.tsx -->
+    <div class="wireframe-section">
+      <span class="badge badge-reuse" title="components/parent/ParentNav.tsx">[REUSE] ParentNav</span>
+      <div class="header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <div class="icon-placeholder">⚔️</div>
+          <strong>EarnQuest</strong>
+          <span style="background: #ff9800; padding: 2px 8px; font-size: 12px;">BETA</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <div class="icon-placeholder">🔔</div>
+          <div class="avatar">JD</div>
+          <span>John Doe</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAVIGATION TABS -->
+    <!-- REUSABLE: Tabs from components/ui/tabs.tsx -->
+    <div class="wireframe-section">
+      <span class="badge badge-reuse" title="components/ui/tabs.tsx">[REUSE] Tabs</span>
+      <div class="nav">
+        <div class="nav-items">
+          <div class="nav-item active">📊 Dashboard</div>
+          <div class="nav-item">✓ Tasks</div>
+          <div class="nav-item">🎁 Rewards</div>
+          <div class="nav-item">👤 Profile</div>
+          <div class="nav-item">⚙️ Settings</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="layout-2col">
+      <!-- LEFT SIDEBAR - QUICK ACTIONS & FILTERS -->
+      <div>
+        <!-- NEW COMPONENT: QuickActionsPanel -->
+        <div class="wireframe-section">
+          <span class="badge badge-new" title="To be created at components/dashboard/QuickActionsPanel.tsx">[NEW] QuickActionsPanel</span>
+          <div class="sidebar">
+            <div class="card-header">⚡ Quick Actions</div>
+            
+            <!-- REUSABLE: Button from components/ui/button.tsx -->
+            <div style="position: relative; margin-top: 10px;">
+              <span class="badge badge-reuse" title="components/ui/button.tsx">[REUSE] Button</span>
+              <div class="button" style="width: 100%;">+ Add New Task</div>
+            </div>
+            <div style="position: relative;">
+              <span class="badge badge-reuse" title="components/ui/button.tsx">[REUSE] Button</span>
+              <div class="button" style="width: 100%; background: #eee; color: #333;">+ Add New Reward</div>
+            </div>
+            <div style="position: relative;">
+              <span class="badge badge-reuse" title="components/ui/button.tsx">[REUSE] Button</span>
+              <div class="button" style="width: 100%; background: #eee; color: #333;">+ Add Child</div>
+            </div>
+
+            <div class="card-header" style="margin-top: 20px;">👨‍👩‍👧‍👦 Filter by Child</div>
+            <!-- NEW COMPONENT: ChildFilterChips -->
+            <div style="position: relative;">
+              <span class="badge badge-new" title="To be created at components/dashboard/ChildFilterChips.tsx">[NEW] ChildFilterChips</span>
+              <div class="child-selector" style="flex-direction: column;">
+                <div class="child-chip active">
+                  <div class="avatar" style="width: 30px; height: 30px;">A</div>
+                  <span>All Children</span>
+                </div>
+                <div class="child-chip">
+                  <div class="avatar" style="width: 30px; height: 30px;">E</div>
+                  <span>Emma (8)</span>
+                </div>
+                <div class="child-chip">
+                  <div class="avatar" style="width: 30px; height: 30px;">L</div>
+                  <span>Liam (10)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- REUSABLE: Card from components/ui/card.tsx -->
+            <div style="position: relative; margin-top: 20px;">
+              <span class="badge badge-reuse" title="components/ui/card.tsx">[REUSE] Card</span>
+              <div class="card">
+                <div class="card-header">💡 Pro Tip</div>
+                <p style="font-size: 12px; color: #666;">
+                  Set up recurring tasks to save time! Tasks automatically reset daily or weekly.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT MAIN CONTENT -->
+      <div class="main-content">
+        <!-- PENDING ACTIONS - PRIORITY SECTION -->
+        <!-- REUSABLE: ActionCenter from components/parent/ActionCenter.tsx (Modified) -->
+        <div class="wireframe-section">
+          <span class="badge badge-reuse" title="components/parent/ActionCenter.tsx">[REUSE] ActionCenter (Enhanced)</span>
+          <div style="margin-bottom: 20px;">
+            <h2 style="font-size: 20px; margin-bottom: 10px;">⚠️ Needs Your Attention (3)</h2>
+            
+            <!-- REUSABLE: ApprovalCard from components/parent/ApprovalCard.tsx -->
+            <div style="position: relative; margin-bottom: 10px;">
+              <span class="badge badge-reuse" title="components/parent/ApprovalCard.tsx">[REUSE] ApprovalCard</span>
+              <div class="alert">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong>Emma</strong> completed "Make Bed" • 15 minutes ago
+                  </div>
+                  <div>
+                    <div class="button" style="padding: 5px 15px;">✓ Approve</div>
+                    <div class="button button-secondary" style="padding: 5px 15px;">✎ Request Fix</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- REUSABLE: PendingTicketsSection from components/dashboard/PendingTicketsSection.tsx -->
+            <div style="position: relative; margin-bottom: 10px;">
+              <span class="badge badge-reuse" title="components/dashboard/PendingTicketsSection.tsx">[REUSE] PendingTicketsSection</span>
+              <div class="alert">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong>Liam</strong> wants to use "30 min Screen Time" ticket
+                  </div>
+                  <div>
+                    <div class="button" style="padding: 5px 15px; background: #4CAF50;">✓ Approve Use</div>
+                    <div class="button button-secondary" style="padding: 5px 15px;">✕ Deny</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAMILY STATS AT A GLANCE -->
+        <!-- NEW COMPONENT: FamilyStatsOverview -->
+        <div class="wireframe-section">
+          <span class="badge badge-new" title="To be created at components/dashboard/FamilyStatsOverview.tsx">[NEW] FamilyStatsOverview</span>
+          <div style="margin-bottom: 30px;">
+            <h2 style="font-size: 20px; margin-bottom: 15px;">📈 This Week's Progress</h2>
+            <div class="grid-3">
+              <!-- REUSABLE: Card from components/ui/card.tsx -->
+              <div style="position: relative;">
+                <span class="badge badge-reuse" title="components/ui/card.tsx">[REUSE] Card</span>
+                <div class="stat-card">
+                  <div class="stat-number">47</div>
+                  <div class="stat-label">Tasks Completed</div>
+                  <div style="font-size: 12px; color: #4CAF50; margin-top: 5px;">↑ 23% from last week</div>
+                </div>
+              </div>
+              <div style="position: relative;">
+                <span class="badge badge-reuse" title="components/ui/card.tsx">[REUSE] Card</span>
+                <div class="stat-card">
+                  <div class="stat-number">1,240</div>
+                  <div class="stat-label">Points Earned</div>
+                  <div style="font-size: 12px; color: #4CAF50; margin-top: 5px;">↑ 15% from last week</div>
+                </div>
+              </div>
+              <div style="position: relative;">
+                <span class="badge badge-reuse" title="components/ui/card.tsx">[REUSE] Card</span>
+                <div class="stat-card">
+                  <div class="stat-number">8</div>
+                  <div class="stat-label">Rewards Claimed</div>
+                  <div style="font-size: 12px; color: #666; margin-top: 5px;">→ Same as last week</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHILDREN OVERVIEW CARDS -->
+        <div class="wireframe-section">
+          <h2 style="font-size: 20px; margin-bottom: 15px;">👨‍👩‍👧‍👦 Your Children</h2>
+          
+          <div class="grid-2">
+            <!-- REUSABLE: ChildCard from components/parent/ChildCard.tsx (Enhanced) -->
+            <div style="position: relative;">
+              <span class="badge badge-reuse" title="components/parent/ChildCard.tsx">[REUSE] ChildCard (Enhanced)</span>
+              <div class="card">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                  <div class="avatar">E</div>
+                  <div>
+                    <strong style="font-size: 18px;">Emma</strong>
+                    <div style="font-size: 12px; color: #666;">Age 8 • 850 points</div>
+                  </div>
+                </div>
+                
+                <div class="card-header" style="font-size: 14px;">Today's Tasks (3/5)</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 60%;"></div>
+                </div>
+                
+                <div style="margin-top: 10px;">
+                  <div style="font-size: 12px; margin: 5px 0;">✓ Make Bed</div>
+                  <div style="font-size: 12px; margin: 5px 0;">✓ Homework</div>
+                  <div style="font-size: 12px; margin: 5px 0;">✓ Practice Piano</div>
+                  <div style="font-size: 12px; margin: 5px 0; color: #999;">○ Clean Room</div>
+                  <div style="font-size: 12px; margin: 5px 0; color: #999;">○ Take out Trash</div>
+                </div>
+
+                <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #eee;">
+                  <div style="font-size: 12px; color: #666;">
+                    <strong>Recent Activity:</strong> Approved "Make Bed" 15m ago
+                  </div>
+                </div>
+
+                <div class="button" style="width: 100%; margin-top: 10px; text-align: center;">
+                  View Full Profile →
+                </div>
+              </div>
+            </div>
+
+            <div style="position: relative;">
+              <span class="badge badge-reuse" title="components/parent/ChildCard.tsx">[REUSE] ChildCard (Enhanced)</span>
+              <div class="card">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                  <div class="avatar">L</div>
+                  <div>
+                    <strong style="font-size: 18px;">Liam</strong>
+                    <div style="font-size: 12px; color: #666;">Age 10 • 1,240 points</div>
+                  </div>
+                </div>
+                
+                <div class="card-header" style="font-size: 14px;">Today's Tasks (5/6)</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 83%;"></div>
+                </div>
+                
+                <div style="margin-top: 10px;">
+                  <div style="font-size: 12px; margin: 5px 0;">✓ Make Bed</div>
+                  <div style="font-size: 12px; margin: 5px 0;">✓ Homework</div>
+                  <div style="font-size: 12px; margin: 5px 0;">✓ Feed Dog</div>
+                  <div style="font-size: 12px; margin: 5px 0;">✓ Math Practice</div>
+                  <div style="font-size: 12px; margin: 5px 0;">✓ Reading</div>
+                  <div style="font-size: 12px; margin: 5px 0; color: #999;">○ Clean Room</div>
+                </div>
+
+                <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #eee;">
+                  <div style="font-size: 12px; color: #666;">
+                    <strong>Recent Activity:</strong> Requested screen time ticket
+                  </div>
+                </div>
+
+                <div class="button" style="width: 100%; margin-top: 10px; text-align: center;">
+                  View Full Profile →
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECENT ACTIVITY FEED -->
+        <!-- REUSABLE: ActivityFeed from components/parent/ActivityFeed.tsx (Enhanced) -->
+        <div class="wireframe-section" style="margin-top: 30px;">
+          <span class="badge badge-reuse" title="components/parent/ActivityFeed.tsx">[REUSE] ActivityFeed (Enhanced)</span>
+          <div>
+            <h2 style="font-size: 20px; margin-bottom: 15px;">📋 Recent Activity</h2>
+            <div class="card">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Child</th>
+                    <th>Activity</th>
+                    <th>Points</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="avatar" style="width: 30px; height: 30px;">E</div>
+                        Emma
+                      </div>
+                    </td>
+                    <td>✓ Completed "Make Bed"</td>
+                    <td style="color: #4CAF50; font-weight: bold;">+50</td>
+                    <td>15 min ago</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="avatar" style="width: 30px; height: 30px;">L</div>
+                        Liam
+                      </div>
+                    </td>
+                    <td>🎁 Redeemed "30 min Screen Time"</td>
+                    <td style="color: #ff9800; font-weight: bold;">-200</td>
+                    <td>1 hour ago</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="avatar" style="width: 30px; height: 30px;">L</div>
+                        Liam
+                      </div>
+                    </td>
+                    <td>✓ Completed "Homework"</td>
+                    <td style="color: #4CAF50; font-weight: bold;">+100</td>
+                    <td>2 hours ago</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="avatar" style="width: 30px; height: 30px;">E</div>
+                        Emma
+                      </div>
+                    </td>
+                    <td>✓ Completed "Practice Piano"</td>
+                    <td style="color: #4CAF50; font-weight: bold;">+75</td>
+                    <td>3 hours ago</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="button button-secondary" style="width: 100%; margin-top: 10px; text-align: center;">
+                View Full History →
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- INSIGHTS & RECOMMENDATIONS -->
+        <!-- NEW COMPONENT: InsightsPanel -->
+        <div class="wireframe-section" style="margin-top: 30px;">
+          <span class="badge badge-new" title="To be created at components/dashboard/InsightsPanel.tsx">[NEW] InsightsPanel</span>
+          <div>
+            <h2 style="font-size: 20px; margin-bottom: 15px;">💡 Insights & Recommendations</h2>
+            <div class="grid-2">
+              <div class="card" style="background: #e3f2fd; border-color: #2196F3;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <div class="icon-placeholder" style="background: #2196F3; color: white;">📊</div>
+                  <strong>Trending Up!</strong>
+                </div>
+                <p style="font-size: 13px;">
+                  Emma's completion rate increased by 23% this week. Great progress on "Make Bed" habit!
+                </p>
+              </div>
+              
+              <div class="card" style="background: #fff3cd; border-color: #ff9800;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <div class="icon-placeholder" style="background: #ff9800; color: white;">💡</div>
+                  <strong>Suggestion</strong>
+                </div>
+                <p style="font-size: 13px;">
+                  Consider adding a "Reading" task for Emma. Kids her age typically read 20 min/day.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 3px solid #333; text-align: center; color: #666;">
+      <p style="font-size: 12px;">
+        <strong>Key Improvements:</strong>
+      </p>
+      <ul style="list-style: none; font-size: 11px; line-height: 1.8;">
+        <li>✓ Unified dashboard with at-a-glance family overview</li>
+        <li>✓ Priority-based action queue (pending approvals at top)</li>
+        <li>✓ Child filter sidebar for focused view</li>
+        <li>✓ Enhanced child cards with progress bars and recent activity</li>
+        <li>✓ Weekly family stats with trend indicators</li>
+        <li>✓ AI-powered insights and recommendations panel</li>
+        <li>✓ Streamlined quick actions in left sidebar</li>
+        <li>✓ Improved information density without overwhelming</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

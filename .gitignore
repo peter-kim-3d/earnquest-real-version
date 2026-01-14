@@ -44,3 +44,7 @@ next-env.d.ts
 
 # stitch temp
 .stitch_child_s_task_list
+
+#prompt
+.prompt
+

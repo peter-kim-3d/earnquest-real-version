@@ -1,0 +1,438 @@
+{
+  "version": "1.0",
+  "locale": "en-US",
+  "lastUpdated": "2025-01-09",
+  
+  "categories": [
+    {
+      "key": "learning",
+      "name": "Learning",
+      "icon": "book",
+      "description": "Educational activities and homework",
+      "color": "#6C5CE7"
+    },
+    {
+      "key": "household",
+      "name": "Household",
+      "icon": "house",
+      "description": "Chores and daily responsibilities",
+      "color": "#00B894"
+    },
+    {
+      "key": "health",
+      "name": "Health",
+      "icon": "heart",
+      "description": "Physical wellness and self-care",
+      "color": "#FF7675"
+    }
+  ],
+  
+  "defaultTasks": {
+    "base": [
+      {
+        "templateKey": "homework",
+        "category": "learning",
+        "name": "Complete homework",
+        "description": "Finish all assigned homework for today",
+        "points": 50,
+        "approvalType": "parent",
+        "icon": "pencil",
+        "metadata": {
+          "subcategory": "homework",
+          "tags": ["school", "daily"]
+        },
+        "ageGroups": ["8-11", "12-14"],
+        "presets": ["busy", "balanced", "academic"]
+      },
+      {
+        "templateKey": "reading",
+        "category": "learning",
+        "name": "Read for 20 minutes",
+        "description": "Read a book of your choice",
+        "points": 30,
+        "approvalType": "timer",
+        "timerMinutes": 20,
+        "icon": "book-open",
+        "metadata": {
+          "subcategory": "reading",
+          "tags": ["literacy", "daily"]
+        },
+        "ageGroups": ["5-7", "8-11", "12-14"],
+        "presets": ["balanced", "academic"]
+      },
+      {
+        "templateKey": "make_bed",
+        "category": "household",
+        "name": "Make your bed",
+        "description": "Make your bed neatly before school",
+        "points": 15,
+        "approvalType": "checklist",
+        "checklist": [
+          "Straighten sheets",
+          "Arrange pillows",
+          "Smooth comforter"
+        ],
+        "icon": "bed",
+        "metadata": {
+          "subcategory": "cleaning",
+          "tags": ["morning", "daily"]
+        },
+        "ageGroups": ["5-7", "8-11", "12-14"],
+        "presets": ["balanced"]
+      },
+      {
+        "templateKey": "clear_dishes",
+        "category": "household",
+        "name": "Clear dishes after meal",
+        "description": "Bring your dishes to the sink and help clean up",
+        "points": 20,
+        "approvalType": "parent",
+        "icon": "fork-knife",
+        "metadata": {
+          "subcategory": "chores",
+          "tags": ["meals", "daily"]
+        },
+        "ageGroups": ["8-11", "12-14"],
+        "presets": ["balanced"],
+        "notes": "Changed from 'auto' to 'parent' - cleanliness standards vary by family"
+      },
+      {
+        "templateKey": "backpack",
+        "category": "household",
+        "name": "Put away backpack & shoes",
+        "description": "Put your backpack and shoes in their place when you get home",
+        "points": 15,
+        "approvalType": "auto",
+        "icon": "backpack",
+        "metadata": {
+          "subcategory": "self_care",
+          "tags": ["afterschool", "daily"]
+        },
+        "ageGroups": ["5-7", "8-11"],
+        "presets": ["balanced"],
+        "notes": "Safe for auto-approval - binary check (in place or not)"
+      },
+      {
+        "templateKey": "brush_teeth",
+        "category": "health",
+        "name": "Brush teeth",
+        "description": "Brush your teeth in the morning and before bed",
+        "points": 10,
+        "approvalType": "checklist",
+        "checklist": [
+          "Morning brushing",
+          "Evening brushing"
+        ],
+        "icon": "tooth",
+        "metadata": {
+          "subcategory": "hygiene",
+          "tags": ["daily", "routine"]
+        },
+        "ageGroups": ["5-7", "8-11", "12-14"],
+        "presets": ["busy", "balanced", "academic", "screen"]
+      },
+      {
+        "templateKey": "exercise",
+        "category": "health",
+        "name": "Exercise for 30 minutes",
+        "description": "Do any physical activity - sports, biking, playing outside",
+        "points": 40,
+        "approvalType": "timer",
+        "timerMinutes": 30,
+        "icon": "person-running",
+        "metadata": {
+          "subcategory": "exercise",
+          "tags": ["fitness", "daily"]
+        },
+        "ageGroups": ["8-11", "12-14"],
+        "presets": ["balanced", "screen"]
+      }
+    ],
+    
+    "conditional": [
+      {
+        "templateKey": "feed_pet",
+        "category": "household",
+        "name": "Feed your pet",
+        "description": "Give food and fresh water to your pet",
+        "points": 20,
+        "approvalType": "parent",
+        "icon": "paw",
+        "metadata": {
+          "subcategory": "pet_care",
+          "tags": ["daily", "responsibility"]
+        },
+        "condition": {
+          "question": "hasPet",
+          "label": "Do you have pets at home?"
+        },
+        "ageGroups": ["5-7", "8-11", "12-14"],
+        "presets": ["balanced"]
+      },
+      {
+        "templateKey": "practice_instrument",
+        "category": "learning",
+        "name": "Practice instrument for 20 minutes",
+        "description": "Practice your musical instrument",
+        "points": 30,
+        "approvalType": "timer",
+        "timerMinutes": 20,
+        "icon": "music-note",
+        "metadata": {
+          "subcategory": "practice",
+          "tags": ["music", "skill"]
+        },
+        "condition": {
+          "question": "hasInstrument",
+          "label": "Does your child play an instrument?"
+        },
+        "ageGroups": ["8-11", "12-14"],
+        "presets": ["academic"]
+      }
+    ],
+    
+    "ageSpecific": {
+      "5-7": [
+        {
+          "templateKey": "pick_up_toys",
+          "category": "household",
+          "name": "Pick up toys",
+          "description": "Put all your toys back where they belong",
+          "points": 15,
+          "approvalType": "parent",
+          "icon": "toy-brick",
+          "metadata": {
+            "subcategory": "cleaning",
+            "tags": ["daily"]
+          },
+          "presets": ["balanced"]
+        },
+        {
+          "templateKey": "get_dressed",
+          "category": "health",
+          "name": "Get dressed by yourself",
+          "description": "Put on your clothes without help",
+          "points": 10,
+          "approvalType": "auto",
+          "icon": "t-shirt",
+          "metadata": {
+            "subcategory": "self_care",
+            "tags": ["morning", "daily"]
+          },
+          "presets": ["balanced"]
+        }
+      ],
+      "12-14": [
+        {
+          "templateKey": "laundry",
+          "category": "household",
+          "name": "Help with laundry",
+          "description": "Fold laundry or help load/unload the washer",
+          "points": 25,
+          "approvalType": "parent",
+          "icon": "t-shirt",
+          "metadata": {
+            "subcategory": "chores",
+            "tags": ["weekly"]
+          },
+          "presets": ["balanced"]
+        },
+        {
+          "templateKey": "study_session",
+          "category": "learning",
+          "name": "Study session (45 min)",
+          "description": "Focused study time for tests or projects",
+          "points": 60,
+          "approvalType": "timer",
+          "timerMinutes": 45,
+          "icon": "graduation-cap",
+          "metadata": {
+            "subcategory": "self_study",
+            "tags": ["academic"]
+          },
+          "presets": ["academic"]
+        }
+      ]
+    }
+  },
+  
+  "presets": {
+    "busy": {
+      "key": "busy",
+      "name": "Busy Parent",
+      "tagline": "Minimal management, maximum impact",
+      "description": "Just 3 essential tasks to get started quickly. Perfect for busy families who want to test the waters.",
+      "icon": "clock",
+      "color": "#00B894",
+      "taskKeys": ["homework", "brush_teeth", "backpack"],
+      "expectedDailyPoints": {
+        "min": 60,
+        "max": 90
+      },
+      "screenBudgetWeeklyMinutes": 300,
+      "recommended": false
+    },
+    "balanced": {
+      "key": "balanced",
+      "name": "Balanced Growth",
+      "tagline": "Build habits across all areas",
+      "description": "A well-rounded set of tasks covering learning, household responsibilities, and health. Our recommended starting point.",
+      "icon": "scales",
+      "color": "#6C5CE7",
+      "taskKeys": ["homework", "reading", "make_bed", "clear_dishes", "backpack", "brush_teeth", "exercise"],
+      "expectedDailyPoints": {
+        "min": 100,
+        "max": 150
+      },
+      "screenBudgetWeeklyMinutes": 300,
+      "recommended": true
+    },
+    "academic": {
+      "key": "academic",
+      "name": "Academic First",
+      "tagline": "Focus on learning habits",
+      "description": "Higher emphasis on educational tasks. Great for families prioritizing academic growth.",
+      "icon": "graduation-cap",
+      "color": "#74B9FF",
+      "taskKeys": ["homework", "reading", "practice_instrument", "brush_teeth", "exercise"],
+      "pointOverrides": {
+        "homework": 60,
+        "reading": 40
+      },
+      "timerOverrides": {
+        "reading": 30
+      },
+      "expectedDailyPoints": {
+        "min": 100,
+        "max": 170
+      },
+      "screenBudgetWeeklyMinutes": 240,
+      "recommended": false
+    },
+    "screen": {
+      "key": "screen",
+      "name": "Screen Time Peace",
+      "tagline": "Reduce screen time conflicts",
+      "description": "For families where screen time is the main source of friction. Tighter screen budget, clear earning path.",
+      "icon": "device-mobile",
+      "color": "#FDCB6E",
+      "taskKeys": ["homework", "clear_dishes", "brush_teeth", "exercise"],
+      "expectedDailyPoints": {
+        "min": 80,
+        "max": 120
+      },
+      "screenBudgetWeeklyMinutes": 180,
+      "recommended": false,
+      "notes": "Stricter screen budget motivates task completion"
+    }
+  },
+  
+  "approvalTypes": {
+    "parent": {
+      "key": "parent",
+      "name": "Parent Check",
+      "description": "Parent reviews and approves the task",
+      "icon": "check-circle",
+      "autoApproveHours": 24,
+      "safeFor": ["homework", "clean_room", "clear_dishes", "feed_pet"]
+    },
+    "auto": {
+      "key": "auto",
+      "name": "Auto Approve",
+      "description": "Task is approved immediately when marked done",
+      "icon": "lightning",
+      "warning": "Use sparingly - only for tasks with clear binary outcomes",
+      "safeFor": ["backpack", "get_dressed", "set_alarm"]
+    },
+    "timer": {
+      "key": "timer",
+      "name": "Timer Based",
+      "description": "Task is approved when timer completes",
+      "icon": "timer",
+      "safeFor": ["reading", "exercise", "practice_instrument", "study_session"]
+    },
+    "checklist": {
+      "key": "checklist",
+      "name": "Checklist",
+      "description": "Task is approved when all items are checked",
+      "icon": "list-checks",
+      "safeFor": ["brush_teeth", "make_bed", "morning_routine"]
+    }
+  },
+  
+  "fixRequestTemplates": {
+    "clean_room": [
+      { "key": "floor", "icon": "👕", "text": "Please pick up clothes from the floor" },
+      { "key": "desk", "icon": "📚", "text": "Your desk needs a bit more organizing" },
+      { "key": "bed", "icon": "🛏️", "text": "Don't forget to make your bed" },
+      { "key": "trash", "icon": "🗑️", "text": "Empty the trash can please" }
+    ],
+    "homework": [
+      { "key": "check", "icon": "✅", "text": "Double-check your answers" },
+      { "key": "handwriting", "icon": "✍️", "text": "Try to write a bit neater" },
+      { "key": "complete", "icon": "📝", "text": "Looks like something is missing" },
+      { "key": "show_work", "icon": "🔢", "text": "Remember to show your work" }
+    ],
+    "clear_dishes": [
+      { "key": "rinse", "icon": "💧", "text": "Please rinse the dishes before putting in sink" },
+      { "key": "wipe", "icon": "🧽", "text": "Wipe down the table too" },
+      { "key": "all", "icon": "🍽️", "text": "Did you get all the dishes?" }
+    ],
+    "default": [
+      { "key": "almost", "icon": "💪", "text": "Almost there! Just a bit more" },
+      { "key": "retry", "icon": "🔄", "text": "Give it another try" },
+      { "key": "help", "icon": "🤝", "text": "Need help? Ask me!" }
+    ]
+  },
+  
+  "onboardingQuestions": [
+    {
+      "key": "hasPet",
+      "question": "Do you have pets at home?",
+      "type": "boolean",
+      "default": false,
+      "affectsPresets": false,
+      "addsTasks": ["feed_pet"]
+    },
+    {
+      "key": "hasInstrument",
+      "question": "Does your child play a musical instrument?",
+      "type": "boolean",
+      "default": false,
+      "affectsPresets": false,
+      "addsTasks": ["practice_instrument"]
+    },
+    {
+      "key": "mainGoal",
+      "question": "What's your main goal with EarnQuest?",
+      "type": "single_choice",
+      "options": [
+        { "value": "screen", "label": "Reduce screen time conflicts", "recommendsPreset": "screen" },
+        { "value": "homework", "label": "Build homework habits", "recommendsPreset": "academic" },
+        { "value": "chores", "label": "Help with household chores", "recommendsPreset": "balanced" },
+        { "value": "simple", "label": "Just want to try it out", "recommendsPreset": "busy" }
+      ],
+      "default": "chores",
+      "affectsPresets": true
+    }
+  ],
+  
+  "pointsGuidance": {
+    "dailyTarget": {
+      "min": 100,
+      "max": 150,
+      "description": "Achievable with 4-5 tasks completed"
+    },
+    "weeklyTarget": {
+      "min": 500,
+      "max": 700,
+      "description": "5 days of good effort"
+    },
+    "exchangeRate": {
+      "screen30min": 100,
+      "smallReward": 80,
+      "mediumReward": 150,
+      "largeReward": 300
+    }
+  }
+}
