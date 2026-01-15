@@ -15,6 +15,7 @@ type Reward = {
   weekly_limit: number | null;
   is_active: boolean;
   icon: string | null;
+  image_url: string | null;
   created_at: string;
 };
 

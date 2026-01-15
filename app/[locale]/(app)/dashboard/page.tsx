@@ -82,7 +82,7 @@ export default async function ParentDashboardPage() {
     .from('reward_purchases')
     .select(`
       *,
-      reward:rewards(id, name, description, category, icon, screen_minutes),
+      reward:rewards(id, name, description, category, icon, image_url, screen_minutes),
       children(name, avatar_url)
     `)
     .eq('family_id', userProfile.family_id)
@@ -95,7 +95,7 @@ export default async function ParentDashboardPage() {
     .from('reward_purchases')
     .select(`
       *,
-      reward:rewards(id, name, description, category, icon, screen_minutes),
+      reward:rewards(id, name, description, category, icon, image_url, screen_minutes),
       children(name, avatar_url)
     `)
     .eq('family_id', userProfile.family_id)

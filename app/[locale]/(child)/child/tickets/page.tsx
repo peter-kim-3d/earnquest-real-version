@@ -34,7 +34,7 @@ export default async function ChildTicketsPage() {
     .select(`
       *,
       reward:rewards (
-        id, name, description, category, icon, screen_minutes
+        id, name, description, category, icon, image_url, screen_minutes
       )
     `)
     .eq('child_id', childId)

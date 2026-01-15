@@ -21,6 +21,7 @@ export async function GET(
           description,
           category,
           icon,
+          image_url,
           screen_minutes
         )
       `

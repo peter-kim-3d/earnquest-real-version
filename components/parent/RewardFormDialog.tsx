@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { ImageIcon, Palette } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +11,10 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { ColorPicker } from '@/components/ui/color-picker';
 import ValueContextPanel from '@/components/parent/ValueContextPanel';
+import RewardIconPicker from '@/components/rewards/RewardIconPicker';
+import DefaultRewardImagePicker from '@/components/rewards/DefaultRewardImagePicker';
+import TaskImageUpload from '@/components/tasks/TaskImageUpload';
+import { getRewardIconById } from '@/lib/reward-icons';
 
 type Reward = {
   id: string;
@@ -20,6 +26,7 @@ type Reward = {
   weekly_limit: number | null;
   is_active: boolean;
   icon: string | null;
+  image_url: string | null;
 };
 
 interface RewardFormDialogProps {
@@ -33,6 +40,9 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [showIconPicker, setShowIconPicker] = useState(false);
+  const [showDefaultImagePicker, setShowDefaultImagePicker] = useState(false);
+  const [imageMode, setImageMode] = useState<'icon' | 'image'>('icon');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -40,7 +50,8 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
     points_cost: 100,
     screen_minutes: null as number | null,
     weekly_limit: null as number | null,
-    icon: 'redeem',
+    icon: 'gift',
+    image_url: null as string | null,
     is_active: true,
     color: '', // Custom color
   });
@@ -55,10 +66,12 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
         points_cost: reward.points_cost,
         screen_minutes: reward.screen_minutes,
         weekly_limit: reward.weekly_limit,
-        icon: reward.icon || 'redeem',
+        icon: reward.icon || 'gift',
+        image_url: reward.image_url || null,
         is_active: reward.is_active,
         color: (reward as any).settings?.color || '',
       });
+      setImageMode(reward.image_url ? 'image' : 'icon');
     } else {
       // Reset form for new reward
       setFormData({
@@ -68,10 +81,12 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
         points_cost: 100,
         screen_minutes: null,
         weekly_limit: null,
-        icon: 'redeem',
+        icon: 'gift',
+        image_url: null,
         is_active: true,
         color: '',
       });
+      setImageMode('icon');
     }
   }, [reward]);
 
@@ -89,15 +104,18 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
       const url = reward ? '/api/rewards/update' : '/api/rewards/create';
       const method = reward ? 'PATCH' : 'POST';
 
+      // Extract color from formData - it goes into settings, not as a direct column
+      const { color, ...dataWithoutColor } = formData;
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...(reward && { rewardId: reward.id }),
-          ...formData,
+          ...dataWithoutColor,
           settings: {
             ...(reward as any)?.settings,
-            ...(formData.color ? { color: formData.color } : {}),
+            ...(color ? { color } : {}),
           },
         }),
       });
@@ -163,6 +181,138 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
               maxLength={500}
             />
           </div>
+
+          {/* Icon/Image Selection */}
+          <div className="space-y-3">
+            <Label>Reward Icon/Image</Label>
+
+            {/* Mode Toggle */}
+            <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 p-1 bg-gray-50 dark:bg-gray-800">
+              <button
+                type="button"
+                onClick={() => setImageMode('icon')}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+                  imageMode === 'icon'
+                    ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <Palette className="w-4 h-4" />
+                Choose Icon
+              </button>
+              <button
+                type="button"
+                onClick={() => setImageMode('image')}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+                  imageMode === 'image'
+                    ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <ImageIcon className="w-4 h-4" />
+                Upload Image
+              </button>
+            </div>
+
+            {/* Icon Selection */}
+            {imageMode === 'icon' && (
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => setShowIconPicker(true)}
+                  className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800/50"
+                >
+                  {(() => {
+                    const selectedIcon = getRewardIconById(formData.icon);
+                    if (selectedIcon) {
+                      const IconComponent = selectedIcon.component;
+                      return (
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <IconComponent size={28} weight="fill" className="text-primary" />
+                          </div>
+                          <div className="text-left">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedIcon.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Click to change</p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Select an icon</p>
+                        <p className="text-xs text-gray-400">Click to browse</p>
+                      </div>
+                    );
+                  })()}
+                </button>
+              </div>
+            )}
+
+            {/* Image Selection */}
+            {imageMode === 'image' && (
+              <div className="space-y-4">
+                {/* Current Image Preview */}
+                {formData.image_url && (
+                  <div className="relative w-32 h-32 rounded-xl overflow-hidden border-2 border-primary">
+                    <Image
+                      src={formData.image_url}
+                      alt="Reward image"
+                      fill
+                      className="object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, image_url: null })}
+                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold hover:bg-red-600"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+
+                {/* Image Options */}
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowDefaultImagePicker(true)}
+                    className="flex-1 px-4 py-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800/50 text-center"
+                  >
+                    <span className="text-2xl block mb-1">🖼️</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Default Images</span>
+                  </button>
+                  <div className="flex-1">
+                    <TaskImageUpload
+                      currentImageUrl={null}
+                      onUpload={(url) => setFormData({ ...formData, image_url: url })}
+                      onRemove={() => {}}
+                      compact
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Icon Picker Dialog */}
+          <RewardIconPicker
+            open={showIconPicker}
+            onClose={() => setShowIconPicker(false)}
+            onSelect={(iconId) => {
+              setFormData({ ...formData, icon: iconId, image_url: null });
+            }}
+            selectedIcon={formData.icon}
+          />
+
+          {/* Default Image Picker Dialog */}
+          <DefaultRewardImagePicker
+            open={showDefaultImagePicker}
+            onClose={() => setShowDefaultImagePicker(false)}
+            onSelect={(imageUrl) => {
+              setFormData({ ...formData, image_url: imageUrl, icon: 'gift' });
+            }}
+            selectedImageUrl={formData.image_url}
+          />
 
           {/* Category */}
           <div className="space-y-2">

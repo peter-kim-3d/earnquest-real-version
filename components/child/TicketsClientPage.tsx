@@ -23,6 +23,7 @@ type Purchase = {
     description: string | null;
     category: string;
     icon: string | null;
+    image_url: string | null;
     screen_minutes: number | null;
   };
 };

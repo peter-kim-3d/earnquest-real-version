@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Sparkle, Lock } from '@phosphor-icons/react';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';
 import { EffortBadge, TierBadge } from '@/components/ui/EffortBadge';
 import { getTierForPoints, Tier } from '@/lib/utils/tiers';
+import { getRewardIconById } from '@/lib/reward-icons';
 
 type Reward = {
   id: string;
@@ -15,6 +17,7 @@ type Reward = {
   category: string;
   points_cost: number;
   icon: string | null;
+  image_url: string | null;
   screen_minutes: number | null;
   weekly_limit: number | null;
   tier?: Tier;
@@ -106,23 +109,39 @@ export default function RewardCard({
         ${canPurchase ? 'border-gray-200 dark:border-gray-700 hover:border-primary/50' : 'border-gray-300 dark:border-gray-600 opacity-60'}
       `}
     >
-      {/* Icon Area */}
-      <div className={`aspect-square rounded-t-xl bg-gradient-to-br ${getCategoryGradient(reward.category)} p-8 flex items-center justify-center relative overflow-hidden`}>
+      {/* Icon/Image Area */}
+      <div className={`aspect-square rounded-t-xl ${!reward.image_url ? `bg-gradient-to-br ${getCategoryGradient(reward.category)}` : ''} flex items-center justify-center relative overflow-hidden`}>
         {/* Category Badge */}
-        <div className="absolute top-3 left-3 px-2 py-1 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
+        <div className="absolute top-3 left-3 px-2 py-1 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm z-10">
           <span className="text-xs font-bold text-gray-900 dark:text-white capitalize">
             {reward.category}
           </span>
         </div>
 
-        {/* Icon */}
-        <div className="flex justify-center text-white">
-          <AppIcon name={reward.icon} size={64} className="drop-shadow-sm" />
-        </div>
+        {/* Icon or Image */}
+        {reward.image_url ? (
+          <Image
+            src={reward.image_url}
+            alt={reward.name}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <div className="flex justify-center text-white">
+            {(() => {
+              const rewardIcon = getRewardIconById(reward.icon || 'gift');
+              if (rewardIcon) {
+                const IconComponent = rewardIcon.component;
+                return <IconComponent size={64} weight="fill" className="drop-shadow-sm" />;
+              }
+              return <AppIcon name={reward.icon} size={64} className="drop-shadow-sm" />;
+            })()}
+          </div>
+        )}
 
         {/* Screen Minutes Badge */}
         {isScreenReward && reward.screen_minutes && (
-          <div className="absolute bottom-3 right-3 px-2 py-1 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm">
+          <div className="absolute bottom-3 right-3 px-2 py-1 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm z-10">
             <span className="text-xs font-bold text-gray-900 dark:text-white">
               {reward.screen_minutes} min
             </span>

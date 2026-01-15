@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Edit, Trash2, MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -13,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { AppIcon } from '@/components/ui/AppIcon';
+import { getRewardIconById } from '@/lib/reward-icons';
 
 type Reward = {
   id: string;
@@ -24,6 +26,7 @@ type Reward = {
   weekly_limit: number | null;
   is_active: boolean;
   icon: string | null;
+  image_url: string | null;
 };
 
 interface RewardCardProps {
@@ -112,12 +115,26 @@ export default function RewardCard({ reward, purchaseCount, onEdit }: RewardCard
         : 'border-gray-300 dark:border-gray-600 opacity-60'
         }`}
     >
-      {/* Icon Header */}
+      {/* Icon/Image Header */}
       <div
-        className={`aspect-video bg-gradient-to-br ${!customColor ? getCategoryColor(reward.category) : ''} p-6 flex items-center justify-center relative`}
-        style={customColor ? { background: customColor } : {}}
+        className={`aspect-video bg-gradient-to-br ${!customColor && !reward.image_url ? getCategoryColor(reward.category) : ''} flex items-center justify-center relative overflow-hidden`}
+        style={customColor && !reward.image_url ? { background: customColor } : {}}
       >
-        <AppIcon name={reward.icon || 'redeem'} className="text-white" size={48} weight="duotone" />
+        {reward.image_url ? (
+          <Image
+            src={reward.image_url}
+            alt={reward.name}
+            fill
+            className="object-cover"
+          />
+        ) : (() => {
+          const rewardIcon = getRewardIconById(reward.icon || 'gift');
+          if (rewardIcon) {
+            const IconComponent = rewardIcon.component;
+            return <IconComponent size={48} weight="duotone" className="text-white" />;
+          }
+          return <AppIcon name={reward.icon || 'redeem'} className="text-white" size={48} weight="duotone" />;
+        })()}
 
         {/* Status Badge */}
         {!reward.is_active && (

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Check, Clock, X, Sparkle, Gift } from '@phosphor-icons/react';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';
@@ -13,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { getRewardIconById } from '@/lib/reward-icons';
 
 type Purchase = {
   id: string;
@@ -27,6 +29,7 @@ type Purchase = {
     description: string | null;
     category: string;
     icon: string | null;
+    image_url: string | null;
     screen_minutes: number | null;
   };
 };
@@ -188,13 +191,25 @@ export default function TicketCard({
 
 
 
-      {/* Icon Area */}
+      {/* Icon/Image Area */}
       <div
-        className={`aspect-video bg-gradient-to-br ${getCategoryColor(
-          purchase.reward.category
-        )} p-6 flex items-center justify-center`}
+        className={`aspect-video ${!purchase.reward.image_url ? `bg-gradient-to-br ${getCategoryColor(purchase.reward.category)}` : ''} flex items-center justify-center relative overflow-hidden`}
       >
-        <AppIcon name={purchase.reward.icon} size={48} className="text-white" />
+        {purchase.reward.image_url ? (
+          <Image
+            src={purchase.reward.image_url}
+            alt={purchase.reward.name}
+            fill
+            className="object-cover"
+          />
+        ) : (() => {
+          const rewardIcon = getRewardIconById(purchase.reward.icon || 'gift');
+          if (rewardIcon) {
+            const IconComponent = rewardIcon.component;
+            return <IconComponent size={48} weight="fill" className="text-white" />;
+          }
+          return <AppIcon name={purchase.reward.icon} size={48} className="text-white" />;
+        })()}
       </div>
 
       {/* Content */}
