@@ -23,16 +23,19 @@ export default function SelectStylePage() {
     try {
       setLoading(true);
 
-      // Get child age group (fetch if needed or assume default for now - simpler to just pass or fetch)
-      // Ideally we should fetch child to be safe, but for MVP speed, let's try to fetch if not in session, or rely on defaults.
-      // BUT existing code used sessionStorage 'onboarding_child_age_group'.
-      // If we don't have it, we might error.
-      // Let's modify api/onboarding/populate to fetch child if ageGroup is missing?
-      // Or just fetch it here.
+      // Get all children from session storage
+      const childrenJson = sessionStorage.getItem('onboarding_children');
+      let childrenToPopulate: Array<{ id: string; ageGroup: string }> = [];
 
-      const ageGroup = sessionStorage.getItem('onboarding_child_age_group') || '8-11'; // Fallback for now to avoid blocking
+      if (childrenJson) {
+        childrenToPopulate = JSON.parse(childrenJson);
+      } else if (childId) {
+        // Fallback to single child for backwards compatibility
+        const ageGroup = sessionStorage.getItem('onboarding_child_age_group') || '8-11';
+        childrenToPopulate = [{ id: childId, ageGroup }];
+      }
 
-      if (!childId) {
+      if (childrenToPopulate.length === 0) {
         toast.error('Child required', {
           description: 'Please add a child first',
         });
@@ -40,34 +43,37 @@ export default function SelectStylePage() {
         return;
       }
 
-      // v2: Populate tasks and rewards with conditional answers
-      const response = await fetch('/api/onboarding/populate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          style: selectedStyle,
-          childId,
-          ageGroup,
-          conditionalAnswers: {
-            hasPet,
-            hasInstrument,
-          },
-        }),
-      });
+      // Populate tasks and rewards for ALL children
+      for (const child of childrenToPopulate) {
+        const response = await fetch('/api/onboarding/populate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            style: selectedStyle,
+            childId: child.id,
+            ageGroup: child.ageGroup,
+            conditionalAnswers: {
+              hasPet,
+              hasInstrument,
+            },
+          }),
+        });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to populate tasks and rewards');
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to populate tasks and rewards');
+        }
+
+        const result = await response.json();
+        console.log(`Populated for child ${child.id}:`, result);
       }
-
-      const result = await response.json();
-      console.log('Populated:', result);
 
       // Store selected style
       sessionStorage.setItem('onboarding_style', selectedStyle);
 
-      // Navigate to next step
-      router.push(`/en-US/onboarding/family-values?childId=${childId}&style=${selectedStyle}`);
+      // Navigate to next step (use first child for URL param)
+      const firstChildId = childrenToPopulate[0].id;
+      router.push(`/en-US/onboarding/family-values?childId=${firstChildId}&style=${selectedStyle}`);
     } catch (error) {
       console.error('Failed to save style:', error);
       toast.error('Save failed', {

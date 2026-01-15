@@ -114,8 +114,7 @@ export default function AddChildPage() {
     try {
       setLoading(true);
 
-      let firstChildId = '';
-      let firstChildAgeGroup = '';
+      const savedChildren: Array<{ id: string; ageGroup: string }> = [];
 
       // Save all children
       for (const child of children) {
@@ -135,20 +134,22 @@ export default function AddChildPage() {
         }
 
         const result = await response.json();
-
-        // Store first child's info for onboarding flow
-        if (!firstChildId) {
-          firstChildId = result.child.id;
-          firstChildAgeGroup = result.child.age_group;
-        }
+        savedChildren.push({
+          id: result.child.id,
+          ageGroup: result.child.age_group,
+        });
       }
 
-      // Store child info in sessionStorage for next step
-      if (firstChildId && firstChildAgeGroup) {
-        sessionStorage.setItem('onboarding_child_id', firstChildId);
-        sessionStorage.setItem('onboarding_child_age_group', firstChildAgeGroup);
+      // Store ALL children info in sessionStorage for next step
+      if (savedChildren.length > 0) {
+        sessionStorage.setItem('onboarding_children', JSON.stringify(savedChildren));
+        // Keep first child info for backwards compatibility
+        sessionStorage.setItem('onboarding_child_id', savedChildren[0].id);
+        sessionStorage.setItem('onboarding_child_age_group', savedChildren[0].ageGroup);
         sessionStorage.setItem('onboarding_children_count', children.length.toString());
       }
+
+      const firstChildId = savedChildren[0]?.id;
 
       toast.success(`${children.length} ${children.length === 1 ? 'child' : 'children'} added successfully!`);
 
