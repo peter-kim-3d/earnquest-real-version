@@ -1,11 +1,21 @@
 import { createClient } from '@/lib/supabase/client';
 
+function getRedirectUrl() {
+  // Use window.location.origin for client-side, fallback to env var for SSR
+  const origin = typeof window !== 'undefined'
+    ? window.location.origin
+    : process.env.NEXT_PUBLIC_APP_URL;
+  return `${origin}/en-US/callback`;
+}
+
 export async function signInWithGoogle() {
   const supabase = createClient();
+  const redirectTo = getRedirectUrl();
+  console.log('OAuth redirectTo:', redirectTo); // Debug log
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/en-US/callback`,
+      redirectTo,
     },
   });
 
@@ -21,7 +31,7 @@ export async function signInWithApple() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'apple',
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/en-US/callback`,
+      redirectTo: getRedirectUrl(),
     },
   });
 
@@ -65,7 +75,7 @@ export async function signUp(email: string, password: string) {
     email,
     password,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/en-US/callback`,
+      emailRedirectTo: getRedirectUrl(),
     },
   });
 
