@@ -112,7 +112,7 @@ export async function populateTasksAndRewards(
 
     return {
       family_id: familyId,
-      child_id: childId, // Always assign to the specific child during onboarding, unless we implement a specific 'shared' logic later
+      child_id: null, // Global task - available to all children in the family
       name: template.name,
       description: template.description,
       category: template.category,

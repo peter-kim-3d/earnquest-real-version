@@ -23,19 +23,20 @@ export default function SelectStylePage() {
     try {
       setLoading(true);
 
-      // Get all children from session storage
+      // Get first child info for age group (tasks are global, so we just need one reference)
       const childrenJson = sessionStorage.getItem('onboarding_children');
-      let childrenToPopulate: Array<{ id: string; ageGroup: string }> = [];
+      let firstChild: { id: string; ageGroup: string } | null = null;
 
       if (childrenJson) {
-        childrenToPopulate = JSON.parse(childrenJson);
+        const children = JSON.parse(childrenJson);
+        firstChild = children[0] || null;
       } else if (childId) {
         // Fallback to single child for backwards compatibility
         const ageGroup = sessionStorage.getItem('onboarding_child_age_group') || '8-11';
-        childrenToPopulate = [{ id: childId, ageGroup }];
+        firstChild = { id: childId, ageGroup };
       }
 
-      if (childrenToPopulate.length === 0) {
+      if (!firstChild) {
         toast.error('Child required', {
           description: 'Please add a child first',
         });
@@ -43,36 +44,34 @@ export default function SelectStylePage() {
         return;
       }
 
-      // Populate tasks and rewards for ALL children
-      for (const child of childrenToPopulate) {
-        const response = await fetch('/api/onboarding/populate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            style: selectedStyle,
-            childId: child.id,
-            ageGroup: child.ageGroup,
-            conditionalAnswers: {
-              hasPet,
-              hasInstrument,
-            },
-          }),
-        });
+      // Populate tasks and rewards ONCE for the family (tasks are global)
+      const response = await fetch('/api/onboarding/populate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          style: selectedStyle,
+          childId: firstChild.id, // Used for age group reference only
+          ageGroup: firstChild.ageGroup,
+          conditionalAnswers: {
+            hasPet,
+            hasInstrument,
+          },
+        }),
+      });
 
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || 'Failed to populate tasks and rewards');
-        }
-
-        const result = await response.json();
-        console.log(`Populated for child ${child.id}:`, result);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to populate tasks and rewards');
       }
+
+      const result = await response.json();
+      console.log('Populated tasks and rewards:', result);
 
       // Store selected style
       sessionStorage.setItem('onboarding_style', selectedStyle);
 
-      // Navigate to next step (use first child for URL param)
-      const firstChildId = childrenToPopulate[0].id;
+      // Navigate to next step
+      const firstChildId = firstChild.id;
       router.push(`/en-US/onboarding/family-values?childId=${firstChildId}&style=${selectedStyle}`);
     } catch (error) {
       console.error('Failed to save style:', error);
