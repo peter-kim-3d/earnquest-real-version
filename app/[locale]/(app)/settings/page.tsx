@@ -2,9 +2,10 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import InviteCoParent from '@/components/settings/InviteCoParent';
 import DeviceConnection from '@/components/settings/DeviceConnection';
+import ChildPinToggle from '@/components/settings/ChildPinToggle';
 import BetaBadge from '@/components/BetaBadge';
 import Link from 'next/link';
-import { Users, Envelope as Mail, CaretRight, Shield, User, Smartphone } from '@/components/ui/ClientIcons';
+import { Users, Envelope as Mail, CaretRight, Shield, User, Smartphone, Lock } from '@/components/ui/ClientIcons';
 import { getUser } from '@/lib/services/user';
 import { CollapsibleSection } from '@/components/ui/collapsible-section';
 
@@ -96,6 +97,16 @@ export default async function SettingsPage() {
               icon={Smartphone}
             >
               <DeviceConnection />
+            </CollapsibleSection>
+
+            {/* Child PIN Security */}
+            <CollapsibleSection
+              id="child-pin"
+              title="Child Login Security"
+              description="Manage PIN requirements for child accounts"
+              icon={Lock}
+            >
+              <ChildPinToggle />
             </CollapsibleSection>
 
             {/* Co-Parent Invite */}

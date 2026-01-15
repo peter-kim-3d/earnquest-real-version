@@ -31,6 +31,7 @@ export default function ChildLoginPage() {
   const [retryAfterSeconds, setRetryAfterSeconds] = useState<number | null>(null);
   const [enteredPin, setEnteredPin] = useState('');
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
+  const [requireChildPin, setRequireChildPin] = useState(true);
 
   // Check for family code in URL
   useEffect(() => {
@@ -101,9 +102,10 @@ export default function ChildLoginPage() {
         return;
       }
 
-      const { familyName, children } = await childrenRes.json();
+      const { familyName, children, requireChildPin: pinRequired } = await childrenRes.json();
       setFamilyName(familyName);
       setChildren(children);
+      setRequireChildPin(pinRequired ?? true);
       setStep('selection');
     } catch (err) {
       console.error('Validation error:', err);
@@ -117,7 +119,44 @@ export default function ChildLoginPage() {
     setSelectedChild(child);
     setEnteredPin('');
     setError('');
-    setStep('pin');
+
+    if (requireChildPin) {
+      // PIN is required, show PIN entry step
+      setStep('pin');
+    } else {
+      // PIN not required, login directly
+      attemptLoginForChild(child, '');
+    }
+  };
+
+  const attemptLoginForChild = async (child: Child, pin: string) => {
+    setStep('logging');
+
+    try {
+      const response = await fetch('/api/auth/child-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          childId: child.id,
+          pinCode: pin,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Login failed');
+      }
+
+      // Success! Redirect to child dashboard
+      toast.success(`Welcome back, ${child.name}!`);
+      router.push('/en-US/child/dashboard');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Login failed';
+      console.error('Login failed:', err);
+      setStep('selection');
+      setError(errorMessage);
+      setTimeout(() => setError(''), 2000);
+    }
   };
 
   const attemptLogin = async (pin: string) => {
@@ -135,19 +174,20 @@ export default function ChildLoginPage() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Login failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Login failed');
       }
 
       // Success! Redirect to child dashboard
       toast.success(`Welcome back, ${selectedChild.name}!`);
       router.push('/en-US/child/dashboard');
-    } catch (error: any) {
-      console.error('Login failed:', error);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Incorrect PIN';
+      console.error('Login failed:', err);
       // Stay on PIN step and show error
       setStep('pin');
       setEnteredPin('');
-      setError(error.message || 'Incorrect PIN');
+      setError(errorMessage);
       // Auto-clear error after 2s
       setTimeout(() => setError(''), 2000);
     }

@@ -39,19 +39,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify PIN
-    // If child has a PIN set, require it.
-    // If no PIN is set (legacy), allow login or enforce setting one?
-    // For now, if PIN is set in DB, check it. If not set, allow (or require empty?).
-    // Implementation plan says "Require PIN entry". So we expect a matched PIN.
-    const storedPin = child.pin_code || '0000'; // Default to 0000 if not set
-    const providedPin = pinCode || '';
+    // Check if PIN is required for this family
+    const { data: family } = await supabase
+      .from('families')
+      .select('settings')
+      .eq('id', child.family_id)
+      .single();
 
-    if (storedPin !== providedPin) {
-      return NextResponse.json(
-        { error: 'Invalid PIN code' },
-        { status: 401 }
-      );
+    const familySettings = family?.settings as { requireChildPin?: boolean } | null;
+    const requirePin = familySettings?.requireChildPin ?? true; // Default to true
+
+    // Verify PIN only if required
+    if (requirePin) {
+      const storedPin = child.pin_code || '0000'; // Default to 0000 if not set
+      const providedPin = pinCode || '';
+
+      if (storedPin !== providedPin) {
+        return NextResponse.json(
+          { error: 'Invalid PIN code' },
+          { status: 401 }
+        );
+      }
     }
 
     // Create session by setting cookie

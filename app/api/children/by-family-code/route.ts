@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const { data: family, error: familyError } = await supabase
     .from('families')
-    .select('id, name')
+    .select('id, name, settings')
     .eq('join_code', familyCode)
     .single();
 
@@ -99,10 +99,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Get family settings
+  const familySettings = family.settings as { requireChildPin?: boolean } | null;
+  const requireChildPin = familySettings?.requireChildPin ?? true;
+
   // Return success with family and children data
   return NextResponse.json({
     success: true,
     familyName: family.name,
     children: children || [],
+    requireChildPin,
   });
 }

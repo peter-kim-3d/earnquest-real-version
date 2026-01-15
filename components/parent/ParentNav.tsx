@@ -16,7 +16,8 @@ import {
 import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { ModeToggle } from '@/components/ModeToggle';
 import { NotificationBadge } from '@/components/ui/notification-badge';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
+// Language switcher disabled for beta - will be enabled after Korean translation is complete
+// import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface ParentNavProps {
   parentName?: string;
@@ -106,9 +107,8 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
 
           {/* Right side - Profile Avatar */}
           <div className="flex items-center gap-4">
-            {/* Language Switcher & Mode Toggle */}
+            {/* Mode Toggle (Language switcher disabled for beta) */}
             <div className="hidden md:flex items-center gap-1">
-              <LanguageSwitcher />
               <ModeToggle />
             </div>
 
@@ -199,7 +199,6 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
             {/* Mobile Actions Footer */}
             <div className="flex items-center justify-between px-4 py-4 mt-2 border-t border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-2">
-                <LanguageSwitcher />
                 <ModeToggle />
               </div>
               <button

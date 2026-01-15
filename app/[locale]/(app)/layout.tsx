@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import ParentNav from '@/components/parent/ParentNav';
-import ParentAuthGuard from '@/components/parent/ParentAuthGuard';
 import SkipToContent from '@/components/SkipToContent';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 
@@ -30,7 +29,7 @@ export default async function AppLayout({
     .single() as { data: { full_name: string | null; avatar_url: string | null } | null };
 
   return (
-    <ParentAuthGuard>
+    <>
       <SkipToContent />
       <div className="min-h-screen bg-background-light dark:bg-background-dark">
         <ParentNav
@@ -42,6 +41,6 @@ export default async function AppLayout({
           {children}
         </main>
       </div>
-    </ParentAuthGuard>
+    </>
   );
 }
