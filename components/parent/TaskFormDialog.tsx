@@ -2,18 +2,21 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { X } from 'lucide-react';
+import { X, ImageIcon, Palette } from 'lucide-react';
+import AvatarDisplay from '@/components/profile/AvatarDisplay';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { ColorPicker } from '@/components/ui/color-picker';
+import IconPicker from '@/components/tasks/IconPicker';
+import TaskImageUpload from '@/components/tasks/TaskImageUpload';
+import { getIconById, TASK_ICON_POOL } from '@/lib/task-icons';
+import Image from 'next/image';
 
 type Task = {
   id: string;
-
   name: string;
   description: string | null;
   category: string;
@@ -22,6 +25,7 @@ type Task = {
   approval_type: string;
   is_active: boolean;
   icon: string | null;
+  image_url: string | null;
 };
 
 type Child = {
@@ -44,6 +48,9 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
   const [hasSubmitted, setHasSubmitted] = useState(false);
   // Track which children are selected (for task view, not child profile)
   const [selectedChildIds, setSelectedChildIds] = useState<Set<string>>(new Set());
+  // Icon/Image selection state
+  const [showIconPicker, setShowIconPicker] = useState(false);
+  const [imageMode, setImageMode] = useState<'icon' | 'image'>('icon');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -51,7 +58,8 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
     points: 50,
     frequency: 'daily',
     approval_type: 'parent',
-    icon: 'task',
+    icon: 'star', // Default icon
+    image_url: null as string | null, // Custom image URL
     is_active: true,
     auto_assign: false, // Changed to false - we don't use task instances
     monthly_mode: 'any_day' as 'any_day' | 'specific_day' | 'first_day' | 'last_day',
@@ -77,7 +85,8 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           points: task.points,
           frequency: task.frequency,
           approval_type: task.approval_type,
-          icon: task.icon || 'task',
+          icon: task.icon || 'star',
+          image_url: task.image_url || null,
           is_active: task.is_active,
           auto_assign: false, // Always false - we don't use task instances
           monthly_mode: (task as any).monthly_mode || 'any_day',
@@ -90,6 +99,8 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           child_id: (task as any).child_id || initialChildId, // Use task's child_id or fallback to initial
           color: (task as any).metadata?.color || '',
         });
+        // Set image mode based on whether task has image_url
+        setImageMode(task.image_url ? 'image' : 'icon');
       } else {
         // Reset form for new task
         setFormData({
@@ -99,7 +110,8 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           points: 50,
           frequency: 'daily',
           approval_type: 'parent',
-          icon: 'task',
+          icon: 'star',
+          image_url: null,
           is_active: true,
           auto_assign: false, // Always false - we don't use task instances
           monthly_mode: 'any_day',
@@ -112,6 +124,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           child_id: initialChildId,
           color: '',
         });
+        setImageMode('icon');
       }
     }
   }, [task, isOpen, initialChildId]);
@@ -298,6 +311,93 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
             )}
           </div>
 
+          {/* Icon/Image Selection */}
+          <div className="space-y-3">
+            <Label>Task Icon/Image</Label>
+
+            {/* Mode Toggle */}
+            <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 p-1 bg-gray-50 dark:bg-gray-800">
+              <button
+                type="button"
+                onClick={() => setImageMode('icon')}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+                  imageMode === 'icon'
+                    ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <Palette className="w-4 h-4" />
+                Choose Icon
+              </button>
+              <button
+                type="button"
+                onClick={() => setImageMode('image')}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+                  imageMode === 'image'
+                    ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <ImageIcon className="w-4 h-4" />
+                Upload Image
+              </button>
+            </div>
+
+            {/* Icon Selection */}
+            {imageMode === 'icon' && (
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => setShowIconPicker(true)}
+                  className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800/50"
+                >
+                  {(() => {
+                    const selectedIcon = getIconById(formData.icon);
+                    if (selectedIcon) {
+                      const IconComponent = selectedIcon.component;
+                      return (
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <IconComponent size={28} weight="fill" className="text-primary" />
+                          </div>
+                          <div className="text-left">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedIcon.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Click to change</p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Select an icon</p>
+                        <p className="text-xs text-gray-400">Click to browse</p>
+                      </div>
+                    );
+                  })()}
+                </button>
+              </div>
+            )}
+
+            {/* Image Upload */}
+            {imageMode === 'image' && (
+              <TaskImageUpload
+                currentImageUrl={formData.image_url}
+                onUpload={(url) => setFormData({ ...formData, image_url: url })}
+                onRemove={() => setFormData({ ...formData, image_url: null })}
+              />
+            )}
+          </div>
+
+          {/* Icon Picker Dialog */}
+          <IconPicker
+            open={showIconPicker}
+            onClose={() => setShowIconPicker(false)}
+            onSelect={(iconId) => {
+              setFormData({ ...formData, icon: iconId, image_url: null });
+            }}
+            selectedIcon={formData.icon}
+          />
+
           {/* Category */}
           <div className="space-y-2">
             <Label htmlFor="category">Category *</Label>
@@ -370,16 +470,11 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-1">
-                        {child.avatar_url && (
-                          <Image
-                            src={child.avatar_url}
-                            alt={child.name}
-                            width={32}
-                            height={32}
-                            className="rounded-full object-cover"
-                            sizes="32px"
-                          />
-                        )}
+                        <AvatarDisplay
+                          avatarUrl={child.avatar_url}
+                          userName={child.name}
+                          size="sm"
+                        />
                         <span className="font-medium text-text-main dark:text-white">{child.name}</span>
                       </div>
                     </button>

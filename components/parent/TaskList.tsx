@@ -15,6 +15,7 @@ type Task = {
   approval_type: string;
   is_active: boolean;
   icon: string | null;
+  image_url: string | null;
   created_at: string;
   archived_at: string | null;
   child_id: string | null;

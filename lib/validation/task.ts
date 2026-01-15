@@ -137,6 +137,7 @@ export const CreateTaskSchema = z
 
     // Other
     icon: z.string().max(50).optional(),
+    image_url: z.string().url('Invalid image URL').nullable().optional(),
     is_active: z.boolean().default(true),
 
     // Child exclusions (for partial assignment)
@@ -276,6 +277,7 @@ const UpdateTaskBaseSchema = z.object({
     .optional(),
 
   icon: z.string().max(50).optional(),
+  image_url: z.string().url('Invalid image URL').nullable().optional(),
   is_active: z.boolean().optional(),
 
   // Child exclusions (for partial assignment)

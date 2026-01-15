@@ -12,6 +12,7 @@ type Task = {
   points: number;
   category: string;
   icon: string | null;
+  image_url: string | null;
   frequency: string;
   is_active: boolean;
   family_id: string;

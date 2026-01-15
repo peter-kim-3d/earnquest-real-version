@@ -163,6 +163,7 @@ export async function POST(request: Request) {
       monthly_day?: number;
       child_id?: string | null;
       icon?: string;
+      image_url?: string | null;
       is_active: boolean;
       excluded_child_ids?: string[];
     };
@@ -280,7 +281,8 @@ export async function POST(request: Request) {
           monthly_day: taskData.monthly_day || null,
 
           // Other fields
-          icon: taskData.icon || 'task',
+          icon: taskData.icon || 'star',
+          image_url: taskData.image_url || null,
           is_active: taskData.is_active,
 
           // Note: created_by column does NOT exist in the tasks table

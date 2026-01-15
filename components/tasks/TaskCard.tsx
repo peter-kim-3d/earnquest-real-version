@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Sparkle, Timer, ListChecks, Checks } from '@phosphor-icons/react';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';
@@ -15,6 +16,7 @@ type Task = {
   category: string;
   points: number;
   icon: string | null;
+  image_url?: string | null;
   frequency: string;
   // v2 fields
   approval_type?: string;
@@ -129,12 +131,23 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
     <div className="group relative overflow-hidden rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
       <div className="p-6">
         <div className="flex items-start justify-between gap-4">
-          {/* Icon & Content */}
+          {/* Icon/Image & Content */}
           <div className="flex items-start gap-4 flex-1">
-            {/* Icon */}
-            <div className={`${getCategoryColor(task.category)} rounded-xl p-3 shrink-0`}>
-              <AppIcon name={task.icon} size={24} className="text-black/60 dark:text-white/80" />
-            </div>
+            {/* Icon or Image */}
+            {task.image_url ? (
+              <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0">
+                <Image
+                  src={task.image_url}
+                  alt={task.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            ) : (
+              <div className={`${getCategoryColor(task.category)} rounded-xl p-3 shrink-0`}>
+                <AppIcon name={task.icon} size={24} className="text-black/60 dark:text-white/80" />
+              </div>
+            )}
 
             {/* Task Info */}
             <div className="flex-1">

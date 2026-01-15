@@ -91,6 +91,7 @@ export async function PATCH(request: Request) {
     // Other fields
     if (taskData.child_id !== undefined) updates.child_id = taskData.child_id;
     if (taskData.icon !== undefined) updates.icon = taskData.icon;
+    if (taskData.image_url !== undefined) updates.image_url = taskData.image_url;
     if (taskData.is_active !== undefined) updates.is_active = taskData.is_active;
 
     // Always update updated_at

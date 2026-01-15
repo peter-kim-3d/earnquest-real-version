@@ -26,6 +26,7 @@ type Task = {
   approval_type: string;
   is_active: boolean;
   icon: string | null;
+  image_url: string | null;
   archived_at: string | null;
   child_id: string | null;
 };
@@ -188,10 +189,10 @@ export default function TaskCard({
     >
 
 
-      {/* Icon Header */}
+      {/* Icon/Image Header */}
       <div
-        className={`aspect-video bg-gradient-to-br ${!customColor ? getCategoryColor(task.category) : ''} p-6 flex items-center justify-center relative cursor-pointer`}
-        style={customColor ? { background: customColor } : {}}
+        className={`aspect-video ${task.image_url ? '' : `bg-gradient-to-br ${!customColor ? getCategoryColor(task.category) : ''}`} p-6 flex items-center justify-center relative cursor-pointer overflow-hidden`}
+        style={customColor && !task.image_url ? { background: customColor } : {}}
         onClick={isSelectionMode ? onToggleSelect : undefined}
       >
         {/* Selection Overlay */}
@@ -206,7 +207,17 @@ export default function TaskCard({
           </div>
         )}
 
-        <AppIcon name={task.icon} size={48} className="text-white" />
+        {/* Display image if available, otherwise show icon */}
+        {task.image_url ? (
+          <Image
+            src={task.image_url}
+            alt={task.name}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <AppIcon name={task.icon} size={48} className="text-white" />
+        )}
 
         {/* Assignee Badge */}
         <div className="absolute top-3 left-3">
