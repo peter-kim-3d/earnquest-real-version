@@ -1,7 +1,7 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Check } from 'lucide-react';
+import AvatarDisplay from '@/components/profile/AvatarDisplay';
 
 interface Child {
   id: string;
@@ -54,12 +54,11 @@ export function RecipientSelector({
               )}
 
               <div className="flex flex-col items-center gap-3">
-                <Avatar className="h-16 w-16 ring-2 ring-offset-2 ring-primary-kindness/30">
-                  <AvatarImage src={child.avatar_url || undefined} />
-                  <AvatarFallback className="bg-gradient-to-br from-orange-400 to-orange-600 text-white text-xl">
-                    {child.name.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <AvatarDisplay
+                  avatarUrl={child.avatar_url}
+                  userName={child.name}
+                  size="md"
+                />
 
                 <span className="font-medium text-gray-900 dark:text-white">
                   {child.name}
