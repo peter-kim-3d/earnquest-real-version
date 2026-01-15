@@ -63,7 +63,14 @@ export async function GET() {
       ...family?.settings,
     };
 
-    return NextResponse.json({ settings });
+    // Also fetch children for PIN management
+    const { data: children } = await supabase
+      .from('children')
+      .select('id, name, avatar_url, pin_code')
+      .eq('family_id', userProfile.family_id)
+      .order('created_at', { ascending: true });
+
+    return NextResponse.json({ settings, children: children || [] });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     console.error('Error getting family settings:', error);

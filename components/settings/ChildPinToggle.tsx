@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { RefreshCw } from '@/components/ui/ClientIcons';
+import { RefreshCw, Check } from '@/components/ui/ClientIcons';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -11,12 +11,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import AvatarDisplay from '@/components/profile/AvatarDisplay';
+
+interface Child {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  pin_code: string;
+}
 
 export default function ChildPinToggle() {
   const [requirePin, setRequirePin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [showDisableDialog, setShowDisableDialog] = useState(false);
+  const [children, setChildren] = useState<Child[]>([]);
+  const [editingPins, setEditingPins] = useState<Record<string, string>>({});
+  const [savingPin, setSavingPin] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSettings();
@@ -27,8 +38,17 @@ export default function ChildPinToggle() {
     try {
       const res = await fetch('/api/family/settings');
       if (res.ok) {
-        const { settings } = await res.json();
+        const { settings, children: childrenData } = await res.json();
         setRequirePin(settings.requireChildPin ?? true);
+        if (childrenData) {
+          setChildren(childrenData);
+          // Initialize editing pins with current values
+          const pins: Record<string, string> = {};
+          childrenData.forEach((child: Child) => {
+            pins[child.id] = child.pin_code || '0000';
+          });
+          setEditingPins(pins);
+        }
       } else {
         toast.error('Failed to load settings');
       }
@@ -78,6 +98,54 @@ export default function ChildPinToggle() {
     }
   };
 
+  const handlePinChange = (childId: string, value: string) => {
+    const cleanValue = value.replace(/[^0-9]/g, '').slice(0, 4);
+    setEditingPins(prev => ({ ...prev, [childId]: cleanValue }));
+  };
+
+  const handleSavePin = async (childId: string) => {
+    const newPin = editingPins[childId];
+    if (!newPin || newPin.length !== 4) {
+      toast.error('PIN must be 4 digits');
+      return;
+    }
+
+    const child = children.find(c => c.id === childId);
+    if (child?.pin_code === newPin) {
+      // No change
+      return;
+    }
+
+    setSavingPin(childId);
+    try {
+      const res = await fetch('/api/children/update', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ childId, pinCode: newPin }),
+      });
+
+      if (res.ok) {
+        // Update local state
+        setChildren(prev => prev.map(c =>
+          c.id === childId ? { ...c, pin_code: newPin } : c
+        ));
+        toast.success(`PIN updated for ${child?.name}`);
+      } else {
+        toast.error('Failed to update PIN');
+      }
+    } catch (err) {
+      console.error('Failed to update PIN:', err);
+      toast.error('Network error');
+    } finally {
+      setSavingPin(null);
+    }
+  };
+
+  const isPinChanged = (childId: string) => {
+    const child = children.find(c => c.id === childId);
+    return child?.pin_code !== editingPins[childId];
+  };
+
   if (fetching) {
     return (
       <div className="flex items-center justify-center py-4">
@@ -115,6 +183,58 @@ export default function ChildPinToggle() {
         </button>
       </div>
 
+      {/* Children PIN Management - Only show when PIN is enabled */}
+      {requirePin && children.length > 0 && (
+        <div className="space-y-3 pt-2">
+          <p className="text-sm font-medium text-text-muted dark:text-text-muted">
+            Manage PINs for each child:
+          </p>
+          <div className="space-y-2">
+            {children.map((child) => (
+              <div
+                key={child.id}
+                className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+              >
+                <AvatarDisplay
+                  avatarUrl={child.avatar_url}
+                  userName={child.name}
+                  size="sm"
+                />
+                <span className="flex-1 font-medium text-text-main dark:text-white">
+                  {child.name}
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={4}
+                    value={editingPins[child.id] || ''}
+                    onChange={(e) => handlePinChange(child.id, e.target.value)}
+                    className="w-20 px-3 py-2 text-center font-mono text-lg tracking-widest rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    placeholder="0000"
+                  />
+                  {isPinChanged(child.id) && editingPins[child.id]?.length === 4 && (
+                    <button
+                      onClick={() => handleSavePin(child.id)}
+                      disabled={savingPin === child.id}
+                      className="p-2 rounded-lg bg-primary hover:bg-primary/90 text-white disabled:opacity-50 transition-colors"
+                      title="Save PIN"
+                    >
+                      {savingPin === child.id ? (
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Check className="w-4 h-4" />
+                      )}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Info Box */}
       <div className={`flex items-start gap-3 p-4 rounded-lg border ${
         requirePin
@@ -136,7 +256,7 @@ export default function ChildPinToggle() {
               : 'text-yellow-800 dark:text-yellow-200'
           }`}>
             {requirePin
-              ? 'Each child has their own PIN (default: 0000). You can change PINs in child settings.'
+              ? 'Each child uses their PIN above to log in. Default PIN is 0000.'
               : 'Anyone with your family code can access any child account. Consider enabling PINs for added security.'}
           </p>
         </div>

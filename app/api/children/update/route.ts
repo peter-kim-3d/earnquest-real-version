@@ -17,9 +17,19 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const { childId, name, ageGroup, familyId, pinCode, birthdate } = body;
 
-    if (!childId || !name || !ageGroup) {
+    if (!childId) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing childId' },
+        { status: 400 }
+      );
+    }
+
+    // For PIN-only updates, we don't require name and ageGroup
+    const isPinOnlyUpdate = pinCode && !name && !ageGroup;
+
+    if (!isPinOnlyUpdate && (!name || !ageGroup)) {
+      return NextResponse.json(
+        { error: 'Missing required fields (name, ageGroup)' },
         { status: 400 }
       );
     }
@@ -61,15 +71,19 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Update child
-    const updateData: any = {
-      name,
-      age_group: ageGroup,
-      ...(birthdate && { birthdate }),
-    };
+    const updateData: any = {};
 
-    // Only update PIN if provided
-    if (pinCode) {
-      updateData.pin_code = pinCode;
+    // Add fields if provided
+    if (name) updateData.name = name;
+    if (ageGroup) updateData.age_group = ageGroup;
+    if (birthdate) updateData.birthdate = birthdate;
+    if (pinCode) updateData.pin_code = pinCode;
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        { error: 'No fields to update' },
+        { status: 400 }
+      );
     }
 
     const { data: child, error } = await supabase
