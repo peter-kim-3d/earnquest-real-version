@@ -118,6 +118,7 @@ export async function populateTasksAndRewards(
       category: template.category,
       points,
       icon: template.icon,
+      image_url: template.image_url || null, // Copy image_url from template
       frequency: template.frequency,
       approval_type: template.approval_type,
 
