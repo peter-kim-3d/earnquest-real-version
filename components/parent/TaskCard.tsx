@@ -193,7 +193,7 @@ export default function TaskCard({
       <div
         className={`aspect-video ${task.image_url ? '' : `bg-gradient-to-br ${!customColor ? getCategoryColor(task.category) : ''}`} p-6 flex items-center justify-center relative cursor-pointer overflow-hidden`}
         style={customColor && !task.image_url ? { background: customColor } : {}}
-        onClick={isSelectionMode ? onToggleSelect : undefined}
+        onClick={isSelectionMode ? onToggleSelect : onEdit}
       >
         {/* Selection Overlay */}
         {isSelectionMode && (
@@ -271,7 +271,10 @@ export default function TaskCard({
       {/* Content */}
       <div className="p-4">
         <div className="flex items-start justify-between mb-2">
-          <h3 className="text-lg font-bold text-text-main dark:text-white flex-1 line-clamp-2">
+          <h3
+            className="text-lg font-bold text-text-main dark:text-white flex-1 line-clamp-2 cursor-pointer hover:text-primary transition-colors"
+            onClick={isSelectionMode ? undefined : onEdit}
+          >
             {task.name}
           </h3>
           <DropdownMenu>

@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { ColorPicker } from '@/components/ui/color-picker';
 import IconPicker from '@/components/tasks/IconPicker';
 import TaskImageUpload from '@/components/tasks/TaskImageUpload';
+import DefaultTaskImagePicker from '@/components/tasks/DefaultTaskImagePicker';
 import { getIconById, TASK_ICON_POOL } from '@/lib/task-icons';
 import Image from 'next/image';
 
@@ -50,6 +51,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
   const [selectedChildIds, setSelectedChildIds] = useState<Set<string>>(new Set());
   // Icon/Image selection state
   const [showIconPicker, setShowIconPicker] = useState(false);
+  const [showDefaultImagePicker, setShowDefaultImagePicker] = useState(false);
   const [imageMode, setImageMode] = useState<'icon' | 'image'>('icon');
   const [formData, setFormData] = useState({
     name: '',
@@ -378,13 +380,48 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
               </div>
             )}
 
-            {/* Image Upload */}
+            {/* Image Selection */}
             {imageMode === 'image' && (
-              <TaskImageUpload
-                currentImageUrl={formData.image_url}
-                onUpload={(url) => setFormData({ ...formData, image_url: url })}
-                onRemove={() => setFormData({ ...formData, image_url: null })}
-              />
+              <div className="space-y-4">
+                {/* Current Image Preview */}
+                {formData.image_url && (
+                  <div className="relative w-32 h-32 rounded-xl overflow-hidden border-2 border-primary">
+                    <Image
+                      src={formData.image_url}
+                      alt="Task image"
+                      fill
+                      className="object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, image_url: null })}
+                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold hover:bg-red-600"
+                    >
+                      X
+                    </button>
+                  </div>
+                )}
+
+                {/* Image Options */}
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowDefaultImagePicker(true)}
+                    className="flex-1 px-4 py-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800/50 text-center"
+                  >
+                    <span className="text-2xl block mb-1">&#128444;&#65039;</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Default Images</span>
+                  </button>
+                  <div className="flex-1">
+                    <TaskImageUpload
+                      currentImageUrl={null}
+                      onUpload={(url) => setFormData({ ...formData, image_url: url })}
+                      onRemove={() => {}}
+                      compact
+                    />
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
@@ -396,6 +433,16 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
               setFormData({ ...formData, icon: iconId, image_url: null });
             }}
             selectedIcon={formData.icon}
+          />
+
+          {/* Default Image Picker Dialog */}
+          <DefaultTaskImagePicker
+            open={showDefaultImagePicker}
+            onClose={() => setShowDefaultImagePicker(false)}
+            onSelect={(imageUrl) => {
+              setFormData({ ...formData, image_url: imageUrl, icon: 'star' });
+            }}
+            selectedImageUrl={formData.image_url}
           />
 
           {/* Category */}
