@@ -94,7 +94,7 @@ export default function TaskImageUpload({
   };
 
   return (
-    <div className="space-y-3">
+    <div className={compact ? 'h-full' : 'space-y-3'}>
       <input
         ref={fileInputRef}
         type="file"
