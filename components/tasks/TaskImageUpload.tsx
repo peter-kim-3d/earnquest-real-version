@@ -133,7 +133,7 @@ export default function TaskImageUpload({
           onClick={triggerFileSelect}
           disabled={isUploading}
           className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800/50 ${
-            compact ? 'w-full h-full px-3 py-3' : 'w-full aspect-square max-w-[200px] mx-auto gap-3'
+            compact ? 'w-full h-[88px] px-3 py-3' : 'w-full aspect-square max-w-[200px] mx-auto gap-3'
           }`}
         >
           {isUploading ? (
