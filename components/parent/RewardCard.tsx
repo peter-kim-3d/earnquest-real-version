@@ -117,8 +117,9 @@ export default function RewardCard({ reward, purchaseCount, onEdit }: RewardCard
     >
       {/* Icon/Image Header */}
       <div
-        className={`aspect-video bg-gradient-to-br ${!customColor && !reward.image_url ? getCategoryColor(reward.category) : ''} flex items-center justify-center relative overflow-hidden`}
+        className={`aspect-video bg-gradient-to-br ${!customColor && !reward.image_url ? getCategoryColor(reward.category) : ''} flex items-center justify-center relative overflow-hidden cursor-pointer`}
         style={customColor && !reward.image_url ? { background: customColor } : {}}
+        onClick={onEdit}
       >
         {reward.image_url ? (
           <Image
@@ -147,7 +148,10 @@ export default function RewardCard({ reward, purchaseCount, onEdit }: RewardCard
       {/* Content */}
       <div className="p-4">
         <div className="flex items-start justify-between mb-2">
-          <h3 className="text-lg font-bold text-text-main dark:text-white flex-1 line-clamp-2">
+          <h3
+            className="text-lg font-bold text-text-main dark:text-white flex-1 line-clamp-2 cursor-pointer hover:text-primary transition-colors"
+            onClick={onEdit}
+          >
             {reward.name}
           </h3>
           <DropdownMenu>

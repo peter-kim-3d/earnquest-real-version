@@ -403,16 +403,16 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                 )}
 
                 {/* Image Options */}
-                <div className="flex gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => setShowDefaultImagePicker(true)}
-                    className="flex-1 px-4 py-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800/50 text-center"
+                    className="h-[88px] px-4 py-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800/50 flex flex-col items-center justify-center"
                   >
-                    <span className="text-2xl block mb-1">&#128444;&#65039;</span>
+                    <span className="text-2xl mb-1">&#128444;&#65039;</span>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Default Images</span>
                   </button>
-                  <div className="flex-1">
+                  <div className="h-[88px]">
                     <TaskImageUpload
                       currentImageUrl={null}
                       onUpload={(url) => setFormData({ ...formData, image_url: url })}
