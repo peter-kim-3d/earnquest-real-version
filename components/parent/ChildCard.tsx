@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Fire, TrendUp, Trash, Plus, Checks, Eye } from '@phosphor-icons/react';
 import { AppIcon } from '@/components/ui/AppIcon';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
@@ -35,6 +36,7 @@ type Task = {
   name: string;
   points: number;
   icon: string | null;
+  image_url: string | null;
   category: string;
   frequency: string;
   isDisabled?: boolean;
@@ -233,7 +235,13 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
               <div className="space-y-2">
                 {tasks.slice(0, 3).map(task => ( // Show top 3
                   <div key={task.id} className={`flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 ${task.isDisabled ? 'opacity-50 grayscale' : ''}`}>
-                    <AppIcon name={task.icon} size={18} className="text-gray-500" />
+                    {task.image_url ? (
+                      <div className="relative h-5 w-5 rounded overflow-hidden flex-shrink-0">
+                        <Image src={task.image_url} alt={task.name} fill className="object-cover" />
+                      </div>
+                    ) : (
+                      <AppIcon name={task.icon} size={18} className="text-gray-500" />
+                    )}
                     <span className="text-sm font-medium text-text-main dark:text-white truncate flex-1">
                       {task.name}
                     </span>
@@ -280,8 +288,12 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
               <div className="space-y-2">
                 {tasks.map(task => (
                   <div key={task.id} className={`flex items-center gap-3 p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 group ${task.isDisabled ? 'bg-gray-100 dark:bg-gray-800/50' : ''}`}>
-                    <div className={`h-10 w-10 rounded-lg flex items-center justify-center text-2xl shadow-sm ${task.isDisabled ? 'bg-gray-200 dark:bg-gray-700 grayscale opacity-50' : 'bg-white dark:bg-gray-700'}`}>
-                      <AppIcon name={task.icon} size={24} className="text-primary" />
+                    <div className={`h-10 w-10 rounded-lg flex items-center justify-center overflow-hidden shadow-sm ${task.isDisabled ? 'bg-gray-200 dark:bg-gray-700 grayscale opacity-50' : 'bg-white dark:bg-gray-700'}`}>
+                      {task.image_url ? (
+                        <Image src={task.image_url} alt={task.name} width={40} height={40} className="object-cover" />
+                      ) : (
+                        <AppIcon name={task.icon} size={24} className="text-primary" />
+                      )}
                     </div>
                     <div className={`flex-1 min-w-0 ${task.isDisabled ? 'opacity-50' : ''}`}>
                       <h4 className="font-semibold text-text-main dark:text-white truncate">
