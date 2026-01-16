@@ -1,57 +1,43 @@
 import { createClient } from '@/lib/supabase/server';
+import { PresetKey, ModuleKey, AgeGroup } from '@/lib/types/task';
+import { getTaskKeysForSelection } from '@/lib/utils/onboarding';
 
-// v2 types
+// Re-export types for backward compatibility
+export type { PresetKey, ModuleKey, AgeGroup };
+
+/**
+ * @deprecated Use PresetKey instead
+ */
 export type FamilyStyle = 'busy' | 'balanced' | 'academic' | 'screen';
-export type AgeGroup = '5-7' | '8-11' | '12-14';
 
+/**
+ * @deprecated Use enabledModules: ModuleKey[] instead
+ */
 export interface ConditionalAnswers {
   hasPet?: boolean;
   hasInstrument?: boolean;
 }
 
 /**
- * Populates initial tasks and rewards based on family style and age group (v2)
+ * Populates initial tasks and rewards based on preset and enabled modules (v2.1)
+ *
+ * @param familyId - The family to populate tasks/rewards for
+ * @param childId - The initial child (currently unused, tasks are family-wide)
+ * @param presetKey - The selected preset (starter, balanced, learning_focus)
+ * @param ageGroup - The child's age group
+ * @param enabledModules - Optional array of enabled add-on modules
  */
 export async function populateTasksAndRewards(
   familyId: string,
   childId: string,
-  style: FamilyStyle,
+  presetKey: PresetKey,
   ageGroup: AgeGroup,
-  conditionalAnswers?: ConditionalAnswers
+  enabledModules: ModuleKey[] = []
 ) {
   const supabase = await createClient();
 
-  // v2: Define preset task keys mapping
-  const PRESET_TASK_KEYS: Record<FamilyStyle, string[]> = {
-    busy: ['homework', 'brush_teeth', 'backpack'],
-    balanced: ['homework', 'reading', 'make_bed', 'clear_dishes', 'backpack', 'brush_teeth', 'exercise'],
-    academic: ['homework', 'reading', 'practice_instrument', 'brush_teeth', 'exercise'],
-    screen: ['homework', 'clear_dishes', 'brush_teeth', 'exercise'],
-  };
-
-  // Start with base task keys for the selected preset
-  let taskKeys = [...PRESET_TASK_KEYS[style]];
-
-  // v2: Add conditional tasks based on answers
-  if (conditionalAnswers?.hasPet) {
-    taskKeys.push('feed_pet');
-  }
-
-  if (conditionalAnswers?.hasInstrument && (style === 'academic' || style === 'balanced')) {
-    // Only add practice_instrument if not already included
-    if (!taskKeys.includes('practice_instrument')) {
-      taskKeys.push('practice_instrument');
-    }
-  }
-
-  // v2: Add age-specific tasks
-  if (ageGroup === '5-7') {
-    taskKeys.push('pick_up_toys', 'get_dressed');
-  } else if (ageGroup === '8-11') {
-    // Middle age group might get specific tasks
-  } else if (ageGroup === '12-14') {
-    taskKeys.push('laundry', 'study_session');
-  }
+  // v2.1: Get task keys from preset + modules (no duplicates)
+  const taskKeys = getTaskKeysForSelection(presetKey, enabledModules);
 
   // Fetch task templates by template_key
   const { data: taskTemplates, error: taskError } = await supabase
@@ -64,51 +50,20 @@ export async function populateTasksAndRewards(
     throw new Error(`Failed to fetch task templates: ${taskError.message}`);
   }
 
-  // v2: Define point overrides per preset
-  const POINT_OVERRIDES: Record<FamilyStyle, Record<string, number>> = {
-    busy: {},
-    balanced: {},
-    academic: {
-      homework: 60,
-      reading: 40,
-      practice_instrument: 50,
-    },
-    screen: {
-      homework: 70,
-    },
-  };
-
-  // v2: Define timer overrides per preset
-  const TIMER_OVERRIDES: Record<FamilyStyle, Record<string, number>> = {
-    busy: {},
-    balanced: {},
-    academic: {
-      reading: 30, // Longer reading time for academic families
-    },
-    screen: {},
-  };
-
-  // Fetch reward templates matching style and age group
+  // Fetch reward templates (use 'all' style for now, as we removed style-specific logic)
   const { data: rewardTemplates, error: rewardError } = await supabase
     .from('reward_templates')
     .select('*')
-    .or(`style.eq.${style},style.eq.all`)
-    .or(`age_group.eq.${ageGroup},age_group.eq.all`);
+    .or(`style.eq.all,age_group.eq.all,age_group.eq.${ageGroup}`);
 
   if (rewardError) {
     console.error('Error fetching reward templates:', rewardError);
     throw new Error(`Failed to fetch reward templates: ${rewardError.message}`);
   }
 
-  // v2: Create tasks from templates with overrides
+  // v2.1: Create tasks from templates
   const tasksToCreate = (taskTemplates || []).map((template) => {
     const templateKey = template.template_key;
-
-    // Apply point override if exists
-    const points = POINT_OVERRIDES[style]?.[templateKey] || template.points;
-
-    // Apply timer override if exists
-    const timerMinutes = TIMER_OVERRIDES[style]?.[templateKey] || template.timer_minutes;
 
     return {
       family_id: familyId,
@@ -116,14 +71,15 @@ export async function populateTasksAndRewards(
       name: template.name,
       description: template.description,
       category: template.category,
-      points,
+      time_context: template.time_context || null, // v2.1: Copy time_context from template
+      points: template.points,
       icon: template.icon,
-      image_url: template.image_url || null, // Copy image_url from template
+      image_url: template.image_url || null,
       frequency: template.frequency,
       approval_type: template.approval_type,
 
       // v2 fields
-      timer_minutes: timerMinutes || null,
+      timer_minutes: template.timer_minutes || null,
       checklist: template.checklist || null,
       photo_required: template.photo_required || false,
       metadata: {
@@ -167,6 +123,7 @@ export async function populateTasksAndRewards(
     category: template.category,
     points_cost: template.points_cost,
     icon: template.icon,
+    image_url: template.image_url || null,
     screen_minutes: template.screen_minutes || null,
     weekly_limit: template.weekly_limit || null,
     is_active: true,
@@ -239,22 +196,13 @@ export async function getOnboardingStatus(familyId: string) {
   const supabase = await createClient();
 
   // Check if family has children
-  const { data: children } = await supabase
-    .from('children')
-    .select('id')
-    .eq('family_id', familyId);
+  const { data: children } = await supabase.from('children').select('id').eq('family_id', familyId);
 
   // Check if family has tasks
-  const { data: tasks } = await supabase
-    .from('tasks')
-    .select('id')
-    .eq('family_id', familyId);
+  const { data: tasks } = await supabase.from('tasks').select('id').eq('family_id', familyId);
 
   // Check if family has rewards
-  const { data: rewards } = await supabase
-    .from('rewards')
-    .select('id')
-    .eq('family_id', familyId);
+  const { data: rewards } = await supabase.from('rewards').select('id').eq('family_id', familyId);
 
   return {
     hasChildren: (children?.length || 0) > 0,

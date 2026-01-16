@@ -12,8 +12,15 @@
 /**
  * Task category (v2)
  * Changed from: hygiene, chores, learning, kindness, other
+ * v2.1: household → life
  */
-export type TaskCategory = 'learning' | 'household' | 'health';
+export type TaskCategory = 'learning' | 'life' | 'health';
+
+/**
+ * Time context for UI grouping (v2.1)
+ * Used to group tasks by time of day in child dashboard
+ */
+export type TaskTimeContext = 'morning' | 'after_school' | 'evening' | 'anytime';
 
 /**
  * Approval type (v2)
@@ -111,6 +118,7 @@ export interface Task {
   name: string;
   description?: string | null;
   category: TaskCategory;
+  time_context?: TaskTimeContext | null; // v2.1: UI grouping
   icon?: string | null;
   points: number;
   frequency: TaskFrequency;
@@ -224,6 +232,7 @@ export interface TaskTemplate {
   name: string;
   description?: string | null;
   category: TaskCategory;
+  time_context?: TaskTimeContext | null; // v2.1: UI grouping
   points: number;
   icon?: string | null;
   frequency: TaskFrequency;
@@ -251,9 +260,15 @@ export interface TaskTemplate {
 // ============================================================================
 
 /**
- * Onboarding preset keys (v2)
+ * Onboarding preset keys (v2.1)
+ * Changed from: busy, balanced, academic, screen
  */
-export type PresetKey = 'busy' | 'balanced' | 'academic' | 'screen';
+export type PresetKey = 'starter' | 'balanced' | 'learning_focus';
+
+/**
+ * Module keys for add-on task groups (v2.1)
+ */
+export type ModuleKey = 'hygiene' | 'fitness' | 'hobby';
 
 /**
  * Onboarding preset configuration
@@ -289,11 +304,26 @@ export interface TaskPreset {
 }
 
 /**
- * Conditional answers for onboarding
+ * @deprecated Use enabledModules: ModuleKey[] instead
+ * Conditional answers for onboarding (legacy v2)
  */
 export interface ConditionalAnswers {
   hasPet?: boolean;
   hasInstrument?: boolean;
+}
+
+/**
+ * Module configuration (v2.1)
+ */
+export interface TaskModule {
+  key: ModuleKey;
+  name: string;
+  nameKo: string;
+  icon: string;
+  description: string;
+  descriptionKo: string;
+  defaultEnabled: boolean;
+  taskKeys: string[];
 }
 
 // ============================================================================
@@ -307,6 +337,7 @@ export interface CreateTaskRequest {
   name: string;
   description?: string;
   category: TaskCategory;
+  time_context?: TaskTimeContext; // v2.1: UI grouping
   points: number;
   frequency: TaskFrequency;
   approval_type: ApprovalType;
@@ -397,6 +428,7 @@ export const AUTO_APPROVAL_WHITELIST = ['backpack', 'get_dressed', 'set_alarm'] 
 
 /**
  * Category display information
+ * v2.1: household → life
  */
 export const CATEGORY_INFO: Record<TaskCategory, { label: string; icon: string; color: string }> = {
   learning: {
@@ -404,8 +436,8 @@ export const CATEGORY_INFO: Record<TaskCategory, { label: string; icon: string; 
     icon: 'school',
     color: '#6C5CE7',
   },
-  household: {
-    label: 'Household',
+  life: {
+    label: 'Life Skills',
     icon: 'home_work',
     color: '#00B894',
   },
@@ -413,6 +445,32 @@ export const CATEGORY_INFO: Record<TaskCategory, { label: string; icon: string; 
     label: 'Health',
     icon: 'fitness_center',
     color: '#FF7675',
+  },
+};
+
+/**
+ * Time context display information (v2.1)
+ */
+export const TIME_CONTEXT_INFO: Record<TaskTimeContext, { label: string; labelKo: string; icon: string }> = {
+  morning: {
+    label: 'Morning',
+    labelKo: '아침에 해요',
+    icon: '☀️',
+  },
+  after_school: {
+    label: 'After School',
+    labelKo: '집에 오면 해요',
+    icon: '🏠',
+  },
+  evening: {
+    label: 'Evening',
+    labelKo: '저녁에 해요',
+    icon: '🌙',
+  },
+  anytime: {
+    label: 'Anytime',
+    labelKo: '언제든 해요',
+    icon: '📚',
   },
 };
 

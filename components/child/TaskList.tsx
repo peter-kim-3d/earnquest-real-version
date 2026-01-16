@@ -6,12 +6,14 @@ import TaskCard from '@/components/tasks/TaskCard';
 import TaskCardPending from '@/components/tasks/TaskCardPending';
 import TaskCardNeedsWork from '@/components/tasks/TaskCardNeedsWork';
 import { AppIcon } from '@/components/ui/AppIcon';
+import { TaskTimeContext, TIME_CONTEXT_INFO } from '@/lib/types/task';
 
 type Task = {
   id: string;
   name: string;
   description: string | null;
   category: string;
+  time_context?: TaskTimeContext | null; // v2.1
   points: number;
   icon: string | null;
   frequency: string;
@@ -48,6 +50,9 @@ type TabType = 'todo' | 'pending' | 'completed';
 
 import confetti from 'canvas-confetti';
 
+// Time context order and configuration
+const TIME_CONTEXT_ORDER: TaskTimeContext[] = ['morning', 'after_school', 'evening', 'anytime'];
+
 export default function TaskList({ tasks, completions, childId, childName }: TaskListProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('todo');
@@ -56,8 +61,8 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
   // Get completions by status
   const pendingCompletions = completions.filter((c) => c.status === 'pending');
   const fixRequestedCompletions = completions.filter((c) => c.status === 'fix_requested');
-  const completedCompletions = completions.filter((c) =>
-    c.status === 'approved' || c.status === 'auto_approved'
+  const completedCompletions = completions.filter(
+    (c) => c.status === 'approved' || c.status === 'auto_approved'
   );
 
   // Get task IDs that are pending or completed
@@ -69,10 +74,7 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
         // Only show if completed today
         const completedAt = c.completed_at ? new Date(c.completed_at) : null;
         const today = new Date();
-        return (
-          completedAt &&
-          completedAt.toDateString() === today.toDateString()
-        );
+        return completedAt && completedAt.toDateString() === today.toDateString();
       })
       .map((c) => c.task_id)
   );
@@ -89,6 +91,15 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
   const pendingTasks = tasks.filter((task) => pendingTaskIds.has(task.id));
   const fixRequestedTasks = tasks.filter((task) => fixRequestedTaskIds.has(task.id));
   const completedTasks = tasks.filter((task) => completedTaskIds.has(task.id));
+
+  // v2.1: Group todoTasks by time_context
+  const groupedTodoTasks = TIME_CONTEXT_ORDER.reduce(
+    (acc, context) => {
+      acc[context] = todoTasks.filter((task) => (task.time_context || 'anytime') === context);
+      return acc;
+    },
+    {} as Record<TaskTimeContext, Task[]>
+  );
 
   // Handler for task completion
   const handleTaskComplete = async (
@@ -159,18 +170,22 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
             onClick={() => setActiveTab(tab.id)}
             className={`
               px-4 py-3 font-semibold text-sm border-b-2 transition-all
-              ${activeTab === tab.id
-                ? 'border-primary text-primary'
-                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              ${
+                activeTab === tab.id
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
               }
             `}
           >
             {tab.label}
             {tab.count > 0 && (
-              <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${activeTab === tab.id
-                ? 'bg-primary/10 text-primary'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-                }`}>
+              <span
+                className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${
+                  activeTab === tab.id
+                    ? 'bg-primary/10 text-primary'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                }`}
+              >
                 {tab.count}
               </span>
             )}
@@ -183,27 +198,56 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
         {/* To Do Tab */}
         {activeTab === 'todo' && (
           <>
-            {/* Fix Requested Tasks */}
-            {fixRequestedTasks.map((task) => {
-              const completion = fixRequestedCompletions.find((c) => c.task_id === task.id)!;
+            {/* Fix Requested Tasks - always show at top */}
+            {fixRequestedTasks.length > 0 && (
+              <div className="space-y-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">⚠️</span>
+                  <h3 className="text-sm font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wide">
+                    Needs Your Attention
+                  </h3>
+                </div>
+                {fixRequestedTasks.map((task) => {
+                  const completion = fixRequestedCompletions.find((c) => c.task_id === task.id)!;
+                  return (
+                    <TaskCardNeedsWork
+                      key={task.id}
+                      task={task}
+                      completion={completion}
+                      onResubmit={handleTaskComplete}
+                    />
+                  );
+                })}
+              </div>
+            )}
+
+            {/* v2.1: Time Context Grouped Tasks */}
+            {TIME_CONTEXT_ORDER.map((context) => {
+              const tasksInContext = groupedTodoTasks[context];
+              if (tasksInContext.length === 0) return null;
+
+              const contextInfo = TIME_CONTEXT_INFO[context];
+
               return (
-                <TaskCardNeedsWork
-                  key={task.id}
-                  task={task}
-                  completion={completion}
-                  onResubmit={handleTaskComplete}
-                />
+                <div key={context} className="space-y-3">
+                  {/* Section Header */}
+                  <div className="flex items-center gap-2 pt-2">
+                    <span className="text-lg">{contextInfo.icon}</span>
+                    <h3 className="text-sm font-bold text-text-muted dark:text-gray-400 uppercase tracking-wide">
+                      {contextInfo.label}
+                    </h3>
+                    <span className="text-xs text-text-muted dark:text-gray-500">
+                      ({tasksInContext.length})
+                    </span>
+                  </div>
+
+                  {/* Tasks in this context */}
+                  {tasksInContext.map((task) => (
+                    <TaskCard key={task.id} task={task} onComplete={handleTaskComplete} />
+                  ))}
+                </div>
               );
             })}
-
-            {/* Available Tasks */}
-            {todoTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onComplete={handleTaskComplete}
-              />
-            ))}
 
             {todoTasks.length === 0 && fixRequestedTasks.length === 0 && (
               <div className="text-center py-12">
@@ -223,13 +267,7 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
           <>
             {pendingTasks.map((task) => {
               const completion = pendingCompletions.find((c) => c.task_id === task.id)!;
-              return (
-                <TaskCardPending
-                  key={task.id}
-                  task={task}
-                  completion={completion}
-                />
-              );
+              return <TaskCardPending key={task.id} task={task} completion={completion} />;
             })}
 
             {pendingTasks.length === 0 && (
@@ -254,14 +292,15 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <AppIcon name="check_circle" size={24} weight="duotone" className="text-green-600 dark:text-green-400" />
+                      <AppIcon
+                        name="check_circle"
+                        size={24}
+                        weight="duotone"
+                        className="text-green-600 dark:text-green-400"
+                      />
                       <div>
-                        <h3 className="font-bold text-text-main dark:text-white">
-                          {task.name}
-                        </h3>
-                        <p className="text-sm text-text-muted dark:text-gray-400">
-                          Completed today
-                        </p>
+                        <h3 className="font-bold text-text-main dark:text-white">{task.name}</h3>
+                        <p className="text-sm text-text-muted dark:text-gray-400">Completed today</p>
                       </div>
                     </div>
                     <span className="text-sm font-bold text-green-600 dark:text-green-400">

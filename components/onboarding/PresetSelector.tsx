@@ -1,80 +1,8 @@
 'use client';
 
-import { CheckCircle2, Plus, Clock, BookOpen, Trophy, Tv } from 'lucide-react';
-
-export type PresetKey = 'busy' | 'balanced' | 'academic' | 'screen';
-
-interface Preset {
-  key: PresetKey;
-  name: string;
-  tagline: string;
-  description: string;
-  icon: string;
-  badge: string;
-  badgeColor: string;
-  taskCount: number;
-  recommended: boolean;
-  examples: string[];
-  expectedDailyPoints: {
-    min: number;
-    max: number;
-  };
-}
-
-const PRESETS: Preset[] = [
-  {
-    key: 'busy',
-    name: 'Busy Parent',
-    tagline: 'Minimal management, maximum impact',
-    description: 'Just 3 essential tasks',
-    icon: '⏰',
-    badge: 'Quick Start',
-    badgeColor: 'bg-orange-200 text-orange-900',
-    taskCount: 3,
-    recommended: false,
-    examples: ['Homework', 'Brush teeth', 'Pack backpack'],
-    expectedDailyPoints: { min: 90, max: 120 },
-  },
-  {
-    key: 'balanced',
-    name: 'Balanced Growth',
-    tagline: 'Build habits across all areas',
-    description: '7 tasks covering learning, household & health',
-    icon: '⚖️',
-    badge: 'Recommended',
-    badgeColor: 'bg-primary text-black',
-    taskCount: 7,
-    recommended: true,
-    examples: ['Homework', 'Reading', 'Make bed', 'Clear dishes', 'Exercise'],
-    expectedDailyPoints: { min: 200, max: 280 },
-  },
-  {
-    key: 'academic',
-    name: 'Academic Focus',
-    tagline: 'Prioritize learning & skill development',
-    description: '5 tasks with higher learning points',
-    icon: '🎓',
-    badge: 'High Achiever',
-    badgeColor: 'bg-purple-200 text-purple-900',
-    taskCount: 5,
-    recommended: false,
-    examples: ['Homework (60 pts)', 'Reading (40 pts)', 'Practice instrument', 'Exercise'],
-    expectedDailyPoints: { min: 180, max: 240 },
-  },
-  {
-    key: 'screen',
-    name: 'Screen Time Manager',
-    tagline: 'Tight screen budget, earn screen time',
-    description: '4 tasks to unlock screen rewards',
-    icon: '📱',
-    badge: 'Screen Control',
-    badgeColor: 'bg-blue-200 text-blue-900',
-    taskCount: 4,
-    recommended: false,
-    examples: ['Homework (70 pts)', 'Clear dishes', 'Brush teeth', 'Exercise'],
-    expectedDailyPoints: { min: 160, max: 200 },
-  },
-];
+import { CheckCircle2, Plus, Star } from 'lucide-react';
+import { PresetKey } from '@/lib/types/task';
+import { PRESETS, getPresetTaskTemplates } from '@/lib/config/presets';
 
 interface PresetSelectorProps {
   selectedPreset: PresetKey;
@@ -82,27 +10,36 @@ interface PresetSelectorProps {
 }
 
 export default function PresetSelector({ selectedPreset, onSelectPreset }: PresetSelectorProps) {
+  const presetOrder: PresetKey[] = ['starter', 'balanced', 'learning_focus'];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {PRESETS.map((preset) => {
-        const isSelected = selectedPreset === preset.key;
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {presetOrder.map((key) => {
+        const preset = PRESETS[key];
+        const isSelected = selectedPreset === key;
         const isRecommended = preset.recommended;
+        const templates = getPresetTaskTemplates(key);
+        const totalPoints = templates.reduce((sum, t) => sum + t.points, 0);
+
+        // Get examples from templates
+        const examples = templates.slice(0, 4).map((t) => t.name);
 
         return (
           <label
-            key={preset.key}
-            className={`group relative flex flex-col gap-4 rounded-xl border-2 border-solid bg-white dark:bg-card-dark p-6 cursor-pointer hover:shadow-lg transition-all duration-200 ${isRecommended
-              ? 'ring-4 ring-transparent hover:ring-primary/10 border-gray-200 dark:border-gray-800'
-              : 'border-gray-200 dark:border-gray-800 hover:border-primary'
-              }`}
+            key={key}
+            className={`group relative flex flex-col gap-4 rounded-xl border-2 border-solid bg-white dark:bg-card-dark p-6 cursor-pointer hover:shadow-lg transition-all duration-200 ${
+              isRecommended
+                ? 'ring-4 ring-transparent hover:ring-primary/10 border-gray-200 dark:border-gray-800'
+                : 'border-gray-200 dark:border-gray-800 hover:border-primary'
+            }`}
           >
             <input
               className="peer sr-only"
               name="preset_selection"
               type="radio"
-              value={preset.key}
+              value={key}
               checked={isSelected}
-              onChange={() => onSelectPreset(preset.key)}
+              onChange={() => onSelectPreset(key)}
             />
 
             {/* Active State Border */}
@@ -116,20 +53,21 @@ export default function PresetSelector({ selectedPreset, onSelectPreset }: Prese
             <div className="flex flex-col gap-1">
               {/* Header */}
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-text-main dark:text-white text-lg font-bold leading-tight">
-                  {preset.name}
-                </h2>
-                <span className={`text-xs font-bold uppercase tracking-wider rounded-full px-2 py-1 ${preset.badgeColor}`}>
-                  {preset.badge}
-                </span>
+                <h2 className="text-text-main dark:text-white text-lg font-bold leading-tight">{preset.name}</h2>
+                {isRecommended && (
+                  <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider rounded-full px-2 py-1 bg-primary text-black">
+                    <Star className="h-3 w-3" />
+                    Recommended
+                  </span>
+                )}
               </div>
 
-              {/* Icon & Tagline */}
+              {/* Icon & Description */}
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-3xl">{preset.icon}</span>
                 <div className="flex flex-col">
                   <span className="text-text-main dark:text-white text-xl font-black leading-tight tracking-[-0.02em]">
-                    {preset.description}
+                    {preset.taskKeys.length} tasks
                   </span>
                 </div>
               </div>
@@ -146,7 +84,7 @@ export default function PresetSelector({ selectedPreset, onSelectPreset }: Prese
               <p className="text-xs font-bold text-text-main dark:text-white uppercase tracking-wide opacity-60">
                 Includes
               </p>
-              {preset.examples.slice(0, 3).map((example, index) => (
+              {examples.slice(0, 3).map((example, index) => (
                 <div
                   key={index}
                   className="text-sm font-normal leading-normal flex items-start gap-3 text-text-main dark:text-white"
@@ -155,19 +93,17 @@ export default function PresetSelector({ selectedPreset, onSelectPreset }: Prese
                   <span>{example}</span>
                 </div>
               ))}
-              {preset.examples.length > 3 && (
+              {templates.length > 3 && (
                 <div className="text-sm font-normal leading-normal flex items-start gap-3 text-text-main dark:text-white opacity-50">
                   <Plus className="h-5 w-5 shrink-0 mt-0.5" />
-                  <span>{preset.examples.length - 3} more tasks</span>
+                  <span>{templates.length - 3} more tasks</span>
                 </div>
               )}
             </div>
 
             {/* Daily Points Range */}
             <div className="mt-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-900/50">
-              <p className="text-xs text-text-muted dark:text-text-muted text-center">
-                {preset.expectedDailyPoints.min}-{preset.expectedDailyPoints.max} XP/day
-              </p>
+              <p className="text-xs text-text-muted dark:text-text-muted text-center">{totalPoints} XP/day</p>
             </div>
           </label>
         );

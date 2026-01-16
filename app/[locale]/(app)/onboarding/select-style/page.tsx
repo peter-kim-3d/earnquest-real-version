@@ -3,17 +3,23 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react';
-import PresetSelector, { type PresetKey } from '@/components/onboarding/PresetSelector';
+import PresetSelector from '@/components/onboarding/PresetSelector';
+import ModuleSelector from '@/components/onboarding/ModuleSelector';
+import { PresetKey, ModuleKey } from '@/lib/types/task';
+import { calculateDailyPoints } from '@/lib/utils/onboarding';
 import { toast } from 'sonner';
 
 export default function SelectStylePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const childId = searchParams.get('childId');
-  const [selectedStyle, setSelectedStyle] = useState<PresetKey>('balanced');
-  const [hasPet, setHasPet] = useState(false);
-  const [hasInstrument, setHasInstrument] = useState(false);
+  const [selectedPreset, setSelectedPreset] = useState<PresetKey>('balanced');
+  const [enabledModules, setEnabledModules] = useState<ModuleKey[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const handleToggleModule = (module: ModuleKey) => {
+    setEnabledModules((prev) => (prev.includes(module) ? prev.filter((m) => m !== module) : [...prev, module]));
+  };
 
   const handleBack = () => {
     router.back();
@@ -44,18 +50,15 @@ export default function SelectStylePage() {
         return;
       }
 
-      // Populate tasks and rewards ONCE for the family (tasks are global)
+      // v2.1: Populate tasks and rewards with preset + modules
       const response = await fetch('/api/onboarding/populate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          style: selectedStyle,
+          presetKey: selectedPreset,
           childId: firstChild.id, // Used for age group reference only
           ageGroup: firstChild.ageGroup,
-          conditionalAnswers: {
-            hasPet,
-            hasInstrument,
-          },
+          enabledModules,
         }),
       });
 
@@ -67,12 +70,13 @@ export default function SelectStylePage() {
       const result = await response.json();
       console.log('Populated tasks and rewards:', result);
 
-      // Store selected style
-      sessionStorage.setItem('onboarding_style', selectedStyle);
+      // Store selected preset and modules
+      sessionStorage.setItem('onboarding_preset', selectedPreset);
+      sessionStorage.setItem('onboarding_modules', JSON.stringify(enabledModules));
 
       // Navigate to next step
       const firstChildId = firstChild.id;
-      router.push(`/en-US/onboarding/family-values?childId=${firstChildId}&style=${selectedStyle}`);
+      router.push(`/en-US/onboarding/family-values?childId=${firstChildId}&preset=${selectedPreset}`);
     } catch (error) {
       console.error('Failed to save style:', error);
       toast.error('Save failed', {
@@ -83,88 +87,53 @@ export default function SelectStylePage() {
     }
   };
 
+  // Calculate total daily points for display
+  const totalDailyPoints = calculateDailyPoints(selectedPreset, enabledModules);
+
   return (
     <div className="w-full max-w-5xl flex flex-col">
       {/* Progress Bar Section */}
       <div className="flex flex-col gap-3 p-4 mb-4">
         <div className="flex gap-6 justify-between">
-          <p className="text-text-main dark:text-white text-base font-medium leading-normal">
-            Step 2 of 4
-          </p>
+          <p className="text-text-main dark:text-white text-base font-medium leading-normal">Step 2 of 4</p>
         </div>
         <div className="rounded bg-gray-200 dark:bg-gray-700">
-          <div
-            className="h-2 rounded bg-primary shadow-[0_0_10px_rgba(55,236,19,0.5)]"
-            style={{ width: '50%' }}
-          />
+          <div className="h-2 rounded bg-primary shadow-[0_0_10px_rgba(55,236,19,0.5)]" style={{ width: '50%' }} />
         </div>
-        <p className="text-text-muted dark:text-text-muted text-sm font-normal leading-normal">
-          Style Selection
-        </p>
+        <p className="text-text-muted dark:text-text-muted text-sm font-normal leading-normal">Style Selection</p>
       </div>
 
       {/* Page Heading */}
       <div className="flex flex-wrap justify-between gap-3 px-4 pb-4">
         <div className="flex min-w-72 flex-col gap-3">
           <h1 className="text-text-main dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
-            Choose Your Family Style
+            Choose Your Task Preset
           </h1>
           <p className="text-text-muted dark:text-text-muted text-base font-normal leading-normal max-w-2xl">
-            Don&apos;t worry, you can always customize this later. Pick a starting
-            point that fits your goals right now.
+            Pick a starting point that fits your goals. You can always customize tasks later.
           </p>
         </div>
       </div>
 
-      {/* v2: Preset Selector */}
+      {/* Preset Selector */}
       <div className="px-4 py-3">
-        <PresetSelector selectedPreset={selectedStyle} onSelectPreset={setSelectedStyle} />
+        <PresetSelector selectedPreset={selectedPreset} onSelectPreset={setSelectedPreset} />
       </div>
 
-      {/* v2: Conditional Questions */}
+      {/* Module Add-ons */}
       <div className="px-4 py-6">
-        <div className="max-w-2xl">
-          <h3 className="text-text-main dark:text-white text-lg font-bold mb-4">
-            A few quick questions to customize your tasks:
-          </h3>
-          <div className="space-y-4">
-            {/* Has Pet Question */}
-            <label className="flex items-center gap-3 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-card-dark cursor-pointer hover:border-primary transition-colors">
-              <input
-                type="checkbox"
-                checked={hasPet}
-                onChange={(e) => setHasPet(e.target.checked)}
-                className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
-              />
-              <div className="flex-1">
-                <p className="text-text-main dark:text-white font-semibold">
-                  Do you have a pet? 🐶
-                </p>
-                <p className="text-text-muted dark:text-text-muted text-sm">
-                  We&apos;ll add a &quot;Feed the pet&quot; task
-                </p>
-              </div>
-            </label>
+        <div className="max-w-full">
+          <h3 className="text-text-main dark:text-white text-lg font-bold mb-4">Optional Add-ons</h3>
+          <ModuleSelector enabledModules={enabledModules} onToggle={handleToggleModule} />
+        </div>
+      </div>
 
-            {/* Has Instrument Question */}
-            {(selectedStyle === 'academic' || selectedStyle === 'balanced') && (
-              <label className="flex items-center gap-3 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-card-dark cursor-pointer hover:border-primary transition-colors">
-                <input
-                  type="checkbox"
-                  checked={hasInstrument}
-                  onChange={(e) => setHasInstrument(e.target.checked)}
-                  className="h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary"
-                />
-                <div className="flex-1">
-                  <p className="text-text-main dark:text-white font-semibold">
-                    Does your child play an instrument? 🎹
-                  </p>
-                  <p className="text-text-muted dark:text-text-muted text-sm">
-                    We&apos;ll add a &quot;Practice instrument&quot; task
-                  </p>
-                </div>
-              </label>
-            )}
+      {/* Summary */}
+      <div className="px-4 py-4">
+        <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
+          <div className="flex items-center justify-between">
+            <span className="text-text-muted dark:text-text-muted font-medium">Total daily points potential:</span>
+            <span className="text-2xl font-black text-primary">{totalDailyPoints} XP</span>
           </div>
         </div>
       </div>

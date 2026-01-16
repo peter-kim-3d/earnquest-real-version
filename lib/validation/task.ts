@@ -13,10 +13,19 @@ import { AUTO_APPROVAL_WHITELIST } from '@/lib/types/task';
 // ============================================================================
 
 /**
- * Task category schema (v2)
+ * Task category schema (v2.1)
+ * Changed: household → life
  */
-export const TaskCategorySchema = z.enum(['learning', 'household', 'health'], {
-  message: 'Category must be one of: learning, household, health',
+export const TaskCategorySchema = z.enum(['learning', 'life', 'health'], {
+  message: 'Category must be one of: learning, life, health',
+});
+
+/**
+ * Task time context schema (v2.1)
+ * For UI grouping by time of day
+ */
+export const TaskTimeContextSchema = z.enum(['morning', 'after_school', 'evening', 'anytime'], {
+  message: 'Time context must be one of: morning, after_school, evening, anytime',
 });
 
 /**
@@ -85,6 +94,9 @@ export const CreateTaskSchema = z
 
     category: TaskCategorySchema,
 
+    // v2.1: Time context for UI grouping
+    time_context: TaskTimeContextSchema.optional(),
+
     points: z
       .number()
       .int('Points must be a whole number')
@@ -137,7 +149,7 @@ export const CreateTaskSchema = z
 
     // Other
     icon: z.string().max(50).optional(),
-    image_url: z.string().url('Invalid image URL').nullable().optional(),
+    image_url: z.string().max(500).nullable().optional(), // Allow relative paths like /images/tasks/...
     is_active: z.boolean().default(true),
 
     // Child exclusions (for partial assignment)
@@ -229,6 +241,9 @@ const UpdateTaskBaseSchema = z.object({
 
   category: TaskCategorySchema.optional(),
 
+  // v2.1: Time context for UI grouping
+  time_context: TaskTimeContextSchema.optional(),
+
   points: z
     .number()
     .int('Points must be a whole number')
@@ -277,7 +292,7 @@ const UpdateTaskBaseSchema = z.object({
     .optional(),
 
   icon: z.string().max(50).optional(),
-  image_url: z.string().url('Invalid image URL').nullable().optional(),
+  image_url: z.string().max(500).nullable().optional(), // Allow relative paths like /images/tasks/...
   is_active: z.boolean().optional(),
 
   // Child exclusions (for partial assignment)
@@ -397,12 +412,23 @@ export const BatchRejectSchema = z.object({
 // ============================================================================
 
 /**
- * Preset key schema
+ * Preset key schema (v2.1)
+ * Changed from: busy, balanced, academic, screen
  */
-export const PresetKeySchema = z.enum(['busy', 'balanced', 'academic', 'screen']);
+export const PresetKeySchema = z.enum(['starter', 'balanced', 'learning_focus'], {
+  message: 'Preset must be one of: starter, balanced, learning_focus',
+});
 
 /**
- * Conditional answers schema
+ * Module key schema (v2.1)
+ */
+export const ModuleKeySchema = z.enum(['hygiene', 'fitness', 'hobby'], {
+  message: 'Module must be one of: hygiene, fitness, hobby',
+});
+
+/**
+ * @deprecated Use enabledModules instead
+ * Conditional answers schema (legacy v2)
  */
 export const ConditionalAnswersSchema = z.object({
   hasPet: z.boolean().optional(),
@@ -410,14 +436,29 @@ export const ConditionalAnswersSchema = z.object({
 });
 
 /**
- * Populate tasks and rewards schema (onboarding)
+ * Age group schema
+ */
+export const AgeGroupSchema = z.enum(['5-7', '8-11', '12-14', 'all'], {
+  message: 'Age group must be one of: 5-7, 8-11, 12-14, all',
+});
+
+/**
+ * Populate tasks and rewards schema (v2.1 onboarding)
  */
 export const PopulateTasksSchema = z.object({
-  style: PresetKeySchema,
+  presetKey: PresetKeySchema.optional(), // v2.1
+  style: PresetKeySchema.optional(), // legacy fallback
   childId: z.string().uuid('Invalid child ID'),
-  ageGroup: z.enum(['5-7', '8-11', '12-14']),
-  conditionalAnswers: ConditionalAnswersSchema.optional(),
-});
+  ageGroup: AgeGroupSchema,
+  enabledModules: z.array(ModuleKeySchema).default([]), // v2.1
+  conditionalAnswers: ConditionalAnswersSchema.optional(), // legacy
+}).refine(
+  (data) => data.presetKey || data.style,
+  {
+    message: 'Either presetKey or style is required',
+    path: ['presetKey'],
+  }
+);
 
 // ============================================================================
 // Query Parameter Schemas

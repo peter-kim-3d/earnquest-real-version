@@ -66,7 +66,7 @@ export default function Home() {
                 Complete your quests and earn rewards by building great habits
               </p>
               <div className="inline-flex items-center gap-2 text-blue-500 font-bold group-hover:gap-4 transition-all">
-                Enter PIN
+                Enter Family Code
                 <ArrowRight size={20} weight="bold" />
               </div>
             </div>

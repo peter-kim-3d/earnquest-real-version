@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, HelpCircle, X } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
@@ -32,6 +32,7 @@ export default function ChildLoginPage() {
   const [enteredPin, setEnteredPin] = useState('');
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
   const [requireChildPin, setRequireChildPin] = useState(true);
+  const [showInfoPopup, setShowInfoPopup] = useState(false);
 
   // Check for family code in URL
   useEffect(() => {
@@ -268,9 +269,19 @@ export default function ChildLoginPage() {
 
               <form onSubmit={handleCodeSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-text-main dark:text-white mb-2">
-                    Family Code
-                  </label>
+                  <div className="flex items-center gap-2 mb-2">
+                    <label className="block text-sm font-medium text-text-main dark:text-white">
+                      Family Code
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowInfoPopup(true)}
+                      className="text-text-muted hover:text-primary transition-colors"
+                      aria-label="How to get family code"
+                    >
+                      <HelpCircle className="h-4 w-4" />
+                    </button>
+                  </div>
                   <input
                     type="text"
                     value={familyCode}
@@ -457,6 +468,51 @@ export default function ChildLoginPage() {
           </Link>
         </p>
       </div>
+
+      {/* Info Popup */}
+      {showInfoPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-card-dark rounded-2xl shadow-xl max-w-sm w-full p-6 relative animate-in fade-in zoom-in-95">
+            <button
+              onClick={() => setShowInfoPopup(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full mb-3">
+                <HelpCircle className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="text-lg font-bold text-text-main dark:text-white">
+                How to Get Your Family Code
+              </h3>
+            </div>
+
+            <div className="space-y-3 text-sm text-text-muted dark:text-gray-300">
+              <div className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-primary/10 text-primary rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                <p>Ask your parent or guardian for the family code</p>
+              </div>
+              <div className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-primary/10 text-primary rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                <p>They can find it in <strong>Settings → Family Management</strong></p>
+              </div>
+              <div className="flex gap-3">
+                <span className="flex-shrink-0 w-6 h-6 bg-primary/10 text-primary rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                <p>The code is 6 characters (letters and numbers)</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowInfoPopup(false)}
+              className="w-full mt-6 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-colors"
+            >
+              Got it!
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
