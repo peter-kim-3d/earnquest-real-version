@@ -32,7 +32,8 @@ export async function populateTasksAndRewards(
   childId: string,
   presetKey: PresetKey,
   ageGroup: AgeGroup,
-  enabledModules: ModuleKey[] = []
+  enabledModules: ModuleKey[] = [],
+  locale: string = 'en-US'
 ) {
   const supabase = await createClient();
 
@@ -50,11 +51,14 @@ export async function populateTasksAndRewards(
     throw new Error(`Failed to fetch task templates: ${taskError.message}`);
   }
 
-  // Fetch reward templates (use 'all' style for now, as we removed style-specific logic)
+  // Fetch reward templates (filter by age group and locale)
+  // Templates without locale in settings are included for all locales
+  // Templates with locale in settings are only included for matching locales
   const { data: rewardTemplates, error: rewardError } = await supabase
     .from('reward_templates')
     .select('*')
-    .or(`style.eq.all,age_group.eq.all,age_group.eq.${ageGroup}`);
+    .or(`style.eq.all,age_group.eq.all,age_group.eq.${ageGroup}`)
+    .or(`settings->>locale.is.null,settings->>locale.eq.${locale}`);
 
   if (rewardError) {
     console.error('Error fetching reward templates:', rewardError);

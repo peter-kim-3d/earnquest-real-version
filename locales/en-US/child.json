@@ -84,7 +84,8 @@
       "screen": "Screen Time",
       "autonomy": "Power Ups",
       "experience": "Fun Stuff",
-      "savings": "Saving"
+      "savings": "Saving",
+      "item": "Gift Cards"
     },
     "weeklyLimit": "Weekly limit: {count}",
     "limitReached": "Limit reached this week",

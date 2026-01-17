@@ -56,6 +56,7 @@
     "autonomy": "Power Ups",
     "experience": "Fun Stuff",
     "savings": "Savings",
+    "item": "Gift Cards",
     "other": "Other",
     "all": "All Categories"
   },
@@ -64,6 +65,7 @@
     "autonomy": "🔓 Power Ups",
     "experience": "🎉 Fun Stuff",
     "savings": "💰 Savings",
+    "item": "🎁 Gift Cards",
     "other": "🎁 Other"
   },
   "filter": {
@@ -87,6 +89,10 @@
     "experience": {
       "title": "Manual Fulfillment:",
       "description": "Child purchases this reward → Parent marks it as \"Given\" when fulfilled."
+    },
+    "item": {
+      "title": "Manual Fulfillment:",
+      "description": "Child purchases this reward. Parent provides the gift card when ready."
     }
   },
   "actions": {

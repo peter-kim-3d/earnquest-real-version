@@ -35,6 +35,7 @@ export async function POST(request: Request) {
     const childId: string = body.childId;
     const ageGroup: AgeGroup = body.ageGroup || '8-11';
     const enabledModules: ModuleKey[] = body.enabledModules || [];
+    const locale: string = body.locale || 'en-US';
 
     if (!childId) {
       return NextResponse.json({ error: 'Child ID is required' }, { status: 400 });
@@ -66,7 +67,8 @@ export async function POST(request: Request) {
       childId,
       presetKey,
       ageGroup,
-      enabledModules
+      enabledModules,
+      locale
     );
 
     return NextResponse.json(

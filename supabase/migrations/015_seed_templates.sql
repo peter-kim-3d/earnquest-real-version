@@ -35,9 +35,7 @@ INSERT INTO reward_templates (name, description, category, points_cost, icon, ag
 -- Autonomy rewards (all styles)
 INSERT INTO reward_templates (name, description, category, points_cost, icon, age_group, style, weekly_limit, settings) VALUES
 ('Pick Tonight''s Dinner', 'Choose what family eats', 'autonomy', 200, 'restaurant_menu', 'all', 'all', 1, '{"color": "#f97316"}'),
-('Stay Up 30 Min Late', 'Extra 30 minutes before bed', 'autonomy', 180, 'bedtime', 'all', 'all', 2, '{"color": "#ea580c"}'),
-('Choose Weekend Activity', 'Pick what family does together', 'autonomy', 300, 'celebration', 'all', 'all', 1, '{"color": "#c2410c"}'),
-('Skip One Chore', 'Skip a chore of your choice', 'autonomy', 250, 'close', 'all', 'all', 1, '{"color": "#9a3412"}');
+('Pick Family Movie/Show', 'Choose what we watch together', 'autonomy', 80, 'movie', 'all', 'all', NULL, '{"color": "#ea580c"}');
 
 -- Experience rewards (all styles)
 INSERT INTO reward_templates (name, description, category, points_cost, icon, age_group, style, settings) VALUES
@@ -49,9 +47,17 @@ INSERT INTO reward_templates (name, description, category, points_cost, icon, ag
 
 -- Savings rewards
 INSERT INTO reward_templates (name, description, category, points_cost, icon, age_group, style, settings) VALUES
-('Save Towards Lego Set', 'Put points towards big goal', 'savings', 1000, 'toys', 'all', 'all', '{"color": "#14b8a6"}'),
-('Save Towards Bike', 'Save for new bicycle', 'savings', 2000, 'pedal_bike', 'all', 'all', '{"color": "#0d9488"}'),
-('Save Towards Game', 'Save for video game', 'savings', 800, 'sports_esports', '8-11', 'all', '{"color": "#0f766e"}');
+('Save Towards Game', 'Save for video game', 'savings', 800, 'sports_esports', '8-11', 'all', '{"color": "#0f766e"}'),
+('Save to Bank', 'Transfer points to savings', 'savings', 150, 'piggybank', 'all', 'all', '{"color": "#14b8a6"}');
+
+-- Item rewards (gift cards - locale specific)
+INSERT INTO reward_templates (name, description, category, points_cost, icon, age_group, style, settings) VALUES
+('$10 Gift Card', 'Redeem for a $10 gift card', 'item', 500, 'gift', 'all', 'all', '{"color": "#8b5cf6", "locale": "en-US"}'),
+('$20 Gift Card', 'Redeem for a $20 gift card', 'item', 1000, 'gift', 'all', 'all', '{"color": "#7c3aed", "locale": "en-US"}'),
+('$50 Gift Card', 'Redeem for a $50 gift card', 'item', 2500, 'gift', 'all', 'all', '{"color": "#6d28d9", "locale": "en-US"}'),
+('₩10,000 기프트 카드', '₩10,000 기프트 카드로 교환', 'item', 500, 'gift', 'all', 'all', '{"color": "#8b5cf6", "locale": "ko-KR"}'),
+('₩20,000 기프트 카드', '₩20,000 기프트 카드로 교환', 'item', 1000, 'gift', 'all', 'all', '{"color": "#7c3aed", "locale": "ko-KR"}'),
+('₩50,000 기프트 카드', '₩50,000 기프트 카드로 교환', 'item', 2500, 'gift', 'all', 'all', '{"color": "#6d28d9", "locale": "ko-KR"}');
 
 -- Comments
 COMMENT ON TABLE task_templates IS 'Templates are used during onboarding to populate initial tasks based on age group and style';

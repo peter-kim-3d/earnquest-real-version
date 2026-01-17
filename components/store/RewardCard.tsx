@@ -65,6 +65,8 @@ export default function RewardCard({
         return 'from-pink-500 to-red-500';
       case 'savings':
         return 'from-teal-500 to-teal-600';
+      case 'item':
+        return 'from-violet-500 to-purple-600';
       default:
         return 'from-gray-500 to-gray-600';
     }

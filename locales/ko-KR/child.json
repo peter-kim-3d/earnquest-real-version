@@ -84,7 +84,8 @@
       "screen": "스크린 타임",
       "autonomy": "파워업",
       "experience": "재미있는 것",
-      "savings": "저축"
+      "savings": "저축",
+      "item": "기프트 카드"
     },
     "weeklyLimit": "주간 한도: {count}회",
     "limitReached": "이번 주 한도 도달",

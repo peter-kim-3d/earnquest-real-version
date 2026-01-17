@@ -142,6 +142,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
     { value: 'autonomy', label: t('categoryLabels.autonomy'), icon: 'stars' },
     { value: 'experience', label: t('categoryLabels.experience'), icon: 'celebration' },
     { value: 'savings', label: t('categoryLabels.savings'), icon: 'savings' },
+    { value: 'item', label: t('categoryLabels.item'), icon: 'gift' },
     { value: 'other', label: t('categoryLabels.other'), icon: 'redeem' },
   ];
 

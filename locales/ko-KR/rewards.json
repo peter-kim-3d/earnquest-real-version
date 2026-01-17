@@ -56,6 +56,7 @@
     "autonomy": "파워업",
     "experience": "재미있는 것",
     "savings": "저축",
+    "item": "기프트 카드",
     "other": "기타",
     "all": "전체 카테고리"
   },
@@ -64,6 +65,7 @@
     "autonomy": "🔓 파워업",
     "experience": "🎉 재미있는 것",
     "savings": "💰 저축",
+    "item": "🎁 기프트 카드",
     "other": "🎁 기타"
   },
   "filter": {
@@ -87,6 +89,10 @@
     "experience": {
       "title": "수동 지급:",
       "description": "아이가 보상 구매 → 실제 지급 시 부모가 \"지급함\"으로 표시"
+    },
+    "item": {
+      "title": "수동 지급:",
+      "description": "아이가 보상 구매 → 부모가 준비되면 기프트 카드 제공"
     }
   },
   "actions": {

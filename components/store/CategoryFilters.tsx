@@ -5,13 +5,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { AppIcon } from '@/components/ui/AppIcon';
 
-const categoryIds = ['all', 'screen', 'autonomy', 'experience', 'savings'] as const;
+const categoryIds = ['all', 'screen', 'autonomy', 'experience', 'savings', 'item'] as const;
 const categoryIcons: Record<string, string> = {
   all: 'grid_view',
   screen: 'tv',
   autonomy: 'bolt',
   experience: 'celebration',
   savings: 'savings',
+  item: 'gift',
 };
 
 export default function CategoryFilters() {
