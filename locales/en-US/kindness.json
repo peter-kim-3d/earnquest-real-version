@@ -15,7 +15,14 @@
     "messagePlaceholder": "Write your gratitude message here...",
     "preview": "Preview",
     "send": "Send Gratitude",
-    "sending": "Sending..."
+    "sending": "Sending...",
+    "back": "Back",
+    "next": "Next",
+    "selectChild": "Please select a child",
+    "completeFields": "Please complete all fields",
+    "sendFailed": "Failed to send gratitude card",
+    "sentSuccess": "Gratitude sent!",
+    "sentSuccessDesc": "{name} will love your message!"
   },
   "themes": {
     "thankYou": "Thank You",

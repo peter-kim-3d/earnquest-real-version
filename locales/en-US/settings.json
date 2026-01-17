@@ -1,6 +1,6 @@
 {
   "title": "Settings",
-  "subtitle": "Manage your account and preferences",
+  "subtitle": "Manage your family account and preferences",
   "sections": {
     "profile": "Profile",
     "children": "Children",
@@ -125,5 +125,45 @@
     "pinRemoved": "PIN code removed",
     "avatarUpdated": "Avatar updated",
     "profileUpdated": "Profile updated"
+  },
+  "page": {
+    "familyManagement": "Family Management",
+    "childrenDesc": "Manage your children's profiles and settings",
+    "deviceAccess": "Child Device Access",
+    "deviceAccessDesc": "Share login codes with your children",
+    "loginSecurity": "Child Login Security",
+    "loginSecurityDesc": "Manage PIN requirements for child accounts",
+    "coParentAccess": "Co-Parent Access",
+    "parentsHaveAccess": "{count} parents have access",
+    "inviteAnotherParent": "Invite another parent",
+    "pendingInvitations": "Pending Invitations",
+    "expires": "Expires {date}",
+    "account": "Account",
+    "email": "Email",
+    "name": "Name",
+    "notSet": "Not set",
+    "support": "Support",
+    "contactUs": "Contact Us"
+  },
+  "invite": {
+    "button": "Invite Co-Parent",
+    "title": "Invite Co-Parent",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "partner@example.com",
+    "emailHelp": "We'll send an invitation link to this email address. They'll be able to access all family features.",
+    "emailRequired": "Please enter an email address",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "createInvitation": "Create Invitation",
+    "created": "Invitation Created!",
+    "createdSuccess": "Invitation created successfully!",
+    "shareLink": "Share this link with {email} to give them access to your family.",
+    "linkLabel": "Invitation Link",
+    "copied": "Copied",
+    "copy": "Copy",
+    "linkCopied": "Link copied to clipboard!",
+    "expiresOn": "This link expires on {date}. They'll need to sign in or create an account to accept.",
+    "done": "Done",
+    "createFailed": "Failed to create invitation"
   }
 }

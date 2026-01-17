@@ -15,7 +15,14 @@
     "messagePlaceholder": "여기에 감사 메시지를 작성하세요...",
     "preview": "미리보기",
     "send": "감사 보내기",
-    "sending": "보내는 중..."
+    "sending": "보내는 중...",
+    "back": "뒤로",
+    "next": "다음",
+    "selectChild": "아이를 선택해주세요",
+    "completeFields": "모든 항목을 완료해주세요",
+    "sendFailed": "감사 카드 전송에 실패했습니다",
+    "sentSuccess": "감사가 전달되었어요!",
+    "sentSuccessDesc": "{name}이(가) 메시지를 좋아할 거예요!"
   },
   "themes": {
     "thankYou": "고마워요",

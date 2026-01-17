@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import InviteCoParent from '@/components/settings/InviteCoParent';
 import DeviceConnection from '@/components/settings/DeviceConnection';
 import ChildPinToggle from '@/components/settings/ChildPinToggle';
@@ -17,6 +18,7 @@ export default async function SettingsPage({
 }) {
   const { locale } = await params;
   const supabase = await createClient();
+  const t = await getTranslations('settings');
 
   // Check authentication
   const {
@@ -59,10 +61,10 @@ export default async function SettingsPage({
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold text-text-main dark:text-white mb-2">
-        Settings
+        {t('title')}
       </h1>
       <p className="text-text-muted dark:text-text-muted mb-8">
-        Manage your family account and preferences
+        {t('subtitle')}
       </p>
 
       <div className="space-y-6">
@@ -71,7 +73,7 @@ export default async function SettingsPage({
           <div className="flex items-center gap-3 mb-4">
             <Users className="h-6 w-6 text-primary" />
             <h2 className="text-xl font-bold text-text-main dark:text-white">
-              Family Management
+              {t('page.familyManagement')}
             </h2>
           </div>
 
@@ -84,10 +86,10 @@ export default async function SettingsPage({
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-text-main dark:text-white mb-1">
-                    Children
+                    {t('sections.children')}
                   </h3>
                   <p className="text-sm text-text-muted dark:text-text-muted">
-                    Manage your children&apos;s profiles and settings
+                    {t('page.childrenDesc')}
                   </p>
                 </div>
                 <CaretRight size={20} className="text-gray-400" />
@@ -97,8 +99,8 @@ export default async function SettingsPage({
             {/* Device Connection */}
             <CollapsibleSection
               id="device-access"
-              title="Child Device Access"
-              description="Share login codes with your children"
+              title={t('page.deviceAccess')}
+              description={t('page.deviceAccessDesc')}
               icon={Smartphone}
             >
               <DeviceConnection />
@@ -107,8 +109,8 @@ export default async function SettingsPage({
             {/* Child PIN Security */}
             <CollapsibleSection
               id="child-pin"
-              title="Child Login Security"
-              description="Manage PIN requirements for child accounts"
+              title={t('page.loginSecurity')}
+              description={t('page.loginSecurityDesc')}
               icon={Lock}
             >
               <ChildPinToggle />
@@ -116,10 +118,10 @@ export default async function SettingsPage({
 
             {/* Co-Parent Invite */}
             <CollapsibleSection
-              title="Co-Parent Access"
+              title={t('page.coParentAccess')}
               description={membersCount && membersCount > 1
-                ? `${membersCount} parents have access`
-                : 'Invite another parent'}
+                ? t('page.parentsHaveAccess', { count: membersCount })
+                : t('page.inviteAnotherParent')}
               icon={Mail}
             >
               <InviteCoParent />
@@ -128,7 +130,7 @@ export default async function SettingsPage({
               {pendingInvites && pendingInvites.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-xs font-semibold text-text-muted dark:text-text-muted mb-2 uppercase">
-                    Pending Invitations
+                    {t('page.pendingInvitations')}
                   </p>
                   <div className="space-y-2">
                     {pendingInvites.map((invite) => (
@@ -140,7 +142,7 @@ export default async function SettingsPage({
                           {invite.invited_email}
                         </span>
                         <span className="text-xs text-text-muted dark:text-text-muted">
-                          Expires {new Date(invite.expires_at).toLocaleDateString()}
+                          {t('page.expires', { date: new Date(invite.expires_at).toLocaleDateString() })}
                         </span>
                       </div>
                     ))}
@@ -156,13 +158,13 @@ export default async function SettingsPage({
           <div className="flex items-center gap-3 mb-4">
             <User size={24} className="text-primary" />
             <h2 className="text-xl font-bold text-text-main dark:text-white">
-              Account
+              {t('page.account')}
             </h2>
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
               <span className="text-sm font-medium text-text-muted dark:text-text-muted">
-                Email
+                {t('page.email')}
               </span>
               <span className="text-sm text-text-main dark:text-white">
                 {user.email}
@@ -170,10 +172,10 @@ export default async function SettingsPage({
             </div>
             <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
               <span className="text-sm font-medium text-text-muted dark:text-text-muted">
-                Name
+                {t('page.name')}
               </span>
               <span className="text-sm text-text-main dark:text-white">
-                {userProfile.full_name || 'Not set'}
+                {userProfile.full_name || t('page.notSet')}
               </span>
             </div>
           </div>
@@ -184,13 +186,13 @@ export default async function SettingsPage({
           <div className="flex items-center gap-3 mb-4">
             <Shield size={24} className="text-primary" />
             <h2 className="text-xl font-bold text-text-main dark:text-white">
-              About EarnQuest
+              {t('about.title')}
             </h2>
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
               <span className="text-sm font-medium text-text-muted dark:text-text-muted">
-                Version
+                {t('about.version')}
               </span>
               <span className="text-sm font-mono text-text-main dark:text-white">
                 v0.1.0 <BetaBadge size="sm" className="ml-1" />
@@ -198,10 +200,10 @@ export default async function SettingsPage({
             </div>
             <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
               <span className="text-sm font-medium text-text-muted dark:text-text-muted">
-                Support
+                {t('page.support')}
               </span>
               <a href="mailto:support@earnquest.app" className="text-sm text-primary hover:underline">
-                Contact Us
+                {t('page.contactUs')}
               </a>
             </div>
           </div>

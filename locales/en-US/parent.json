@@ -145,5 +145,34 @@
     "setPin": "Set PIN Code",
     "changePin": "Change PIN Code",
     "pinInfo": "PIN is used for child login"
+  },
+  "childForm": {
+    "editTitle": "Edit Child",
+    "addTitle": "Add Child",
+    "nameLabel": "Child's First Name",
+    "namePlaceholder": "What's their name?",
+    "nameRequired": "Please enter child's name",
+    "birthdateLabel": "Date of Birth",
+    "birthdateHelp": "We use this to calculate age and recommend appropriate tasks",
+    "birthdateRequired": "Please select date of birth",
+    "calculatedInfo": "Calculated Info",
+    "yearsOld": "{age} years old",
+    "ageGroupLabel": "Age Group",
+    "ageGroups": {
+      "5-7": "Mini Earners",
+      "8-11": "Pro Earners",
+      "12-14": "Teen Earners"
+    },
+    "pinLabel": "Secret PIN (4 digits)",
+    "pinPlaceholder": "0000",
+    "pinHelp": "Used for child login. Default is 0000.",
+    "pinInvalid": "PIN must be 4 digits",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "update": "Update",
+    "addChild": "Add Child",
+    "updated": "Child updated!",
+    "added": "Child added!",
+    "saveFailed": "Failed to save child"
   }
 }

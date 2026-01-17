@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -36,6 +37,7 @@ export function ChildFormDialog({
   child,
   familyId,
 }: ChildFormDialogProps) {
+  const t = useTranslations('parent.childForm');
   const [name, setName] = useState('');
   const [birthYear, setBirthYear] = useState<string>('');
   const [pinCode, setPinCode] = useState('');
@@ -82,9 +84,9 @@ export function ChildFormDialog({
 
   const getAgeGroupLabel = (ageGroup: AgeGroup) => {
     const labels = {
-      '5-7': { emoji: '🐣', label: 'Mini Earners' },
-      '8-11': { emoji: '🚀', label: 'Pro Earners' },
-      '12-14': { emoji: '🎓', label: 'Teen Earners' },
+      '5-7': { emoji: '🐣', label: t('ageGroups.5-7') },
+      '8-11': { emoji: '🚀', label: t('ageGroups.8-11') },
+      '12-14': { emoji: '🎓', label: t('ageGroups.12-14') },
     };
     return labels[ageGroup];
   };
@@ -93,17 +95,17 @@ export function ChildFormDialog({
     e.preventDefault();
 
     if (!name.trim()) {
-      toast.error("Please enter child's name");
+      toast.error(t('nameRequired'));
       return;
     }
 
     if (!birthYear) {
-      toast.error("Please select date of birth");
+      toast.error(t('birthdateRequired'));
       return;
     }
 
     if (pinCode && pinCode.length !== 4) {
-      toast.error("PIN must be 4 digits");
+      toast.error(t('pinInvalid'));
       return;
     }
 
@@ -135,12 +137,12 @@ export function ChildFormDialog({
         throw new Error(error.error || 'Failed to save child');
       }
 
-      toast.success(child ? 'Child updated!' : 'Child added!');
+      toast.success(child ? t('updated') : t('added'));
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error('Save child error:', error);
-      toast.error(error.message || 'Failed to save child');
+      toast.error(error.message || t('saveFailed'));
     } finally {
       setLoading(false);
     }
@@ -156,17 +158,17 @@ export function ChildFormDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {child ? 'Edit Child' : 'Add Child'}
+            {child ? t('editTitle') : t('addTitle')}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Name Input */}
           <div className="space-y-2">
-            <Label htmlFor="name">Child&apos;s First Name</Label>
+            <Label htmlFor="name">{t('nameLabel')}</Label>
             <Input
               id="name"
-              placeholder="What's their name?"
+              placeholder={t('namePlaceholder')}
               value={name}
               onChange={(e) => setName(e.target.value)}
               autoFocus
@@ -175,7 +177,7 @@ export function ChildFormDialog({
 
           {/* Birth Date Picker */}
           <div className="space-y-2">
-            <Label htmlFor="birthdate">Date of Birth</Label>
+            <Label htmlFor="birthdate">{t('birthdateLabel')}</Label>
             <Input
               id="birthdate"
               type="date"
@@ -184,7 +186,7 @@ export function ChildFormDialog({
               max={new Date().toISOString().split('T')[0]}
             />
             <p className="text-xs text-gray-500">
-              We use this to calculate age and recommend appropriate tasks
+              {t('birthdateHelp')}
             </p>
           </div>
 
@@ -193,14 +195,14 @@ export function ChildFormDialog({
             <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Calculated Info</p>
-                  <p className="text-lg font-bold text-gray-900 dark:text-white">{currentAge} years old</p>
+                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">{t('calculatedInfo')}</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">{t('yearsOld', { age: currentAge })}</p>
                 </div>
                 <div className="text-right">
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-lg">
                     <span className="text-2xl">{ageGroupInfo.emoji}</span>
                     <div className="text-left">
-                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">Age Group</p>
+                      <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">{t('ageGroupLabel')}</p>
                       <p className="text-sm font-bold text-primary">{ageGroupInfo.label}</p>
                     </div>
                   </div>
@@ -211,14 +213,14 @@ export function ChildFormDialog({
 
           {/* PIN Code */}
           <div className="space-y-2">
-            <Label htmlFor="pin">Secret PIN (4 digits)</Label>
+            <Label htmlFor="pin">{t('pinLabel')}</Label>
             <Input
               id="pin"
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
               maxLength={4}
-              placeholder="0000"
+              placeholder={t('pinPlaceholder')}
               value={pinCode || ''}
               onChange={(e) => {
                 const val = e.target.value.replace(/[^0-9]/g, '');
@@ -227,7 +229,7 @@ export function ChildFormDialog({
               className="font-mono tracking-widest text-center text-lg"
             />
             <p className="text-xs text-gray-500">
-              Used for child login. Default is 0000.
+              {t('pinHelp')}
             </p>
           </div>
 
@@ -239,14 +241,14 @@ export function ChildFormDialog({
               onClick={onClose}
               disabled={loading}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               type="submit"
               disabled={loading}
               className="bg-primary hover:bg-primary/90 text-white"
             >
-              {loading ? 'Saving...' : child ? 'Update' : 'Add Child'}
+              {loading ? t('saving') : child ? t('update') : t('addChild')}
             </Button>
           </div>
         </form>

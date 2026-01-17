@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { RecipientSelector } from './RecipientSelector';
 import { ThemePicker, CardTheme } from './ThemePicker';
 import { CardPreview } from './CardPreview';
@@ -27,6 +28,7 @@ export function SendGratitudeForm({
   familyId,
 }: SendGratitudeFormProps) {
   const router = useRouter();
+  const t = useTranslations('kindness.form');
   const [step, setStep] = useState(1);
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
   const [theme, setTheme] = useState<CardTheme>('cosmic');
@@ -37,7 +39,7 @@ export function SendGratitudeForm({
 
   const handleNext = () => {
     if (step === 1 && !selectedChildId) {
-      toast.error('Please select a child');
+      toast.error(t('selectChild'));
       return;
     }
     setStep(step + 1);
@@ -49,7 +51,7 @@ export function SendGratitudeForm({
 
   const handleSend = async () => {
     if (!selectedChildId || !message.trim()) {
-      toast.error('Please complete all fields');
+      toast.error(t('completeFields'));
       return;
     }
 
@@ -70,11 +72,11 @@ export function SendGratitudeForm({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to send gratitude card');
+        throw new Error(error.error || t('sendFailed'));
       }
 
-      toast.success('Gratitude sent! ❤️', {
-        description: `${selectedChild?.name} will love your message!`,
+      toast.success(`${t('sentSuccess')} ❤️`, {
+        description: t('sentSuccessDesc', { name: selectedChild?.name || '' }),
       });
 
       // Reset form
@@ -89,7 +91,7 @@ export function SendGratitudeForm({
       }, 1500);
     } catch (error: any) {
       console.error('Send gratitude error:', error);
-      toast.error(error.message || 'Failed to send gratitude');
+      toast.error(error.message || t('sendFailed'));
     } finally {
       setIsSending(false);
     }
@@ -164,7 +166,7 @@ export function SendGratitudeForm({
               disabled={isSending}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              {t('back')}
             </Button>
           )}
           <Button
@@ -172,7 +174,7 @@ export function SendGratitudeForm({
             className="flex-1 bg-primary-kindness hover:bg-primary-kindness/90 text-white"
             disabled={step === 1 && !selectedChildId}
           >
-            Next
+            {t('next')}
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>

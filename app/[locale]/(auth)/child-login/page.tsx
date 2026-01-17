@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { ArrowLeft, Loader2, HelpCircle, X } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
 import { AppIcon } from '@/components/ui/AppIcon';
 
@@ -22,6 +23,7 @@ export default function ChildLoginPage() {
   const pathname = usePathname();
   const locale = pathname.split('/')[1] || 'en-US';
   const searchParams = useSearchParams();
+  const t = useTranslations('auth.childLogin');
 
   // State management
   const [step, setStep] = useState<Step>('code');
@@ -81,12 +83,12 @@ export default function ChildLoginPage() {
       if (!validateRes.ok) {
         const data = await validateRes.json();
         if (data.error === 'TOO_MANY_ATTEMPTS') {
-          setError(`Too many attempts. Try again in ${data.retryAfterSeconds} seconds.`);
+          setError(t('errors.tooManyAttempts', { seconds: data.retryAfterSeconds }));
           setRetryAfterSeconds(data.retryAfterSeconds);
         } else if (data.error === 'INVALID_CODE') {
-          setError('Invalid family code. Please check and try again.');
+          setError(t('errors.invalidCode'));
         } else {
-          setError('Invalid family code format.');
+          setError(t('errors.invalidFormat'));
         }
         setLoading(false);
         return;
@@ -100,7 +102,7 @@ export default function ChildLoginPage() {
       });
 
       if (!childrenRes.ok) {
-        setError('Failed to load family. Please try again.');
+        setError(t('errors.loadFailed'));
         setLoading(false);
         return;
       }
@@ -112,7 +114,7 @@ export default function ChildLoginPage() {
       setStep('selection');
     } catch (err) {
       console.error('Validation error:', err);
-      setError('Network error. Please check your connection.');
+      setError(t('errors.networkError'));
     } finally {
       setLoading(false);
     }
@@ -151,10 +153,10 @@ export default function ChildLoginPage() {
       }
 
       // Success! Redirect to child dashboard
-      toast.success(`Welcome back, ${child.name}!`);
+      toast.success(t('welcomeBack', { name: child.name }));
       router.push(`/${locale}/child/dashboard`);
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Login failed';
+      const errorMessage = err instanceof Error ? err.message : t('errors.loginFailed');
       console.error('Login failed:', err);
       setStep('selection');
       setError(errorMessage);
@@ -178,14 +180,14 @@ export default function ChildLoginPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Login failed');
+        throw new Error(errorData.error || t('errors.loginFailed'));
       }
 
       // Success! Redirect to child dashboard
-      toast.success(`Welcome back, ${selectedChild.name}!`);
+      toast.success(t('welcomeBack', { name: selectedChild.name }));
       router.push(`/${locale}/child/dashboard`);
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Incorrect PIN';
+      const errorMessage = err instanceof Error ? err.message : t('errors.incorrectPin');
       console.error('Login failed:', err);
       // Stay on PIN step and show error
       setStep('pin');
@@ -252,7 +254,7 @@ export default function ChildLoginPage() {
           className="mb-6 flex items-center gap-2 text-text-muted dark:text-text-muted hover:text-primary transition-colors disabled:opacity-50"
         >
           <ArrowLeft className="h-5 w-5" />
-          Back
+          {t('back')}
         </button>
 
         {/* Main Card */}
@@ -262,10 +264,10 @@ export default function ChildLoginPage() {
             <>
               <div className="text-center mb-6">
                 <h1 className="text-3xl font-bold text-text-main dark:text-white mb-2">
-                  Welcome!
+                  {t('welcome')}
                 </h1>
                 <p className="text-text-muted dark:text-text-muted">
-                  Enter your family code to get started
+                  {t('enterFamilyCode')}
                 </p>
               </div>
 
@@ -273,7 +275,7 @@ export default function ChildLoginPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <label className="block text-sm font-medium text-text-main dark:text-white">
-                      Family Code
+                      {t('familyCode')}
                     </label>
                     <button
                       type="button"
@@ -308,7 +310,7 @@ export default function ChildLoginPage() {
                     <span className="text-xl">⚠️</span>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-red-700 dark:text-red-400">
-                        {error.includes('Too many') ? 'Too Many Attempts' : 'Connection Issue'}
+                        {error.includes('Too many') || error.includes('시도 횟수') ? t('errors.tooManyAttemptsTitle') : t('errors.connectionIssue')}
                       </p>
                       <p className="text-xs text-red-600 dark:text-red-300 mt-0.5">
                         {error}
@@ -320,7 +322,7 @@ export default function ChildLoginPage() {
                 {retryAfterSeconds !== null && retryAfterSeconds > 0 && (
                   <div className="text-center">
                     <p className="text-sm text-text-muted dark:text-gray-400">
-                      Please wait <span className="font-bold text-red-500">{retryAfterSeconds}s</span> before trying again.
+                      {t('errors.pleaseWait', { seconds: retryAfterSeconds })}
                     </p>
                   </div>
                 )}
@@ -333,15 +335,15 @@ export default function ChildLoginPage() {
                   {loading ? (
                     <>
                       <Loader2 className="h-5 w-5 animate-spin" />
-                      Checking...
+                      {t('checking')}
                     </>
                   ) : (
-                    'Continue'
+                    t('continue')
                   )}
                 </button>
 
                 <p className="text-sm text-center text-text-muted dark:text-text-muted">
-                  Ask your parent for the family code
+                  {t('askParent')}
                 </p>
               </form>
             </>
@@ -352,10 +354,10 @@ export default function ChildLoginPage() {
             <>
               <div className="text-center mb-6">
                 <h1 className="text-3xl font-bold text-text-main dark:text-white mb-2">
-                  Who are you?
+                  {t('whoAreYou')}
                 </h1>
                 <p className="text-text-muted dark:text-text-muted">
-                  {familyName ? `${familyName} Family` : 'Select your profile to continue'}
+                  {familyName ? t('familyName', { name: familyName }) : t('selectProfile')}
                 </p>
               </div>
 
@@ -374,7 +376,7 @@ export default function ChildLoginPage() {
                         {child.name}
                       </p>
                       <p className="text-sm text-text-muted dark:text-text-muted">
-                        Age {child.age_group}
+                        {t('age', { ageGroup: child.age_group })}
                       </p>
                     </div>
                     <AppIcon name="arrow_forward" size={20} className="text-gray-400 group-hover:text-primary" />
@@ -396,10 +398,10 @@ export default function ChildLoginPage() {
                   />
                 </div>
                 <h1 className="text-2xl font-bold text-text-main dark:text-white mb-2">
-                  Hello, {selectedChild.name}!
+                  {t('hello', { name: selectedChild.name })}
                 </h1>
                 <p className="text-text-muted dark:text-text-muted">
-                  Enter your secret code
+                  {t('enterSecretCode')}
                 </p>
               </div>
 
@@ -457,16 +459,16 @@ export default function ChildLoginPage() {
           {step === 'logging' && (
             <div className="text-center py-12">
               <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-              <p className="text-text-muted dark:text-text-muted">Logging in...</p>
+              <p className="text-text-muted dark:text-text-muted">{t('loggingIn')}</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
         <p className="text-center text-sm text-text-muted dark:text-text-muted mt-6">
-          Are you a parent?{' '}
+          {t('areYouParent')}{' '}
           <Link href={`/${locale}/login`} className="text-primary hover:underline font-semibold">
-            Parent Login
+            {t('parentLogin')}
           </Link>
         </p>
       </div>
@@ -487,22 +489,22 @@ export default function ChildLoginPage() {
                 <HelpCircle className="h-6 w-6 text-primary" />
               </div>
               <h3 className="text-lg font-bold text-text-main dark:text-white">
-                How to Get Your Family Code
+                {t('infoPopup.title')}
               </h3>
             </div>
 
             <div className="space-y-3 text-sm text-text-muted dark:text-gray-300">
               <div className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-primary/10 text-primary rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                <p>Ask your parent or guardian for the family code</p>
+                <p>{t('infoPopup.step1')}</p>
               </div>
               <div className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-primary/10 text-primary rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                <p>They can find it in <strong>Settings → Family Management</strong></p>
+                <p>{t('infoPopup.step2')}</p>
               </div>
               <div className="flex gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-primary/10 text-primary rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                <p>The code is 6 characters (letters and numbers)</p>
+                <p>{t('infoPopup.step3')}</p>
               </div>
             </div>
 
@@ -510,7 +512,7 @@ export default function ChildLoginPage() {
               onClick={() => setShowInfoPopup(false)}
               className="w-full mt-6 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-colors"
             >
-              Got it!
+              {t('infoPopup.gotIt')}
             </button>
           </div>
         </div>

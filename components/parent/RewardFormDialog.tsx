@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ImageIcon, Palette } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,6 +39,7 @@ interface RewardFormDialogProps {
 
 export default function RewardFormDialog({ reward, isOpen, onClose, existingRewards = [] }: RewardFormDialogProps) {
   const router = useRouter();
+  const t = useTranslations('rewards');
   const [loading, setLoading] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -129,18 +131,18 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
       onClose();
     } catch (error: any) {
       console.error('Error saving reward:', error);
-      toast.error('Save Failed', { description: error.message || 'Failed to save reward. Please try again.' });
+      toast.error(t('dialog.saveFailed'), { description: error.message || t('toast.error') });
     } finally {
       setLoading(false);
     }
   };
 
   const categories = [
-    { value: 'screen', label: '📺 Screen Time', icon: 'tv' },
-    { value: 'autonomy', label: '🔓 Power Ups', icon: 'stars' },
-    { value: 'experience', label: '🎉 Fun Stuff', icon: 'celebration' },
-    { value: 'savings', label: '💰 Savings', icon: 'savings' },
-    { value: 'other', label: '🎁 Other', icon: 'redeem' },
+    { value: 'screen', label: t('categoryLabels.screen'), icon: 'tv' },
+    { value: 'autonomy', label: t('categoryLabels.autonomy'), icon: 'stars' },
+    { value: 'experience', label: t('categoryLabels.experience'), icon: 'celebration' },
+    { value: 'savings', label: t('categoryLabels.savings'), icon: 'savings' },
+    { value: 'other', label: t('categoryLabels.other'), icon: 'redeem' },
   ];
 
   return (
@@ -148,35 +150,35 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
       <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            {reward ? 'Edit Reward' : 'Create New Reward'}
+            {reward ? t('dialog.editTitle') : t('dialog.createTitle')}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
           {/* Reward Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Reward Name *</Label>
+            <Label htmlFor="name">{t('form.nameLabel')}</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g., 30 Minutes TV Time"
+              placeholder={t('form.namePlaceholder')}
               maxLength={100}
               className={hasSubmitted && !formData.name.trim() ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
             {hasSubmitted && !formData.name.trim() && (
-              <p className="text-sm text-red-500 font-medium">Reward name is required</p>
+              <p className="text-sm text-red-500 font-medium">{t('form.nameRequired')}</p>
             )}
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('form.description')}</Label>
             <textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Optional details about the reward"
+              placeholder={t('form.descriptionPlaceholder')}
               className="w-full min-h-20 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
               maxLength={500}
             />
@@ -184,7 +186,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
 
           {/* Icon/Image Selection */}
           <div className="space-y-3">
-            <Label>Reward Icon/Image</Label>
+            <Label>{t('form.iconLabel')}</Label>
 
             {/* Mode Toggle */}
             <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 p-1 bg-gray-50 dark:bg-gray-800">
@@ -198,7 +200,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
                 }`}
               >
                 <Palette className="w-4 h-4" />
-                Choose Icon
+                {t('form.chooseIcon')}
               </button>
               <button
                 type="button"
@@ -210,7 +212,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
                 }`}
               >
                 <ImageIcon className="w-4 h-4" />
-                Upload Image
+                {t('form.uploadImage')}
               </button>
             </div>
 
@@ -233,15 +235,15 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
                           </div>
                           <div className="text-left">
                             <p className="text-sm font-medium text-gray-900 dark:text-white">{selectedIcon.name}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Click to change</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{t('form.clickToChange')}</p>
                           </div>
                         </div>
                       );
                     }
                     return (
                       <div className="text-center">
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Select an icon</p>
-                        <p className="text-xs text-gray-400">Click to browse</p>
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{t('form.selectIcon')}</p>
+                        <p className="text-xs text-gray-400">{t('form.clickToBrowse')}</p>
                       </div>
                     );
                   })()}
@@ -279,7 +281,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
                     className="h-[88px] px-4 py-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800/50 flex flex-col items-center justify-center"
                   >
                     <span className="text-2xl mb-1">🖼️</span>
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Default Images</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('form.defaultImages')}</span>
                   </button>
                   <div className="h-[88px]">
                     <TaskImageUpload
@@ -316,7 +318,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
 
           {/* Category */}
           <div className="space-y-2">
-            <Label htmlFor="category">Category *</Label>
+            <Label htmlFor="category">{t('form.categoryLabel')}</Label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {categories.map((cat) => (
                 <button
@@ -339,23 +341,23 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
                   'bg-orange-50 text-orange-900 dark:bg-orange-900/20 dark:text-orange-100'
               }`}>
               <p className="font-semibold mb-1">
-                {formData.category === 'screen' ? '⏱️ How Screen Time Works:' :
-                  formData.category === 'autonomy' ? '⚡ Instant Redemption:' :
-                    formData.category === 'savings' ? '💰 Instant Deduction:' :
-                      '🎁 Manual Fulfillment:'}
+                {formData.category === 'screen' ? `⏱️ ${t('categoryInfo.screen.title')}` :
+                  formData.category === 'autonomy' ? `⚡ ${t('categoryInfo.autonomy.title')}` :
+                    formData.category === 'savings' ? `💰 ${t('categoryInfo.savings.title')}` :
+                      `🎁 ${t('categoryInfo.experience.title')}`}
               </p>
               <p className="opacity-90 leading-relaxed">
-                {formData.category === 'screen' ? 'Child requests usage → Parent approves → Timer starts automatically.' :
-                  formData.category === 'autonomy' ? 'Reward is marked "Used" immediately upon purchase. No parent approval needed.' :
-                    formData.category === 'savings' ? 'Points are deducted immediately. Great for long-term saving goals.' :
-                      'Child purchases this reward → Parent marks it as "Given" when it is physically received.'}
+                {formData.category === 'screen' ? t('categoryInfo.screen.description') :
+                  formData.category === 'autonomy' ? t('categoryInfo.autonomy.description') :
+                    formData.category === 'savings' ? t('categoryInfo.savings.description') :
+                      t('categoryInfo.experience.description')}
               </p>
             </div>
           </div>
 
           {/* Points Cost */}
           <div className="space-y-2">
-            <Label htmlFor="points_cost">Points Cost *</Label>
+            <Label htmlFor="points_cost">{t('form.costLabel')}</Label>
             <Input
               id="points_cost"
               type="number"
@@ -379,15 +381,15 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
           {/* Screen Minutes (optional) */}
           <div className="space-y-2">
             <Label htmlFor="screen_minutes">
-              Screen Time (minutes)
-              <span className="text-xs text-text-muted dark:text-gray-500 ml-2">Optional - for screen rewards</span>
+              {t('form.screenMinutes')}
+              <span className="text-xs text-text-muted dark:text-gray-500 ml-2">{t('form.screenMinutesHelp')}</span>
             </Label>
             <Input
               id="screen_minutes"
               type="number"
               value={formData.screen_minutes || ''}
               onChange={(e) => setFormData({ ...formData, screen_minutes: e.target.value ? parseInt(e.target.value) : null })}
-              placeholder="e.g., 30"
+              placeholder={t('form.screenMinutesPlaceholder')}
               min={5}
               max={240}
               step={5}
@@ -397,15 +399,15 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
           {/* Weekly Limit (optional) */}
           <div className="space-y-2">
             <Label htmlFor="weekly_limit">
-              Weekly Purchase Limit
-              <span className="text-xs text-text-muted dark:text-gray-500 ml-2">Optional - max purchases per week</span>
+              {t('form.weeklyLimit')}
+              <span className="text-xs text-text-muted dark:text-gray-500 ml-2">{t('form.weeklyLimitHelp')}</span>
             </Label>
             <Input
               id="weekly_limit"
               type="number"
               value={formData.weekly_limit || ''}
               onChange={(e) => setFormData({ ...formData, weekly_limit: e.target.value ? parseInt(e.target.value) : null })}
-              placeholder="e.g., 2"
+              placeholder={t('form.weeklyLimitPlaceholder')}
               min={1}
               max={10}
             />
@@ -420,14 +422,14 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
               disabled={loading}
               className="flex-1"
             >
-              Cancel
+              {t('dialog.cancel')}
             </Button>
             <Button
               type="submit"
               disabled={loading}
               className="flex-1 bg-primary hover:bg-primary/90"
             >
-              {loading ? 'Saving...' : reward ? 'Update Reward' : 'Create Reward'}
+              {loading ? t('actions.saving') : reward ? t('actions.update') : t('actions.create')}
             </Button>
           </div>
         </form>

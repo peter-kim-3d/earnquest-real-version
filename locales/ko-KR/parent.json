@@ -145,5 +145,34 @@
     "setPin": "PIN 코드 설정",
     "changePin": "PIN 코드 변경",
     "pinInfo": "PIN은 아이 로그인에 사용됩니다"
+  },
+  "childForm": {
+    "editTitle": "아이 수정",
+    "addTitle": "아이 추가",
+    "nameLabel": "아이의 이름",
+    "namePlaceholder": "이름이 뭐예요?",
+    "nameRequired": "아이 이름을 입력해 주세요",
+    "birthdateLabel": "생년월일",
+    "birthdateHelp": "나이를 계산하고 적절한 할 일을 추천하는 데 사용됩니다",
+    "birthdateRequired": "생년월일을 선택해 주세요",
+    "calculatedInfo": "계산된 정보",
+    "yearsOld": "{age}세",
+    "ageGroupLabel": "연령대",
+    "ageGroups": {
+      "5-7": "꼬마 어너",
+      "8-11": "프로 어너",
+      "12-14": "틴 어너"
+    },
+    "pinLabel": "비밀 PIN (4자리)",
+    "pinPlaceholder": "0000",
+    "pinHelp": "아이 로그인에 사용됩니다. 기본값은 0000입니다.",
+    "pinInvalid": "PIN은 4자리여야 합니다",
+    "cancel": "취소",
+    "saving": "저장 중...",
+    "update": "수정",
+    "addChild": "아이 추가",
+    "updated": "아이 정보가 수정되었습니다!",
+    "added": "아이가 추가되었습니다!",
+    "saveFailed": "아이 저장에 실패했습니다"
   }
 }

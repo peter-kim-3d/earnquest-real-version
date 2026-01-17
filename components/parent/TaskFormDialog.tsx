@@ -15,6 +15,7 @@ import TaskImageUpload from '@/components/tasks/TaskImageUpload';
 import DefaultTaskImagePicker from '@/components/tasks/DefaultTaskImagePicker';
 import { getIconById, TASK_ICON_POOL } from '@/lib/task-icons';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 type Task = {
   id: string;
@@ -45,6 +46,8 @@ interface TaskFormDialogProps {
 
 export default function TaskFormDialog({ task, isOpen, onClose, initialChildId = null, availableChildren = [] }: TaskFormDialogProps) {
   const router = useRouter();
+  const t = useTranslations('tasks');
+  const tCommon = useTranslations('common');
   const [loading, setLoading] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   // Track which children are selected (for task view, not child profile)
@@ -223,8 +226,8 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
 
         if (selectedCount === 0) {
           // No children selected: shouldn't happen, but handle it
-          toast.error('No children selected', {
-            description: 'Please select at least one child for this task',
+          toast.error(t('dialog.noChildrenSelected'), {
+            description: t('dialog.noChildrenSelectedDesc'),
           });
           setLoading(false);
           return;
@@ -272,8 +275,8 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
       onClose();
     } catch (error: any) {
       console.error('Error saving task:', error);
-      toast.error('Failed to save task', {
-        description: error.message || 'Please try again.',
+      toast.error(t('dialog.saveFailed'), {
+        description: error.message || tCommon('errors.tryAgain'),
       });
     } finally {
       setLoading(false);
@@ -282,9 +285,9 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
 
   // v2 categories
   const categories = [
-    { value: 'learning', label: '📚 Learning', icon: 'school' },
-    { value: 'household', label: '🏠 Household', icon: 'home_work' },
-    { value: 'health', label: '💪 Health', icon: 'fitness_center' },
+    { value: 'learning', label: t('categoryLabels.learning'), icon: 'school' },
+    { value: 'household', label: t('categoryLabels.chores'), icon: 'home_work' },
+    { value: 'health', label: t('categoryLabels.health'), icon: 'fitness_center' },
   ];
 
   return (
@@ -292,30 +295,30 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
       <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            {task ? 'Edit Task' : 'Create New Task'}
+            {task ? t('dialog.editTitle') : t('dialog.createTitle')}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
           {/* Task Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Task Name *</Label>
+            <Label htmlFor="name">{t('form.nameLabel')}</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g., Brush teeth"
+              placeholder={t('form.namePlaceholder')}
               maxLength={100}
               className={hasSubmitted && !formData.name.trim() ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
             {hasSubmitted && !formData.name.trim() && (
-              <p className="text-sm text-red-500 font-medium">Task name is required</p>
+              <p className="text-sm text-red-500 font-medium">{t('form.nameRequired')}</p>
             )}
           </div>
 
           {/* Icon/Image Selection */}
           <div className="space-y-3">
-            <Label>Task Icon/Image</Label>
+            <Label>{t('form.iconLabel')}</Label>
 
             {/* Mode Toggle */}
             <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 p-1 bg-gray-50 dark:bg-gray-800">
@@ -329,7 +332,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                 }`}
               >
                 <Palette className="w-4 h-4" />
-                Choose Icon
+                {t('form.chooseIcon')}
               </button>
               <button
                 type="button"
@@ -341,7 +344,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                 }`}
               >
                 <ImageIcon className="w-4 h-4" />
-                Upload Image
+                {t('form.uploadImage')}
               </button>
             </div>
 
@@ -371,8 +374,8 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                     }
                     return (
                       <div className="text-center">
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Select an icon</p>
-                        <p className="text-xs text-gray-400">Click to browse</p>
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{t('form.selectIcon')}</p>
+                        <p className="text-xs text-gray-400">{t('form.clickToBrowse')}</p>
                       </div>
                     );
                   })()}
@@ -410,7 +413,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                     className="h-[88px] px-4 py-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800/50 flex flex-col items-center justify-center"
                   >
                     <span className="text-2xl mb-1">&#128444;&#65039;</span>
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Default Images</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('form.defaultImages')}</span>
                   </button>
                   <div className="h-[88px]">
                     <TaskImageUpload
@@ -447,7 +450,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
 
           {/* Category */}
           <div className="space-y-2">
-            <Label htmlFor="category">Category *</Label>
+            <Label htmlFor="category">{t('form.categoryLabel')}</Label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {categories.map((cat) => (
                 <button
@@ -466,7 +469,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
 
             {/* Color Picker (Optional) */}
             <div className="mt-3 flex items-center gap-3">
-              <Label className="text-sm text-gray-500 font-normal">Custom Color (Optional):</Label>
+              <Label className="text-sm text-gray-500 font-normal">{t('form.customColor')}</Label>
               <div className="w-48">
                 <ColorPicker
                   value={formData.color}
@@ -479,9 +482,9 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           {/* Child Selection - Only shown in Task View (not child profile) */}
           {!initialChildId && availableChildren.length > 0 && (
             <div className="space-y-2 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-              <Label>Assign to Children *</Label>
+              <Label>{t('form.assignLabel')}</Label>
               <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
-                Select which children should see this task. Default is all children.
+                {t('form.assignHelp')}
               </p>
               <div className="space-y-2">
                 {availableChildren.map((child) => {
@@ -529,11 +532,11 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                 })}
               </div>
               <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                {selectedChildIds.size === availableChildren.length && '✓ All children selected (Global Task)'}
-                {selectedChildIds.size === 1 && '✓ Assigned to one child'}
+                {selectedChildIds.size === availableChildren.length && t('form.allChildrenSelected')}
+                {selectedChildIds.size === 1 && t('form.oneChildSelected')}
                 {selectedChildIds.size > 1 && selectedChildIds.size < availableChildren.length &&
-                  `✓ ${selectedChildIds.size} of ${availableChildren.length} children selected`}
-                {selectedChildIds.size === 0 && '⚠️ Please select at least one child'}
+                  t('form.multiChildSelected', { count: selectedChildIds.size, total: availableChildren.length })}
+                {selectedChildIds.size === 0 && t('form.noChildSelected')}
               </div>
             </div>
           )}
@@ -541,7 +544,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           {/* Points */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label>Reward Points *</Label>
+              <Label>{t('form.pointsLabel')}</Label>
               <span className="text-lg font-bold text-primary">{formData.points} XP</span>
             </div>
             <div className="flex items-center gap-3">
@@ -579,13 +582,13 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
 
           {/* Frequency */}
           <div className="space-y-3">
-            <Label>Frequency *</Label>
+            <Label>{t('form.frequencyLabel')}</Label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {[
-                { value: 'daily', label: 'Daily', icon: '☀️' },
-                { value: 'weekly', label: 'Weekly', icon: '📅' },
-                { value: 'monthly', label: 'Monthly', icon: '📆' },
-                { value: 'one_time', label: 'One Time', icon: '⚡' },
+                { value: 'daily', label: t('frequencies.daily'), icon: '☀️' },
+                { value: 'weekly', label: t('frequencies.weekly'), icon: '📅' },
+                { value: 'monthly', label: t('frequencies.monthly'), icon: '📆' },
+                { value: 'one_time', label: t('frequencies.oneTime'), icon: '⚡' },
               ].map((freq) => (
                 <button
                   key={freq.value}
@@ -607,13 +610,13 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
 
           {/* Approval Method */}
           <div className="space-y-3">
-            <Label>Approval Method *</Label>
+            <Label>{t('form.approvalLabel')}</Label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {[
-                { value: 'parent', label: 'Parent', icon: '👤' },
-                { value: 'timer', label: 'Timer', icon: '⏱️' },
-                { value: 'checklist', label: 'List', icon: '✓' },
-                { value: 'auto', label: 'Auto', icon: '⚡' },
+                { value: 'parent', label: t('form.approvalParent'), icon: '👤' },
+                { value: 'timer', label: t('form.approvalTimer'), icon: '⏱️' },
+                { value: 'checklist', label: t('form.approvalChecklist'), icon: '✓' },
+                { value: 'auto', label: t('form.approvalAuto'), icon: '⚡' },
               ].map((method) => (
                 <button
                   key={method.value}
@@ -633,7 +636,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
             </div>
             {formData.approval_type === 'auto' && (
               <p className="text-xs text-orange-600 dark:text-orange-400 p-2 rounded bg-orange-50 dark:bg-orange-900/20">
-                ⚠️ Auto-approval should only be used for simple, trust-based tasks.
+                {t('form.autoWarning')}
               </p>
             )}
           </div>
@@ -643,7 +646,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
             <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 space-y-3">
               <div className="flex items-center gap-2">
                 <span className="text-xl">⏱️</span>
-                <Label className="text-green-700 dark:text-green-300 font-semibold">Set Timer Duration</Label>
+                <Label className="text-green-700 dark:text-green-300 font-semibold">{t('form.timerLabel')}</Label>
               </div>
               <div className="flex items-center gap-3">
                 <Input
@@ -656,7 +659,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                   className="w-24 text-center text-lg font-bold"
                   required
                 />
-                <span className="text-sm text-gray-600 dark:text-gray-400">minutes</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('form.timerMinutes')}</span>
               </div>
             </div>
           )}
@@ -664,7 +667,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           {/* v2: Checklist Items (conditional) */}
           {formData.approval_type === 'checklist' && (
             <div className="space-y-2 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-              <Label>Checklist Items *</Label>
+              <Label>{t('form.checklistLabel')}</Label>
               <div className="space-y-2">
                 {formData.checklist.map((item, index) => (
                   <div key={index} className="flex items-center gap-2">
@@ -675,7 +678,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                         newChecklist[index] = e.target.value;
                         setFormData({ ...formData, checklist: newChecklist });
                       }}
-                      placeholder={`Step ${index + 1}`}
+                      placeholder={t('form.checklistPlaceholder', { index: index + 1 })}
                       maxLength={100}
                       required
                     />
@@ -702,12 +705,12 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                     }}
                     className="w-full py-2 px-3 rounded-lg border-2 border-dashed border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/30 text-sm font-medium"
                   >
-                    + Add Checklist Item
+                    {t('form.addChecklistItem')}
                   </button>
                 )}
               </div>
               <p className="text-xs text-green-700 dark:text-green-300">
-                Child must check off all items to complete this task. Perfect for routines with multiple steps (e.g., brush teeth AM/PM, make bed).
+                {t('form.checklistHelp')}
               </p>
             </div>
           )}
@@ -725,10 +728,10 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                 />
                 <div className="flex-1">
                   <Label htmlFor="auto_assign" className="cursor-pointer font-semibold text-blue-900 dark:text-blue-100">
-                    Auto-assign daily (Recommended)
+                    {t('form.autoAssignLabel')}
                   </Label>
                   <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                    Task automatically appears in child&apos;s todo list each day/week. Uncheck for manual template mode where child can complete whenever they want.
+                    {t('form.autoAssignHelp')}
                   </p>
                 </div>
               </div>
@@ -738,16 +741,16 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           {/* Weekly Task Options */}
           {formData.frequency === 'weekly' && (
             <div className="space-y-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-              <Label>Which days should this task appear?</Label>
+              <Label>{t('form.weeklyDaysLabel')}</Label>
               <div className="grid grid-cols-7 gap-2">
                 {[
-                  { label: 'Sun', value: 0 },
-                  { label: 'Mon', value: 1 },
-                  { label: 'Tue', value: 2 },
-                  { label: 'Wed', value: 3 },
-                  { label: 'Thu', value: 4 },
-                  { label: 'Fri', value: 5 },
-                  { label: 'Sat', value: 6 },
+                  { label: t('days.sun'), value: 0 },
+                  { label: t('days.mon'), value: 1 },
+                  { label: t('days.tue'), value: 2 },
+                  { label: t('days.wed'), value: 3 },
+                  { label: t('days.thu'), value: 4 },
+                  { label: t('days.fri'), value: 5 },
+                  { label: t('days.sat'), value: 6 },
                 ].map((day) => {
                   const isSelected = formData.days_of_week.includes(day.value);
                   return (
@@ -778,7 +781,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                 })}
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
-                Select at least one day. Task will appear on selected days each week.
+                {t('form.weeklyDaysHelp')}
               </p>
             </div>
           )}
@@ -787,23 +790,23 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           {formData.frequency === 'monthly' && (
             <div className="space-y-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
               <div className="space-y-2">
-                <Label htmlFor="monthly_mode">When should this task appear?</Label>
+                <Label htmlFor="monthly_mode">{t('form.monthlyModeLabel')}</Label>
                 <select
                   id="monthly_mode"
                   value={formData.monthly_mode}
                   onChange={(e) => setFormData({ ...formData, monthly_mode: e.target.value as any })}
                   className="w-full h-10 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                 >
-                  <option value="any_day">Anytime during the month</option>
-                  <option value="specific_day">Specific day of month</option>
-                  <option value="first_day">First day of month</option>
-                  <option value="last_day">Last day of month</option>
+                  <option value="any_day">{t('form.monthlyAnyDay')}</option>
+                  <option value="specific_day">{t('form.monthlySpecificDay')}</option>
+                  <option value="first_day">{t('form.monthlyFirstDay')}</option>
+                  <option value="last_day">{t('form.monthlyLastDay')}</option>
                 </select>
               </div>
 
               {formData.monthly_mode === 'specific_day' && (
                 <div className="space-y-2">
-                  <Label htmlFor="monthly_day">Day of Month (1-31)</Label>
+                  <Label htmlFor="monthly_day">{t('form.monthlyDayLabel')}</Label>
                   <Input
                     id="monthly_day"
                     type="number"
@@ -811,10 +814,10 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                     onChange={(e) => setFormData({ ...formData, monthly_day: parseInt(e.target.value) || 1 })}
                     min={1}
                     max={31}
-                    placeholder="e.g., 15 for the 15th"
+                    placeholder={t('form.monthlyDayPlaceholder')}
                   />
                   <p className="text-xs text-gray-600 dark:text-gray-400">
-                    For months with fewer days, task will appear on the last available day.
+                    {t('form.monthlyDayHelp')}
                   </p>
                 </div>
               )}
@@ -830,14 +833,14 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
               disabled={loading}
               className="flex-1 h-11"
             >
-              Cancel
+              {t('dialog.cancel')}
             </Button>
             <Button
               type="submit"
               disabled={loading}
               className="flex-1 h-11 bg-green-600 hover:bg-green-700 text-white font-bold"
             >
-              {loading ? 'Saving...' : task ? 'Update Task' : 'Create Task'}
+              {loading ? t('actions.saving') : task ? t('actions.update') : t('actions.create')}
             </Button>
           </div>
         </form>
