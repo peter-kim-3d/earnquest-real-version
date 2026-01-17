@@ -76,15 +76,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Handle auto-assigned tasks (require instance)
-    if (task.auto_assign) {
-      if (!instanceId) {
-        return NextResponse.json(
-          { error: 'Instance ID required for auto-assigned tasks' },
-          { status: 400 }
-        );
-      }
-
+    // Handle auto-assigned tasks with instance (if instanceId provided)
+    if (task.auto_assign && instanceId) {
       // Validate instance exists and is pending
       const { data: instance, error: instanceError } = await supabase
         .from('task_instances')
@@ -102,7 +95,7 @@ export async function POST(request: Request) {
         );
       }
     } else {
-      // Manual tasks: check if already completed today
+      // For all tasks without instance: check if already completed today
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
