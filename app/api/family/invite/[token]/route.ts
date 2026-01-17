@@ -182,10 +182,32 @@ export async function POST(
       .single();
 
     if (userProfile?.family_id) {
-      return NextResponse.json(
-        { error: 'You already belong to a family. Please contact support to switch families.' },
-        { status: 400 }
-      );
+      // Check if their current family has any children
+      const { count: childrenCount } = await adminClient
+        .from('children')
+        .select('*', { count: 'exact', head: true })
+        .eq('family_id', userProfile.family_id);
+
+      if (childrenCount && childrenCount > 0) {
+        // Has children - cannot switch families
+        return NextResponse.json(
+          { error: 'You already belong to a family with children. Please contact support to switch families.' },
+          { status: 400 }
+        );
+      }
+
+      // No children - delete the empty family before joining new one
+      const oldFamilyId = userProfile.family_id;
+
+      // Delete any tasks/rewards in the old family
+      await adminClient.from('tasks').delete().eq('family_id', oldFamilyId);
+      await adminClient.from('rewards').delete().eq('family_id', oldFamilyId);
+      await adminClient.from('goals').delete().eq('family_id', oldFamilyId);
+      await adminClient.from('family_values').delete().eq('family_id', oldFamilyId);
+      await adminClient.from('family_invitations').delete().eq('family_id', oldFamilyId);
+
+      // Delete the empty family
+      await adminClient.from('families').delete().eq('id', oldFamilyId);
     }
 
     // Update user's family_id
