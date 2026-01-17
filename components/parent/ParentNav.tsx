@@ -67,8 +67,8 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
             className="flex items-center gap-2"
             aria-label="EarnQuest home - Go to dashboard"
           >
-            <div className="flex items-center gap-0.5">
-              <Image src="/logo.png" alt="EarnQuest Logo" width={40} height={40} />
+            <div className="flex items-center gap-0">
+              <Image src="/logo.png" alt="EarnQuest Logo" width={48} height={48} className="-mr-1" />
               <span className="text-xl font-black text-text-main dark:text-white">
                 EarnQuest
               </span>
