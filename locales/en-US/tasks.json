@@ -218,5 +218,24 @@
     "doMore": "Do {minutes} More Minutes (+ {points} XP)",
     "close": "Close",
     "closeSaveProgress": "Close & Save Progress"
+  },
+  "checklist": {
+    "progress": "Progress",
+    "complete": "{completed} / {total} Complete",
+    "completeAllSteps": "Complete all steps:",
+    "allCompleted": "Great job! All items completed!",
+    "cancel": "Cancel",
+    "completeTask": "Complete Task"
+  },
+  "taskCard": {
+    "submitFailed": "Submit Failed",
+    "failedToSubmit": "Failed to submit. Please try again.",
+    "submitting": "Submitting...",
+    "resumeTimer": "Resume Timer",
+    "startTimer": "Start Timer",
+    "openChecklist": "Open Checklist",
+    "iDidIt": "I Did It!",
+    "minutesLeft": "{minutes}m left",
+    "minutes": "{minutes}m"
   }
 }

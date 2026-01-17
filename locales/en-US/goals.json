@@ -108,6 +108,7 @@
     "yourBalance": "Your Balance",
     "amountToDeposit": "Amount to Deposit",
     "enterAmount": "Enter amount",
+    "presetXp": "{amount} XP",
     "all": "All",
     "errors": {
       "invalidAmount": "Please enter a valid amount",

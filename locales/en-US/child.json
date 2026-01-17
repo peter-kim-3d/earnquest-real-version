@@ -89,6 +89,20 @@
     "weeklyLimit": "Weekly limit: {count}",
     "limitReached": "Limit reached this week",
     "screenMinutes": "{minutes} min",
+    "rewardCard": {
+      "purchased": "Ticket purchased!",
+      "purchasedDesc": "You now have {balance} QP left.",
+      "purchaseFailed": "Purchase failed",
+      "tryAgain": "Please try again.",
+      "weeklyMax": "{limit}x/week max",
+      "percentSaved": "{percent}% Saved",
+      "qpToGo": "{points} QP to go",
+      "purchasing": "Purchasing...",
+      "locked": "Locked",
+      "screenLimitReached": "Screen limit reached",
+      "buyNow": "Buy Now",
+      "min": "min"
+    },
     "wallet": {
       "title": "My Wallet",
       "questPoints": "Quest Points",

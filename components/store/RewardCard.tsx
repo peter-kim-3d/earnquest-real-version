@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Sparkle, Lock } from '@phosphor-icons/react';
 import { AppIcon } from '@/components/ui/AppIcon';
@@ -41,6 +41,7 @@ export default function RewardCard({
 }: RewardCardProps) {
   const router = useRouter();
   const locale = useLocale();
+  const t = useTranslations('child.store.rewardCard');
   const [loading, setLoading] = useState(false);
 
   const canAfford = currentBalance >= reward.points_cost;
@@ -89,15 +90,15 @@ export default function RewardCard({
       }
 
       const result = await response.json();
-      toast.success('Ticket purchased!', {
-        description: `You now have ${result.newBalance} QP left.`,
+      toast.success(t('purchased'), {
+        description: t('purchasedDesc', { balance: result.newBalance }),
       });
       router.refresh();
       router.push(`/${locale}/child/tickets`);
     } catch (error: any) {
       console.error('Failed to purchase:', error);
-      toast.error('Purchase failed', {
-        description: error.message || 'Please try again.',
+      toast.error(t('purchaseFailed'), {
+        description: error.message || t('tryAgain'),
       });
     } finally {
       setLoading(false);
@@ -145,7 +146,7 @@ export default function RewardCard({
         {isScreenReward && reward.screen_minutes && (
           <div className="absolute bottom-3 right-3 px-2 py-1 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm z-10">
             <span className="text-xs font-bold text-gray-900 dark:text-white">
-              {reward.screen_minutes} min
+              {reward.screen_minutes} {t('min')}
             </span>
           </div>
         )}
@@ -183,7 +184,7 @@ export default function RewardCard({
 
           {reward.weekly_limit && (
             <span className="text-xs text-text-muted dark:text-gray-500">
-              {reward.weekly_limit}x/week max
+              {t('weeklyMax', { limit: reward.weekly_limit })}
             </span>
           )}
         </div>
@@ -193,10 +194,10 @@ export default function RewardCard({
           <div className="mb-3">
             <div className="flex justify-between text-xs mb-1">
               <span className="font-medium text-text-muted dark:text-gray-400">
-                {Math.floor((currentBalance / reward.points_cost) * 100)}% Saved
+                {t('percentSaved', { percent: Math.floor((currentBalance / reward.points_cost) * 100) })}
               </span>
               <span className="text-primary font-bold">
-                {reward.points_cost - currentBalance} QP to go
+                {t('qpToGo', { points: reward.points_cost - currentBalance })}
               </span>
             </div>
             <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
@@ -223,19 +224,19 @@ export default function RewardCard({
           `}
         >
           {loading ? (
-            'Purchasing...'
+            t('purchasing')
           ) : !canAfford ? (
             <span className="flex items-center justify-center gap-2">
               <Lock size={16} />
-              Locked
+              {t('locked')}
             </span>
           ) : !hasScreenBudget ? (
             <span className="flex items-center justify-center gap-2">
               <Lock size={16} />
-              Screen limit reached
+              {t('screenLimitReached')}
             </span>
           ) : (
-            'Buy Now'
+            t('buyNow')
           )}
         </button>
       </div>

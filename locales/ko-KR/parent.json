@@ -146,6 +146,16 @@
     "changePin": "PIN 코드 변경",
     "pinInfo": "PIN은 아이 로그인에 사용됩니다"
   },
+  "childStats": {
+    "currentBalance": "현재 잔액",
+    "ofWeeklyGoal": "주간 목표 중",
+    "weeklyGoalProgress": "주간 목표 진행률",
+    "lifetimeEarned": "총 획득",
+    "trustStreak": "신뢰 연속",
+    "days": "{count}일",
+    "trustLevel": "신뢰 레벨",
+    "trustLevelDescription": "자동 승인 설정을 결정합니다"
+  },
   "childForm": {
     "editTitle": "아이 수정",
     "addTitle": "아이 추가",

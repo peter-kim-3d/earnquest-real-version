@@ -43,9 +43,9 @@ export default function DepositModal({
 
   // Preset amounts
   const presets = [
-    { label: '10 XP', value: 10 },
-    { label: '25 XP', value: 25 },
-    { label: '50 XP', value: 50 },
+    { label: t('presetXp', { amount: 10 }), value: 10 },
+    { label: t('presetXp', { amount: 25 }), value: 25 },
+    { label: t('presetXp', { amount: 50 }), value: 50 },
     { label: t('all'), value: maxDeposit },
   ].filter((p) => p.value <= maxDeposit && p.value > 0);
 

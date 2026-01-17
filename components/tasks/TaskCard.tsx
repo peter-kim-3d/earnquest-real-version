@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Sparkle, Timer, ListChecks, Checks } from '@phosphor-icons/react';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import TimerModal from './TimerModal';
 import ChecklistModal from './ChecklistModal';
 
@@ -38,6 +39,7 @@ interface TaskCardProps {
 
 export default function TaskCard({ task, onComplete }: TaskCardProps) {
   const router = useRouter();
+  const t = useTranslations('tasks.taskCard');
   const [loading, setLoading] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
   const [showChecklist, setShowChecklist] = useState(false);
@@ -63,7 +65,7 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
       await onComplete(task.id, undefined, task.instance_id || undefined);
     } catch (error) {
       console.error('Failed to complete task:', error);
-      toast.error('Submit Failed', { description: 'Failed to submit. Please try again.' });
+      toast.error(t('submitFailed'), { description: t('failedToSubmit') });
     } finally {
       setLoading(false);
     }
@@ -78,7 +80,7 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
       setLocalMetadata({ ...localMetadata, timer_state: null });
     } catch (error) {
       console.error('Failed to complete task:', error);
-      toast.error('Submit Failed', { description: 'Failed to submit. Please try again.' });
+      toast.error(t('submitFailed'), { description: t('failedToSubmit') });
     } finally {
       setLoading(false);
     }
@@ -91,7 +93,7 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
       await onComplete(task.id, { checklistState }, task.instance_id || undefined);
     } catch (error) {
       console.error('Failed to complete task:', error);
-      toast.error('Submit Failed', { description: 'Failed to submit. Please try again.' });
+      toast.error(t('submitFailed'), { description: t('failedToSubmit') });
     } finally {
       setLoading(false);
     }
@@ -113,15 +115,15 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
 
   // Get button text based on approval type
   const getButtonText = () => {
-    if (loading) return 'Submitting...';
+    if (loading) return t('submitting');
     if (task.approval_type === 'timer') {
       if (localMetadata?.timer_state?.remainingSeconds) {
-        return '⏱️ Resume Timer';
+        return t('resumeTimer');
       }
-      return '⏱️ Start Timer';
+      return t('startTimer');
     }
-    if (task.approval_type === 'checklist') return '✓ Open Checklist';
-    return 'I Did It! 🎉';
+    if (task.approval_type === 'checklist') return t('openChecklist');
+    return t('iDidIt');
   };
 
   const getButtonIcon = () => {
@@ -176,8 +178,8 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
                     }`}>
                     <Timer className="w-3 h-3 mr-1" />
                     {localMetadata?.timer_state?.remainingSeconds
-                      ? `${Math.ceil(localMetadata.timer_state.remainingSeconds / 60)}m left`
-                      : `${task.timer_minutes}m`
+                      ? t('minutesLeft', { minutes: Math.ceil(localMetadata.timer_state.remainingSeconds / 60) })
+                      : t('minutes', { minutes: task.timer_minutes })
                     }
                   </span>
                 )}

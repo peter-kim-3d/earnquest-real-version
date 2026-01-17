@@ -89,6 +89,20 @@
     "weeklyLimit": "주간 한도: {count}회",
     "limitReached": "이번 주 한도 도달",
     "screenMinutes": "{minutes}분",
+    "rewardCard": {
+      "purchased": "티켓 구매 완료!",
+      "purchasedDesc": "남은 잔액: {balance} QP",
+      "purchaseFailed": "구매 실패",
+      "tryAgain": "다시 시도해주세요.",
+      "weeklyMax": "주 {limit}회 제한",
+      "percentSaved": "{percent}% 모음",
+      "qpToGo": "{points} QP 더 필요",
+      "purchasing": "구매 중...",
+      "locked": "잠김",
+      "screenLimitReached": "스크린 한도 도달",
+      "buyNow": "지금 구매",
+      "min": "분"
+    },
     "wallet": {
       "title": "내 지갑",
       "questPoints": "퀘스트 포인트",

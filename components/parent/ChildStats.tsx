@@ -2,6 +2,7 @@
 
 import { Trophy, Flame, TrendingUp, Target } from 'lucide-react';
 import { formatPoints, formatPercentage } from '@/lib/format';
+import { useTranslations } from 'next-intl';
 
 type Child = {
   name: string;
@@ -19,6 +20,7 @@ interface ChildStatsProps {
 }
 
 export default function ChildStats({ child }: ChildStatsProps) {
+  const t = useTranslations('parent.childStats');
   const weeklyGoal = child.settings?.weeklyGoal || 500;
   const progressPercentage = Math.min((child.points_balance / weeklyGoal) * 100, 100);
 
@@ -28,11 +30,11 @@ export default function ChildStats({ child }: ChildStatsProps) {
       <div className="rounded-xl bg-gradient-to-br from-primary to-green-600 p-6 text-black">
         <div className="flex items-center gap-2 mb-2">
           <Trophy className="h-5 w-5" />
-          <span className="text-sm font-semibold opacity-90">Current Balance</span>
+          <span className="text-sm font-semibold opacity-90">{t('currentBalance')}</span>
         </div>
         <p className="text-4xl font-black mb-1">{formatPoints(child.points_balance)} XP</p>
         <p className="text-sm opacity-75">
-          {formatPercentage(progressPercentage)} of weekly goal
+          {formatPercentage(progressPercentage)} {t('ofWeeklyGoal')}
         </p>
       </div>
 
@@ -42,7 +44,7 @@ export default function ChildStats({ child }: ChildStatsProps) {
           <div className="flex items-center gap-2">
             <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             <span className="text-sm font-semibold text-text-main dark:text-white">
-              Weekly Goal Progress
+              {t('weeklyGoalProgress')}
             </span>
           </div>
           <span className="text-sm font-bold text-text-muted dark:text-gray-400">
@@ -64,7 +66,7 @@ export default function ChildStats({ child }: ChildStatsProps) {
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400" />
             <span className="text-xs font-semibold text-text-muted dark:text-gray-400">
-              Lifetime Earned
+              {t('lifetimeEarned')}
             </span>
           </div>
           <p className="text-2xl font-black text-text-main dark:text-white">
@@ -77,11 +79,11 @@ export default function ChildStats({ child }: ChildStatsProps) {
           <div className="flex items-center gap-2 mb-2">
             <Flame className="h-4 w-4 text-orange-600 dark:text-orange-400" />
             <span className="text-xs font-semibold text-text-muted dark:text-gray-400">
-              Trust Streak
+              {t('trustStreak')}
             </span>
           </div>
           <p className="text-2xl font-black text-text-main dark:text-white">
-            {child.trust_streak_days || 0} days
+            {t('days', { count: child.trust_streak_days || 0 })}
           </p>
         </div>
       </div>
@@ -91,10 +93,10 @@ export default function ChildStats({ child }: ChildStatsProps) {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex-1 min-w-0">
             <span className="text-sm font-semibold text-text-main dark:text-white">
-              Trust Level
+              {t('trustLevel')}
             </span>
             <p className="text-xs text-text-muted dark:text-gray-400 mt-1">
-              Determines auto-approval settings
+              {t('trustLevelDescription')}
             </p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">

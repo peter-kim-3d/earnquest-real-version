@@ -146,6 +146,16 @@
     "changePin": "Change PIN Code",
     "pinInfo": "PIN is used for child login"
   },
+  "childStats": {
+    "currentBalance": "Current Balance",
+    "ofWeeklyGoal": "of weekly goal",
+    "weeklyGoalProgress": "Weekly Goal Progress",
+    "lifetimeEarned": "Lifetime Earned",
+    "trustStreak": "Trust Streak",
+    "days": "{count} days",
+    "trustLevel": "Trust Level",
+    "trustLevelDescription": "Determines auto-approval settings"
+  },
   "childForm": {
     "editTitle": "Edit Child",
     "addTitle": "Add Child",

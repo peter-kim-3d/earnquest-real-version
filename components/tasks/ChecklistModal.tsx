@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Check, Square, CheckSquare } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface ChecklistModalProps {
   taskName: string;
@@ -20,6 +21,7 @@ export default function ChecklistModal({
   onComplete,
   onCancel,
 }: ChecklistModalProps) {
+  const t = useTranslations('tasks.checklist');
   const [checkedItems, setCheckedItems] = useState<boolean[]>(
     new Array(items.length).fill(false)
   );
@@ -62,10 +64,10 @@ export default function ChecklistModal({
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="font-semibold text-gray-700 dark:text-gray-300">
-                Progress
+                {t('progress')}
               </span>
               <span className="font-bold text-primary">
-                {completedCount} / {totalCount} Complete
+                {t('complete', { completed: completedCount, total: totalCount })}
               </span>
             </div>
             <div className="h-3 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
@@ -82,7 +84,7 @@ export default function ChecklistModal({
           {/* Checklist Items */}
           <div className="space-y-3">
             <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-              Complete all steps:
+              {t('completeAllSteps')}
             </p>
             <div className="space-y-2">
               {items.map((item, index) => {
@@ -135,7 +137,7 @@ export default function ChecklistModal({
           {allChecked && (
             <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-center">
               <p className="text-sm font-semibold text-green-800 dark:text-green-200">
-                🎉 Great job! All items completed!
+                {t('allCompleted')}
               </p>
             </div>
           )}
@@ -147,7 +149,7 @@ export default function ChecklistModal({
               variant="outline"
               className="flex-1"
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               onClick={handleComplete}
@@ -158,7 +160,7 @@ export default function ChecklistModal({
                 }`}
             >
               <Check className="h-5 w-5 mr-2" />
-              Complete Task
+              {t('completeTask')}
             </Button>
           </div>
         </div>
