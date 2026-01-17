@@ -7,6 +7,7 @@ import { PencilSimple, Trash, DotsThreeVertical, Archive, ArrowCounterClockwise,
 import { ALL_AVATARS } from '@/lib/avatars';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,6 +62,8 @@ export default function TaskCard({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const t = useTranslations('tasks');
+  const tCommon = useTranslations('common');
 
   const handleToggleActive = async () => {
     setLoading(true);
@@ -81,7 +84,7 @@ export default function TaskCard({
       router.refresh();
     } catch (error) {
       console.error('Error toggling task:', error);
-      toast.error('Update Failed', { description: 'Failed to update task. Please try again.' });
+      toast.error(t('card.updateFailed'));
     } finally {
       setLoading(false);
     }
@@ -107,7 +110,7 @@ export default function TaskCard({
       router.refresh();
     } catch (error) {
       console.error('Error deleting task:', error);
-      toast.error('Delete Failed', { description: 'Failed to delete task. Please try again.' });
+      toast.error(t('card.deleteFailed'));
     } finally {
       setLoading(false);
     }
@@ -135,7 +138,7 @@ export default function TaskCard({
       router.refresh();
     } catch (error) {
       console.error(`Error ${action}ing task:`, error);
-      toast.error(`${action.charAt(0).toUpperCase() + action.slice(1)} Failed`, { description: `Failed to ${action} task. Please try again.` });
+      toast.error(t('card.updateFailed'));
     } finally {
       setLoading(false);
     }
@@ -166,13 +169,13 @@ export default function TaskCard({
   const getFrequencyLabel = (frequency: string) => {
     switch (frequency) {
       case 'daily':
-        return 'Daily';
+        return t('frequencies.daily');
       case 'weekly':
-        return 'Weekly';
+        return t('frequencies.weekly');
       case 'monthly':
-        return 'Monthly';
+        return t('frequencies.monthly');
       case 'one_time':
-        return 'One Time';
+        return t('frequencies.oneTime');
       default:
         return frequency;
     }
@@ -255,7 +258,7 @@ export default function TaskCard({
           ) : (
             <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/30 backdrop-blur-sm border border-white/10">
               <Users size={14} className="text-white" />
-              <span className="text-xs font-medium text-white">Shared</span>
+              <span className="text-xs font-medium text-white">{t('card.shared')}</span>
             </div>
           )}
         </div>
@@ -263,7 +266,7 @@ export default function TaskCard({
         {/* Status Badge */}
         {!task.is_active && (
           <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-black/30 backdrop-blur-sm border border-white/10">
-            <span className="text-xs font-semibold text-white">Inactive</span>
+            <span className="text-xs font-semibold text-white">{t('card.inactive')}</span>
           </div>
         )}
       </div>
@@ -289,28 +292,28 @@ export default function TaskCard({
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={onEdit}>
                 <PencilSimple size={16} className="mr-2" />
-                Edit
+                {t('card.edit')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleToggleActive}>
-                {task.is_active ? 'Deactivate' : 'Activate'}
+                {task.is_active ? t('card.deactivate') : t('card.activate')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleArchive}>
                 {task.archived_at ? (
                   <>
                     <ArrowCounterClockwise size={16} className="mr-2" />
-                    Unarchive
+                    {t('card.unarchive')}
                   </>
                 ) : (
                   <>
                     <Archive size={16} className="mr-2" />
-                    Archive
+                    {t('card.archive')}
                   </>
                 )}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleDelete} className="text-red-600 dark:text-red-400">
                 <Trash size={16} className="mr-2" />
-                Delete
+                {t('card.delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -325,19 +328,19 @@ export default function TaskCard({
         {/* Task Info */}
         <div className="space-y-2 mb-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-text-muted dark:text-gray-500">Points:</span>
+            <span className="text-text-muted dark:text-gray-500">{t('card.points')}</span>
             <span className="font-bold text-primary">{task.points} QP</span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-text-muted dark:text-gray-500">Frequency:</span>
+            <span className="text-text-muted dark:text-gray-500">{t('card.frequency')}</span>
             <span className="font-semibold text-text-main dark:text-white">
               {getFrequencyLabel(task.frequency)}
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-text-muted dark:text-gray-500">Approval:</span>
+            <span className="text-text-muted dark:text-gray-500">{t('card.approval')}</span>
             <span className="font-semibold text-text-main dark:text-white">
-              {task.approval_type === 'auto' ? 'Auto (24h)' : 'Manual'}
+              {task.approval_type === 'auto' ? t('card.autoApproval') : t('card.manualApproval')}
             </span>
           </div>
         </div>
@@ -347,7 +350,7 @@ export default function TaskCard({
           <div className="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
             {completionCount > 0 && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-text-muted dark:text-gray-500">Completed (30d):</span>
+                <span className="text-text-muted dark:text-gray-500">{t('card.completed30d')}</span>
                 <span className="font-bold text-green-600 dark:text-green-400">
                   {completionCount}×
                 </span>
@@ -358,7 +361,7 @@ export default function TaskCard({
               <div className="flex items-center justify-between text-sm bg-orange-50 dark:bg-orange-900/20 p-2 rounded-lg">
                 <span className="text-orange-700 dark:text-orange-300 font-medium flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
-                  Needs Approval
+                  {t('card.needsApproval')}
                 </span>
                 <span className="font-bold text-orange-700 dark:text-orange-300">
                   {pendingCount}
@@ -373,10 +376,10 @@ export default function TaskCard({
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={confirmDelete}
-        title="Delete Task Permanently?"
-        description={`Are you sure you want to permanently delete "${task.name}"? This will remove it for all children and cannot be undone.`}
-        confirmLabel="Yes, Delete"
-        cancelLabel="No, Keep It"
+        title={t('card.deleteTitle')}
+        description={t('card.deleteDescription', { name: task.name })}
+        confirmLabel={tCommon('confirm.yesDelete')}
+        cancelLabel={tCommon('confirm.noKeep')}
         variant="danger"
         isLoading={loading}
       />

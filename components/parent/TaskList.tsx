@@ -158,6 +158,8 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
     hygiene: t('categoryLabels.hygiene'),
     chores: t('categoryLabels.chores'),
     learning: t('categoryLabels.learning'),
+    life: t('categoryLabels.life'),
+    health: t('categoryLabels.health'),
     exercise: t('categoryLabels.exercise'),
     creativity: t('categoryLabels.creativity'),
     other: t('categoryLabels.other'),

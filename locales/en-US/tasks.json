@@ -55,6 +55,8 @@
     "hygiene": "🧼 Hygiene",
     "chores": "🏠 Chores",
     "learning": "📚 Learning",
+    "life": "🏡 Life Skills",
+    "health": "❤️ Health",
     "exercise": "💪 Exercise",
     "creativity": "🎨 Creativity",
     "other": "📋 Other"
@@ -62,7 +64,8 @@
   "frequencies": {
     "daily": "Daily",
     "weekly": "Weekly",
-    "oneTime": "One-time"
+    "monthly": "Monthly",
+    "oneTime": "One Time"
   },
   "timeContexts": {
     "morning": "Morning",
@@ -126,5 +129,26 @@
     "deleteSelected": "Delete Selected",
     "enableSelected": "Enable Selected",
     "disableSelected": "Disable Selected"
+  },
+  "card": {
+    "shared": "Shared",
+    "inactive": "Inactive",
+    "points": "Points:",
+    "frequency": "Frequency:",
+    "approval": "Approval:",
+    "autoApproval": "Auto (24h)",
+    "manualApproval": "Manual",
+    "completed30d": "Completed (30d):",
+    "needsApproval": "Needs Approval",
+    "edit": "Edit",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "delete": "Delete",
+    "deleteTitle": "Delete Task Permanently?",
+    "deleteDescription": "Are you sure you want to permanently delete \"{name}\"? This will remove it for all children and cannot be undone.",
+    "updateFailed": "Failed to update task. Please try again.",
+    "deleteFailed": "Failed to delete task. Please try again."
   }
 }

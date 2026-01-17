@@ -111,8 +111,10 @@ export default function ChildPinToggle() {
     }
 
     const child = children.find(c => c.id === childId);
-    if (child?.pin_code === newPin) {
+    const originalPin = child?.pin_code || '0000';
+    if (originalPin === newPin) {
       // No change
+      toast.info('PIN is the same as current');
       return;
     }
 
@@ -143,7 +145,9 @@ export default function ChildPinToggle() {
 
   const isPinChanged = (childId: string) => {
     const child = children.find(c => c.id === childId);
-    return child?.pin_code !== editingPins[childId];
+    const originalPin = child?.pin_code || '0000';
+    const currentPin = editingPins[childId] || '0000';
+    return originalPin !== currentPin;
   };
 
   if (fetching) {
@@ -211,23 +215,34 @@ export default function ChildPinToggle() {
                     maxLength={4}
                     value={editingPins[child.id] || ''}
                     onChange={(e) => handlePinChange(child.id, e.target.value)}
-                    className="w-20 px-3 py-2 text-center font-mono text-lg tracking-widest rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && editingPins[child.id]?.length === 4) {
+                        handleSavePin(child.id);
+                      }
+                    }}
+                    className={`w-20 px-3 py-2 text-center font-mono text-lg tracking-widest rounded-lg border bg-white dark:bg-gray-900 text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 ${
+                      isPinChanged(child.id)
+                        ? 'border-primary ring-2 ring-primary/30'
+                        : 'border-gray-300 dark:border-gray-600'
+                    }`}
                     placeholder="0000"
                   />
-                  {isPinChanged(child.id) && editingPins[child.id]?.length === 4 && (
-                    <button
-                      onClick={() => handleSavePin(child.id)}
-                      disabled={savingPin === child.id}
-                      className="p-2 rounded-lg bg-primary hover:bg-primary/90 text-white disabled:opacity-50 transition-colors"
-                      title="Save PIN"
-                    >
-                      {savingPin === child.id ? (
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Check className="w-4 h-4" />
-                      )}
-                    </button>
-                  )}
+                  <button
+                    onClick={() => handleSavePin(child.id)}
+                    disabled={savingPin === child.id || !isPinChanged(child.id) || editingPins[child.id]?.length !== 4}
+                    className={`p-2 rounded-lg transition-colors ${
+                      isPinChanged(child.id) && editingPins[child.id]?.length === 4
+                        ? 'bg-primary hover:bg-primary/90 text-white'
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                    } disabled:opacity-50`}
+                    title={isPinChanged(child.id) ? 'Save PIN' : 'No changes to save'}
+                  >
+                    {savingPin === child.id ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Check className="w-4 h-4" />
+                    )}
+                  </button>
                 </div>
               </div>
             ))}
