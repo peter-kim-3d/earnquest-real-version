@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     const insertData = {
       family_id: userProfile.family_id,
       invited_by: user.id,
-      invited_email: null, // Email not required - anyone with link can join
+      invited_email: 'link-invite@earnquest.app', // Placeholder for link-based invites
       invite_token: token,
       expires_at: expiresAt.toISOString(),
       status: 'pending',
