@@ -11,7 +11,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
   }
 
   // Load all namespaces and merge them
-  const [common, auth, onboarding, parent, child, tasks, rewards, settings] = await Promise.all([
+  const [common, auth, onboarding, parent, child, tasks, rewards, settings, goals, kindness] = await Promise.all([
     import(`@/locales/${locale}/common.json`),
     import(`@/locales/${locale}/auth.json`),
     import(`@/locales/${locale}/onboarding.json`),
@@ -20,6 +20,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
     import(`@/locales/${locale}/tasks.json`),
     import(`@/locales/${locale}/rewards.json`),
     import(`@/locales/${locale}/settings.json`),
+    import(`@/locales/${locale}/goals.json`),
+    import(`@/locales/${locale}/kindness.json`),
   ]);
 
   return {
@@ -33,6 +35,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
       tasks: tasks.default,
       rewards: rewards.default,
       settings: settings.default,
+      goals: goals.default,
+      kindness: kindness.default,
     },
   };
 });
