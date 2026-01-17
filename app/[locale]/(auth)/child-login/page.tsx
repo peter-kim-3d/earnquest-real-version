@@ -32,7 +32,6 @@ export default function ChildLoginPage() {
   const [children, setChildren] = useState<Child[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [retryAfterSeconds, setRetryAfterSeconds] = useState<number | null>(null);
   const [enteredPin, setEnteredPin] = useState('');
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
   const [requireChildPin, setRequireChildPin] = useState(true);
@@ -49,28 +48,10 @@ export default function ChildLoginPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  // Countdown timer for rate limiting
-  useEffect(() => {
-    if (retryAfterSeconds === null || retryAfterSeconds <= 0) return;
-
-    const interval = setInterval(() => {
-      setRetryAfterSeconds((prev) => {
-        if (prev === null || prev <= 1) {
-          clearInterval(interval);
-          return null;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [retryAfterSeconds]);
-
   // Validate family code
   const validateCode = async (code: string) => {
     setLoading(true);
     setError('');
-    setRetryAfterSeconds(null);
 
     try {
       // Validate code
@@ -82,10 +63,7 @@ export default function ChildLoginPage() {
 
       if (!validateRes.ok) {
         const data = await validateRes.json();
-        if (data.error === 'TOO_MANY_ATTEMPTS') {
-          setError(t('errors.tooManyAttempts', { seconds: data.retryAfterSeconds }));
-          setRetryAfterSeconds(data.retryAfterSeconds);
-        } else if (data.error === 'INVALID_CODE') {
+        if (data.error === 'INVALID_CODE') {
           setError(t('errors.invalidCode'));
         } else {
           setError(t('errors.invalidFormat'));
@@ -310,7 +288,7 @@ export default function ChildLoginPage() {
                     <span className="text-xl">⚠️</span>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-red-700 dark:text-red-400">
-                        {error.includes('Too many') || error.includes('시도 횟수') ? t('errors.tooManyAttemptsTitle') : t('errors.connectionIssue')}
+                        {t('errors.connectionIssue')}
                       </p>
                       <p className="text-xs text-red-600 dark:text-red-300 mt-0.5">
                         {error}
@@ -319,17 +297,9 @@ export default function ChildLoginPage() {
                   </div>
                 )}
 
-                {retryAfterSeconds !== null && retryAfterSeconds > 0 && (
-                  <div className="text-center">
-                    <p className="text-sm text-text-muted dark:text-gray-400">
-                      {t('errors.pleaseWait', { seconds: retryAfterSeconds })}
-                    </p>
-                  </div>
-                )}
-
                 <button
                   type="submit"
-                  disabled={familyCode.length !== 6 || loading || (retryAfterSeconds !== null && retryAfterSeconds > 0)}
+                  disabled={familyCode.length !== 6 || loading}
                   className="w-full py-4 bg-primary hover:bg-primary/90 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-semibold rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {loading ? (

@@ -3,41 +3,13 @@
  *
  * POST /api/family/validate-code
  * Validates a 6-character family join code and returns basic family info
- *
- * Rate limited: 5 attempts per 15 minutes per IP
  */
 
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { ValidateFamilyCodeSchema } from '@/lib/validation/family';
-import { checkRateLimit } from '@/lib/security/rate-limiter';
 
 export async function POST(request: NextRequest) {
-  // Extract client IP for rate limiting
-  const ip =
-    request.headers.get('x-forwarded-for') ||
-    request.headers.get('x-real-ip') ||
-    'unknown';
-
-  // Check rate limit (5 attempts per 15 minutes)
-  const rateLimit = checkRateLimit(ip, 5, 15 * 60 * 1000);
-
-  if (!rateLimit.allowed) {
-    return NextResponse.json(
-      {
-        error: 'TOO_MANY_ATTEMPTS',
-        message: `Too many attempts. Try again in ${rateLimit.retryAfterSeconds} seconds.`,
-        retryAfterSeconds: rateLimit.retryAfterSeconds,
-      },
-      {
-        status: 429,
-        headers: {
-          'Retry-After': rateLimit.retryAfterSeconds!.toString(),
-        },
-      }
-    );
-  }
-
   // Parse and validate request body
   let body: unknown;
   try {
