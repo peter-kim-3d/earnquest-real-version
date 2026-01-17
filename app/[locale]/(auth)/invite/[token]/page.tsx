@@ -85,6 +85,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
       }
 
       toast.success(t('toast.welcomeToFamily'));
+      router.refresh(); // Clear cache before navigation
       router.push(`/${locale}/dashboard`);
     } catch (error: any) {
       console.error('Accept error:', error);

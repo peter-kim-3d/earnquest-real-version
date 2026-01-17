@@ -181,6 +181,9 @@ export async function POST(
       .eq('id', user.id)
       .single();
 
+    // Store old family ID for cleanup (if exists and has no children)
+    let oldFamilyId: string | null = null;
+
     if (userProfile?.family_id) {
       // Check if their current family has any children
       const { count: childrenCount } = await adminClient
@@ -196,21 +199,11 @@ export async function POST(
         );
       }
 
-      // No children - delete the empty family before joining new one
-      const oldFamilyId = userProfile.family_id;
-
-      // Delete any tasks/rewards in the old family
-      await adminClient.from('tasks').delete().eq('family_id', oldFamilyId);
-      await adminClient.from('rewards').delete().eq('family_id', oldFamilyId);
-      await adminClient.from('goals').delete().eq('family_id', oldFamilyId);
-      await adminClient.from('family_values').delete().eq('family_id', oldFamilyId);
-      await adminClient.from('family_invitations').delete().eq('family_id', oldFamilyId);
-
-      // Delete the empty family
-      await adminClient.from('families').delete().eq('id', oldFamilyId);
+      // Mark for cleanup after user is moved to new family
+      oldFamilyId = userProfile.family_id;
     }
 
-    // Update user's family_id
+    // Update user's family_id FIRST (before deleting old family)
     const { error: updateError } = await adminClient
       .from('users')
       .update({ family_id: invitation.family_id })
@@ -222,6 +215,16 @@ export async function POST(
         { error: 'Failed to join family' },
         { status: 500 }
       );
+    }
+
+    // Now clean up the old empty family (no longer referenced by user)
+    if (oldFamilyId) {
+      await adminClient.from('tasks').delete().eq('family_id', oldFamilyId);
+      await adminClient.from('rewards').delete().eq('family_id', oldFamilyId);
+      await adminClient.from('goals').delete().eq('family_id', oldFamilyId);
+      await adminClient.from('family_values').delete().eq('family_id', oldFamilyId);
+      await adminClient.from('family_invitations').delete().eq('family_id', oldFamilyId);
+      await adminClient.from('families').delete().eq('id', oldFamilyId);
     }
 
     // Mark invitation as accepted
