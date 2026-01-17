@@ -13,8 +13,14 @@ export async function GET(
     const { token } = await params;
     const supabase = await createClient();
 
-    // Get invitation
-    const { data: invitation, error } = await supabase
+    // Get invitation using admin client to bypass RLS for public invite links
+    const { createClient: createAdminClient } = await import('@supabase/supabase-js');
+    const adminClient = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { data: invitation, error } = await adminClient
       .from('family_invitations')
       .select(`
         id,
@@ -24,7 +30,7 @@ export async function GET(
         family_id,
         families (
           id,
-          family_name
+          name
         ),
         invited_by_user:users!family_invitations_invited_by_fkey (
           full_name
@@ -46,7 +52,7 @@ export async function GET(
 
     if (now > expiresAt) {
       // Mark as expired
-      await supabase
+      await adminClient
         .from('family_invitations')
         .update({ status: 'expired' })
         .eq('id', invitation.id);
@@ -73,14 +79,14 @@ export async function GET(
       );
     }
 
-    const family = (invitation.families as unknown) as { id: string; family_name: string } | null;
+    const family = (invitation.families as unknown) as { id: string; name: string } | null;
     const invitedByUser = (invitation.invited_by_user as unknown) as { full_name: string } | null;
 
     return NextResponse.json({
       invitation: {
         id: invitation.id,
         email: invitation.invited_email,
-        familyName: family?.family_name || 'Family',
+        familyName: family?.name || 'Family',
         invitedBy: invitedByUser?.full_name || 'A family member',
         expiresAt: invitation.expires_at,
       },
@@ -115,8 +121,15 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Use admin client to bypass RLS
+    const { createClient: createAdminClient } = await import('@supabase/supabase-js');
+    const adminClient = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     // Get invitation
-    const { data: invitation, error: inviteError } = await supabase
+    const { data: invitation, error: inviteError } = await adminClient
       .from('family_invitations')
       .select('*')
       .eq('invite_token', token)
@@ -134,7 +147,7 @@ export async function POST(
     const expiresAt = new Date(invitation.expires_at);
 
     if (now > expiresAt) {
-      await supabase
+      await adminClient
         .from('family_invitations')
         .update({ status: 'expired' })
         .eq('id', invitation.id);
@@ -162,7 +175,7 @@ export async function POST(
     }
 
     // Check if user already belongs to a family
-    const { data: userProfile } = await supabase
+    const { data: userProfile } = await adminClient
       .from('users')
       .select('family_id')
       .eq('id', user.id)
@@ -176,7 +189,7 @@ export async function POST(
     }
 
     // Update user's family_id
-    const { error: updateError } = await supabase
+    const { error: updateError } = await adminClient
       .from('users')
       .update({ family_id: invitation.family_id })
       .eq('id', user.id);
@@ -190,7 +203,7 @@ export async function POST(
     }
 
     // Mark invitation as accepted
-    await supabase
+    await adminClient
       .from('family_invitations')
       .update({
         status: 'accepted',
