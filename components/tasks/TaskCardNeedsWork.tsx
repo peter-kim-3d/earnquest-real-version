@@ -12,6 +12,9 @@ type Task = {
   category: string;
   points: number;
   icon: string | null;
+  // auto_assign fields
+  auto_assign?: boolean;
+  instance_id?: string | null;
 };
 
 type TaskCompletion = {
@@ -26,7 +29,7 @@ type TaskCompletion = {
 interface TaskCardNeedsWorkProps {
   task: Task;
   completion: TaskCompletion;
-  onResubmit: (taskId: string) => Promise<void>;
+  onResubmit: (taskId: string, evidence?: any, instanceId?: string) => Promise<void>;
 }
 
 export default function TaskCardNeedsWork({ task, completion, onResubmit }: TaskCardNeedsWorkProps) {
@@ -35,7 +38,7 @@ export default function TaskCardNeedsWork({ task, completion, onResubmit }: Task
   const handleResubmit = async () => {
     setLoading(true);
     try {
-      await onResubmit(task.id);
+      await onResubmit(task.id, undefined, task.instance_id || undefined);
     } catch (error) {
       console.error('Failed to resubmit task:', error);
       toast.error('Submit Failed', { description: 'Failed to submit. Please try again.' });

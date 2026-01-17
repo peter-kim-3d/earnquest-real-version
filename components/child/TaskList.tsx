@@ -109,7 +109,8 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
     evidence?: {
       timerCompleted?: boolean;
       checklistState?: boolean[];
-    }
+    },
+    instanceId?: string
   ) => {
     // 1. Optimistic Update
     setOptimisticCompletedIds((prev) => new Set(prev).add(taskId));
@@ -129,6 +130,7 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
         body: JSON.stringify({
           taskId,
           childId,
+          ...(instanceId && { instanceId }),
           ...(evidence && { evidence }),
         }),
       });

@@ -23,6 +23,9 @@ type Task = {
   timer_minutes?: number | null;
   checklist?: string[] | null;
   metadata?: any;
+  // auto_assign fields
+  auto_assign?: boolean;
+  instance_id?: string | null;
 };
 
 interface TaskCardProps {
@@ -30,7 +33,7 @@ interface TaskCardProps {
   onComplete: (taskId: string, evidence?: {
     timerCompleted?: boolean;
     checklistState?: boolean[];
-  }) => Promise<void>;
+  }, instanceId?: string) => Promise<void>;
 }
 
 export default function TaskCard({ task, onComplete }: TaskCardProps) {
@@ -57,7 +60,7 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
     // For parent/auto approval, proceed directly
     setLoading(true);
     try {
-      await onComplete(task.id);
+      await onComplete(task.id, undefined, task.instance_id || undefined);
     } catch (error) {
       console.error('Failed to complete task:', error);
       toast.error('Submit Failed', { description: 'Failed to submit. Please try again.' });
@@ -70,7 +73,7 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
     setShowTimer(false);
     setLoading(true);
     try {
-      await onComplete(task.id, { timerCompleted: true });
+      await onComplete(task.id, { timerCompleted: true }, task.instance_id || undefined);
       // Reset local metadata
       setLocalMetadata({ ...localMetadata, timer_state: null });
     } catch (error) {
@@ -85,7 +88,7 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
     setShowChecklist(false);
     setLoading(true);
     try {
-      await onComplete(task.id, { checklistState });
+      await onComplete(task.id, { checklistState }, task.instance_id || undefined);
     } catch (error) {
       console.error('Failed to complete task:', error);
       toast.error('Submit Failed', { description: 'Failed to submit. Please try again.' });
