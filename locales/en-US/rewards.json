@@ -97,10 +97,17 @@
     "error": "Failed to save reward. Please try again."
   },
   "stats": {
-    "purchased30d": "Purchased (30d)",
-    "cost": "Cost",
-    "screenTime": "Screen Time",
-    "weeklyLimit": "Weekly Limit"
+    "purchased30d": "Purchased (30d):",
+    "cost": "Cost:",
+    "screenTime": "Screen Time:",
+    "weeklyLimit": "Weekly Limit:",
+    "minutes": "{count} min"
+  },
+  "card": {
+    "inactive": "Inactive",
+    "edit": "Edit",
+    "updateFailed": "Failed to update reward. Please try again.",
+    "deleteFailed": "Failed to delete reward. Please try again."
   },
   "valueContext": {
     "title": "Value Context",

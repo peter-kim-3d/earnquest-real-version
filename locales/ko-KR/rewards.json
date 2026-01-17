@@ -97,10 +97,17 @@
     "error": "보상 저장에 실패했습니다. 다시 시도해주세요."
   },
   "stats": {
-    "purchased30d": "구매 (30일)",
-    "cost": "비용",
-    "screenTime": "스크린 타임",
-    "weeklyLimit": "주간 한도"
+    "purchased30d": "구매 (30일):",
+    "cost": "비용:",
+    "screenTime": "스크린 타임:",
+    "weeklyLimit": "주간 한도:",
+    "minutes": "{count}분"
+  },
+  "card": {
+    "inactive": "비활성",
+    "edit": "수정",
+    "updateFailed": "보상 업데이트에 실패했습니다. 다시 시도해주세요.",
+    "deleteFailed": "보상 삭제에 실패했습니다. 다시 시도해주세요."
   },
   "valueContext": {
     "title": "가치 맥락",

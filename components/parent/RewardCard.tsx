@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Edit, Trash2, MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +40,8 @@ export default function RewardCard({ reward, purchaseCount, onEdit }: RewardCard
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const t = useTranslations('rewards');
+  const tCommon = useTranslations('common');
 
   const handleToggleActive = async () => {
     setLoading(true);
@@ -59,7 +62,7 @@ export default function RewardCard({ reward, purchaseCount, onEdit }: RewardCard
       router.refresh();
     } catch (error) {
       console.error('Error toggling reward:', error);
-      toast.error('Update Failed', { description: 'Failed to update reward. Please try again.' });
+      toast.error(t('card.updateFailed'));
     } finally {
       setLoading(false);
     }
@@ -85,7 +88,7 @@ export default function RewardCard({ reward, purchaseCount, onEdit }: RewardCard
       router.refresh();
     } catch (error) {
       console.error('Error deleting reward:', error);
-      toast.error('Delete Failed', { description: 'Failed to delete reward. Please try again.' });
+      toast.error(t('card.deleteFailed'));
     } finally {
       setLoading(false);
     }
@@ -140,7 +143,7 @@ export default function RewardCard({ reward, purchaseCount, onEdit }: RewardCard
         {/* Status Badge */}
         {!reward.is_active && (
           <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-black/30 backdrop-blur-sm">
-            <span className="text-xs font-semibold text-white">Inactive</span>
+            <span className="text-xs font-semibold text-white">{t('card.inactive')}</span>
           </div>
         )}
       </div>
@@ -166,15 +169,15 @@ export default function RewardCard({ reward, purchaseCount, onEdit }: RewardCard
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={onEdit}>
                 <Edit className="h-4 w-4 mr-2" />
-                Edit
+                {t('card.edit')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleToggleActive}>
-                {reward.is_active ? 'Deactivate' : 'Activate'}
+                {reward.is_active ? t('actions.deactivate') : t('actions.activate')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleDelete} className="text-red-600 dark:text-red-400">
                 <Trash2 className="h-4 w-4 mr-2" />
-                Delete
+                {t('actions.delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -189,20 +192,20 @@ export default function RewardCard({ reward, purchaseCount, onEdit }: RewardCard
         {/* Reward Info */}
         <div className="space-y-2 mb-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-text-muted dark:text-gray-500">Cost:</span>
+            <span className="text-text-muted dark:text-gray-500">{t('stats.cost')}</span>
             <span className="font-bold text-primary">{reward.points_cost} QP</span>
           </div>
           {reward.screen_minutes && (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-text-muted dark:text-gray-500">Screen Time:</span>
+              <span className="text-text-muted dark:text-gray-500">{t('stats.screenTime')}</span>
               <span className="font-semibold text-blue-600 dark:text-blue-400">
-                {reward.screen_minutes} min
+                {t('stats.minutes', { count: reward.screen_minutes })}
               </span>
             </div>
           )}
           {reward.weekly_limit && (
             <div className="flex items-center justify-between text-sm">
-              <span className="text-text-muted dark:text-gray-500">Weekly Limit:</span>
+              <span className="text-text-muted dark:text-gray-500">{t('stats.weeklyLimit')}</span>
               <span className="font-semibold text-text-main dark:text-white">
                 {reward.weekly_limit}×
               </span>
@@ -214,7 +217,7 @@ export default function RewardCard({ reward, purchaseCount, onEdit }: RewardCard
         {purchaseCount > 0 && (
           <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-text-muted dark:text-gray-500">Purchased (30d):</span>
+              <span className="text-text-muted dark:text-gray-500">{t('stats.purchased30d')}</span>
               <span className="font-bold text-purple-600 dark:text-purple-400">
                 {purchaseCount}×
               </span>
@@ -227,10 +230,10 @@ export default function RewardCard({ reward, purchaseCount, onEdit }: RewardCard
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={confirmDelete}
-        title="Delete Reward Permanently?"
-        description={`Are you sure you want to permanently delete "${reward.name}"? This will remove it from all children and cannot be undone.`}
-        confirmLabel="Yes, Delete"
-        cancelLabel="No, Keep It"
+        title={t('confirm.deleteTitle')}
+        description={t('confirm.deleteDescription', { name: reward.name })}
+        confirmLabel={tCommon('confirm.yesDelete')}
+        cancelLabel={tCommon('confirm.noKeep')}
         variant="danger"
         isLoading={loading}
       />
