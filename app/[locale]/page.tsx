@@ -17,8 +17,8 @@ export default async function Home({
       <div className="text-center max-w-4xl">
         {/* Logo & Title */}
         <div className="mb-12">
-          <div className="flex items-center justify-center gap-4 mb-2">
-            <Image src="/logo.png" alt="EarnQuest Logo" width={140} height={140} className="drop-shadow-lg" />
+          <div className="flex items-center justify-center gap-1 mb-2">
+            <Image src="/logo.png" alt="EarnQuest Logo" width={180} height={180} className="drop-shadow-lg -mr-2" />
             <div className="text-left">
               <div className="flex items-center gap-3">
                 <h1 className="text-5xl md:text-6xl font-bold text-text-main dark:text-white font-display">
