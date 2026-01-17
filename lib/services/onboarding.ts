@@ -80,7 +80,7 @@ export async function populateTasksAndRewards(
 
       // v2 fields
       timer_minutes: template.timer_minutes || null,
-      checklist: template.checklist || null,
+      checklist: template.checklist || template.metadata?.checklist || null,
       photo_required: template.photo_required || false,
       metadata: {
         ...template.metadata,
