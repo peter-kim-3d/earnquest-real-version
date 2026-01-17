@@ -20,8 +20,8 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
 
         {/* Logo area */}
-        <div className="relative z-10 flex items-center gap-3 text-white">
-          <Image src="/logo.png" alt="EarnQuest Logo" width={40} height={40} />
+        <div className="relative z-10 flex items-center gap-1.5 text-white">
+          <Image src="/logo.png" alt="EarnQuest Logo" width={36} height={36} />
           <h2 className="text-2xl font-bold tracking-tight">EarnQuest</h2>
           <BetaBadge />
         </div>
@@ -44,8 +44,8 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <div className="relative flex w-full lg:w-1/2 flex-col justify-center px-6 py-12 lg:px-20 xl:px-32 bg-background-light dark:bg-background-dark">
         {/* Mobile Logo Header */}
         <div className="flex lg:hidden items-center justify-between mb-8">
-          <div className="flex items-center gap-2 text-text-main dark:text-white">
-            <Image src="/logo.png" alt="EarnQuest Logo" width={40} height={40} />
+          <div className="flex items-center gap-1 text-text-main dark:text-white">
+            <Image src="/logo.png" alt="EarnQuest Logo" width={36} height={36} />
             <h2 className="text-xl font-bold tracking-tight">EarnQuest</h2>
             <BetaBadge />
           </div>
