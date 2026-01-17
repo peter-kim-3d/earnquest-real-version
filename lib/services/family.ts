@@ -7,15 +7,47 @@ export interface CreateFamilyParams {
 }
 
 /**
- * Creates a new family with default settings
+ * Generates a unique 6-character join code
+ * Uses uppercase alphanumeric excluding confusing characters (I, O, L, 0, 1)
+ */
+async function generateUniqueJoinCode(supabase: any): Promise<string> {
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  const maxAttempts = 100;
+
+  for (let attempts = 0; attempts < maxAttempts; attempts++) {
+    const code = Array.from({ length: 6 }, () =>
+      chars[Math.floor(Math.random() * chars.length)]
+    ).join('');
+
+    // Check if code already exists
+    const { data: existing } = await supabase
+      .from('families')
+      .select('id')
+      .eq('join_code', code)
+      .single();
+
+    if (!existing) {
+      return code;
+    }
+  }
+
+  throw new Error('Failed to generate unique join code after max attempts');
+}
+
+/**
+ * Creates a new family with default settings and auto-generated join code
  */
 export async function createFamily(params?: CreateFamilyParams) {
   const supabase = await createClient();
+
+  // Generate unique join code
+  const joinCode = await generateUniqueJoinCode(supabase);
 
   const { data: family, error } = await supabase
     .from('families')
     .insert({
       name: params?.name || 'My Family',
+      join_code: joinCode,
       settings: {
         timezone: params?.timezone || 'America/New_York',
         language: params?.language || 'en-US',
