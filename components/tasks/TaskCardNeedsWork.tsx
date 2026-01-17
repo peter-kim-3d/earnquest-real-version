@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { AppIcon } from '@/components/ui/AppIcon';
 
 type Task = {
@@ -33,6 +34,8 @@ interface TaskCardNeedsWorkProps {
 }
 
 export default function TaskCardNeedsWork({ task, completion, onResubmit }: TaskCardNeedsWorkProps) {
+  const t = useTranslations('tasks.needsWork');
+  const tCard = useTranslations('tasks.taskCard');
   const [loading, setLoading] = useState(false);
 
   const handleResubmit = async () => {
@@ -41,7 +44,7 @@ export default function TaskCardNeedsWork({ task, completion, onResubmit }: Task
       await onResubmit(task.id, undefined, task.instance_id || undefined);
     } catch (error) {
       console.error('Failed to resubmit task:', error);
-      toast.error('Submit Failed', { description: 'Failed to submit. Please try again.' });
+      toast.error(tCard('submitFailed'), { description: tCard('failedToSubmit') });
     } finally {
       setLoading(false);
     }
@@ -107,7 +110,7 @@ export default function TaskCardNeedsWork({ task, completion, onResubmit }: Task
             <div className="flex items-start gap-2 mb-2">
               <AlertCircle className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
               <p className="text-sm font-semibold text-orange-800 dark:text-orange-200">
-                Please check these items:
+                {t('pleaseCheck')}
               </p>
             </div>
             {completion.fix_request.items && completion.fix_request.items.length > 0 && (
@@ -133,7 +136,7 @@ export default function TaskCardNeedsWork({ task, completion, onResubmit }: Task
           disabled={loading}
           className="mt-4 w-full px-6 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-base shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Submitting...' : 'Try Again! 💪'}
+          {loading ? t('submitting') : t('tryAgain')}
         </button>
       </div>
     </div>

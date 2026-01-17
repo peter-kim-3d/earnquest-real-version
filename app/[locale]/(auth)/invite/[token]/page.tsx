@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Users, Check, X, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface InvitationData {
   id: string;
@@ -18,6 +19,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
   const router = useRouter();
   const pathname = usePathname();
   const locale = pathname.split('/')[1] || 'en-US';
+  const t = useTranslations('auth.invite');
   const [token, setToken] = useState<string>('');
   const [invitation, setInvitation] = useState<InvitationData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,7 +53,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
         } else {
           // Check expiration client-side as well for safety
           if (new Date(data.invitation.expiresAt) < new Date()) {
-            setError('This invitation has expired.');
+            setError(t('expired'));
           } else {
             setInvitation(data.invitation);
           }
@@ -60,7 +62,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
       })
       .catch(err => {
         console.error('Failed to fetch invitation:', err);
-        setError('Failed to load invitation');
+        setError(t('loadFailed'));
         setLoading(false);
       });
   }, [token]);
@@ -82,11 +84,11 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
         throw new Error(data.error || 'Failed to accept invitation');
       }
 
-      toast.success('Welcome to the family!');
+      toast.success(t('toast.welcomeToFamily'));
       router.push(`/${locale}/dashboard`);
     } catch (error: any) {
       console.error('Accept error:', error);
-      toast.error(error.message || 'Failed to accept invitation');
+      toast.error(error.message || t('toast.acceptFailed'));
     } finally {
       setAccepting(false);
     }
@@ -97,7 +99,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
       <div className="flex min-h-screen items-center justify-center bg-background-light dark:bg-background-dark">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-text-muted dark:text-text-muted">Loading invitation...</p>
+          <p className="text-text-muted dark:text-text-muted">{t('loading')}</p>
         </div>
       </div>
     );
@@ -112,7 +114,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
               <X className="h-8 w-8 text-red-600 dark:text-red-400" />
             </div>
             <h1 className="text-2xl font-bold text-text-main dark:text-white mb-2">
-              Invalid Invitation
+              {t('invalidTitle')}
             </h1>
             <p className="text-text-muted dark:text-text-muted mb-6">
               {error}
@@ -121,7 +123,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
               href={`/${locale}`}
               className="inline-block px-6 py-3 bg-primary hover:bg-primary/90 text-black font-bold rounded-lg transition-colors"
             >
-              Go to Home
+              {t('goHome')}
             </Link>
           </div>
         </div>
@@ -145,10 +147,10 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
           {/* Content */}
           <div className="text-center mb-6">
             <h1 className="text-2xl md:text-3xl font-bold text-text-main dark:text-white mb-2">
-              You&apos;re Invited!
+              {t('youreInvited')}
             </h1>
             <p className="text-text-muted dark:text-text-muted mb-4">
-              <strong className="text-text-main dark:text-white">{invitation.invitedBy}</strong> has invited you to join their family on EarnQuest
+              {t('invitedBy', { name: invitation.invitedBy })}
             </p>
           </div>
 
@@ -156,19 +158,19 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
           <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 mb-6 text-left">
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-text-muted dark:text-text-muted">Family Name:</span>
+                <span className="text-text-muted dark:text-text-muted">{t('familyName')}</span>
                 <span className="font-semibold text-text-main dark:text-white">
                   {invitation.familyName}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-text-muted dark:text-text-muted">Invited Email:</span>
+                <span className="text-text-muted dark:text-text-muted">{t('invitedEmail')}</span>
                 <span className="font-semibold text-text-main dark:text-white">
                   {invitation.email}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-text-muted dark:text-text-muted">Expires:</span>
+                <span className="text-text-muted dark:text-text-muted">{t('expires')}</span>
                 <div className="text-right">
                   <span className="font-semibold text-text-main dark:text-white block">
                     {new Date(invitation.expiresAt).toLocaleDateString()}
@@ -176,10 +178,10 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
                   <span className="text-xs text-text-muted block">
                     {(() => {
                       const daysLeft = Math.ceil((new Date(invitation.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-                      if (daysLeft < 0) return 'Expired';
-                      if (daysLeft === 0) return 'Expires today';
-                      if (daysLeft === 1) return 'Expires tomorrow';
-                      return `${daysLeft} days left`;
+                      if (daysLeft < 0) return t('expiresExpired');
+                      if (daysLeft === 0) return t('expiresToday');
+                      if (daysLeft === 1) return t('expiresTomorrow');
+                      return t('daysLeft', { count: daysLeft });
                     })()}
                   </span>
                 </div>
@@ -197,31 +199,31 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
               {accepting ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  Accepting...
+                  {t('accepting')}
                 </>
               ) : (
                 <>
                   <Check className="h-5 w-5" />
-                  Accept Invitation
+                  {t('acceptInvitation')}
                 </>
               )}
             </button>
           ) : (
             <div className="space-y-3">
               <p className="text-sm text-text-muted dark:text-text-muted text-center mb-3">
-                Please sign in or create an account to accept this invitation
+                {t('signInPrompt')}
               </p>
               <Link
                 href={`/${locale}/login?invite=${token}`}
                 className="w-full flex items-center justify-center px-6 py-4 bg-primary hover:bg-primary/90 text-black font-bold rounded-lg transition-colors shadow-lg"
               >
-                Sign In
+                {t('signIn')}
               </Link>
               <Link
                 href={`/${locale}/signup?invite=${token}`}
                 className="w-full flex items-center justify-center px-6 py-4 border-2 border-gray-300 dark:border-gray-600 text-text-main dark:text-white font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
-                Create Account
+                {t('createAccount')}
               </Link>
             </div>
           )}
@@ -229,9 +231,9 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
 
         {/* Footer */}
         <p className="text-center text-sm text-text-muted dark:text-text-muted mt-6">
-          Questions?{' '}
+          {t('questions')}{' '}
           <Link href={`/${locale}`} className="text-primary hover:underline font-semibold">
-            Visit our homepage
+            {t('visitHomepage')}
           </Link>
         </p>
       </div>

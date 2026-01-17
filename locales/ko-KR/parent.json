@@ -184,5 +184,27 @@
     "updated": "아이 정보가 수정되었습니다!",
     "added": "아이가 추가되었습니다!",
     "saveFailed": "아이 저장에 실패했습니다"
+  },
+  "childProfileTasks": {
+    "title": "할당된 할 일",
+    "addTask": "할 일 추가",
+    "noActiveTasks": "할당된 활성 할 일이 없습니다",
+    "assignFirstTask": "첫 할 일 할당",
+    "autoApproval": "자동 승인",
+    "manualApproval": "수동 승인",
+    "completions30d": "{count}회 완료 (30일)",
+    "noRecentActivity": "최근 활동 없음",
+    "removeTask": "할 일 제거",
+    "removeTaskTitle": "할 일을 제거할까요?",
+    "removeTaskDescription": "{childName}의 할 일 목록에서 \"{taskName}\"을(를) 제거하시겠습니까? 이 할 일은 더 이상 이 아이에게 표시되지 않습니다.",
+    "yesRemove": "네, 제거합니다",
+    "noKeep": "아니오, 유지합니다",
+    "toast": {
+      "taskRemoved": "이 아이에게서 할 일이 제거되었습니다",
+      "taskRemoveFailed": "할 일 제거에 실패했습니다",
+      "taskVisible": "할 일이 다시 보입니다",
+      "taskHidden": "이 아이에게 할 일이 숨겨졌습니다",
+      "taskUpdateFailed": "할 일 업데이트에 실패했습니다"
+    }
   }
 }

@@ -166,6 +166,37 @@
     "done": "Done",
     "createFailed": "Failed to create invitation"
   },
+  "pinToggle": {
+    "title": "Require PIN for Children",
+    "descriptionEnabled": "Children must enter a 4-digit PIN to access their dashboard",
+    "descriptionDisabled": "Children can access their dashboard without a PIN",
+    "managePins": "Manage PINs for each child:",
+    "savePin": "Save PIN",
+    "noChanges": "No changes to save",
+    "protectionActive": "PIN Protection Active",
+    "protectionDisabled": "PIN Protection Disabled",
+    "infoEnabled": "Each child uses their PIN above to log in. Default PIN is 0000.",
+    "infoDisabled": "Anyone with your family code can access any child account. Consider enabling PINs for added security.",
+    "disableDialog": {
+      "title": "Disable PIN Requirement?",
+      "description": "This will allow children to access their accounts without entering a PIN code.",
+      "warningTitle": "Reduced Security",
+      "warningDescription": "Anyone with your family code can access any child's account. Only disable this if your children's devices are already secured."
+    },
+    "toast": {
+      "loadFailed": "Failed to load settings",
+      "enabled": "PIN requirement enabled",
+      "disabled": "PIN requirement disabled",
+      "updateFailed": "Failed to update setting",
+      "networkError": "Network error",
+      "pinMustBe4": "PIN must be 4 digits",
+      "pinSameAsCurrent": "PIN is the same as current",
+      "pinUpdated": "PIN updated for {name}"
+    },
+    "cancel": "Cancel",
+    "disabling": "Disabling...",
+    "disablePin": "Disable PIN"
+  },
   "deviceConnection": {
     "copyCode": "Copy code",
     "instructions": {

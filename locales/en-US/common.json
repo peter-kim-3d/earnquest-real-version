@@ -138,5 +138,11 @@
   "accessibility": {
     "skipToContent": "Skip to main content",
     "beta": "BETA"
+  },
+  "errorPage": {
+    "title": "Something went wrong!",
+    "description": "We encountered an unexpected error. Don't worry, we're already looking into it.",
+    "tryAgain": "Try Again",
+    "goToDashboard": "Go to Dashboard"
   }
 }

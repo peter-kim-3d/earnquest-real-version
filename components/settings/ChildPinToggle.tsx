@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { RefreshCw, Check } from '@/components/ui/ClientIcons';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,7 @@ interface Child {
 }
 
 export default function ChildPinToggle() {
+  const t = useTranslations('settings.pinToggle');
   const [requirePin, setRequirePin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -50,11 +52,11 @@ export default function ChildPinToggle() {
           setEditingPins(pins);
         }
       } else {
-        toast.error('Failed to load settings');
+        toast.error(t('toast.loadFailed'));
       }
     } catch (err) {
       console.error('Failed to fetch settings:', err);
-      toast.error('Failed to load settings');
+      toast.error(t('toast.loadFailed'));
     } finally {
       setFetching(false);
     }
@@ -86,13 +88,13 @@ export default function ChildPinToggle() {
 
       if (res.ok) {
         setRequirePin(newValue);
-        toast.success(newValue ? 'PIN requirement enabled' : 'PIN requirement disabled');
+        toast.success(newValue ? t('toast.enabled') : t('toast.disabled'));
       } else {
-        toast.error('Failed to update setting');
+        toast.error(t('toast.updateFailed'));
       }
     } catch (err) {
       console.error('Failed to update setting:', err);
-      toast.error('Network error');
+      toast.error(t('toast.networkError'));
     } finally {
       setLoading(false);
     }
@@ -106,7 +108,7 @@ export default function ChildPinToggle() {
   const handleSavePin = async (childId: string) => {
     const newPin = editingPins[childId];
     if (!newPin || newPin.length !== 4) {
-      toast.error('PIN must be 4 digits');
+      toast.error(t('toast.pinMustBe4'));
       return;
     }
 
@@ -114,7 +116,7 @@ export default function ChildPinToggle() {
     const originalPin = child?.pin_code || '0000';
     if (originalPin === newPin) {
       // No change
-      toast.info('PIN is the same as current');
+      toast.info(t('toast.pinSameAsCurrent'));
       return;
     }
 
@@ -131,13 +133,13 @@ export default function ChildPinToggle() {
         setChildren(prev => prev.map(c =>
           c.id === childId ? { ...c, pin_code: newPin } : c
         ));
-        toast.success(`PIN updated for ${child?.name}`);
+        toast.success(t('toast.pinUpdated', { name: child?.name || '' }));
       } else {
-        toast.error('Failed to update PIN');
+        toast.error(t('toast.updateFailed'));
       }
     } catch (err) {
       console.error('Failed to update PIN:', err);
-      toast.error('Network error');
+      toast.error(t('toast.networkError'));
     } finally {
       setSavingPin(null);
     }
@@ -164,12 +166,12 @@ export default function ChildPinToggle() {
       <div className="flex items-center justify-between py-2">
         <div className="flex-1">
           <p className="font-medium text-text-main dark:text-white">
-            Require PIN for Children
+            {t('title')}
           </p>
           <p className="text-sm text-text-muted dark:text-text-muted">
             {requirePin
-              ? 'Children must enter a 4-digit PIN to access their dashboard'
-              : 'Children can access their dashboard without a PIN'}
+              ? t('descriptionEnabled')
+              : t('descriptionDisabled')}
           </p>
         </div>
         <button
@@ -191,7 +193,7 @@ export default function ChildPinToggle() {
       {requirePin && children.length > 0 && (
         <div className="space-y-3 pt-2">
           <p className="text-sm font-medium text-text-muted dark:text-text-muted">
-            Manage PINs for each child:
+            {t('managePins')}
           </p>
           <div className="space-y-2">
             {children.map((child) => (
@@ -235,7 +237,7 @@ export default function ChildPinToggle() {
                         ? 'bg-primary hover:bg-primary/90 text-white'
                         : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                     } disabled:opacity-50`}
-                    title={isPinChanged(child.id) ? 'Save PIN' : 'No changes to save'}
+                    title={isPinChanged(child.id) ? t('savePin') : t('noChanges')}
                   >
                     {savingPin === child.id ? (
                       <RefreshCw className="w-4 h-4 animate-spin" />
@@ -263,7 +265,7 @@ export default function ChildPinToggle() {
               ? 'text-green-900 dark:text-green-100'
               : 'text-yellow-900 dark:text-yellow-100'
           }`}>
-            {requirePin ? 'PIN Protection Active' : 'PIN Protection Disabled'}
+            {requirePin ? t('protectionActive') : t('protectionDisabled')}
           </p>
           <p className={`text-xs ${
             requirePin
@@ -271,8 +273,8 @@ export default function ChildPinToggle() {
               : 'text-yellow-800 dark:text-yellow-200'
           }`}>
             {requirePin
-              ? 'Each child uses their PIN above to log in. Default PIN is 0000.'
-              : 'Anyone with your family code can access any child account. Consider enabling PINs for added security.'}
+              ? t('infoEnabled')
+              : t('infoDisabled')}
           </p>
         </div>
       </div>
@@ -282,10 +284,10 @@ export default function ChildPinToggle() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-text-main dark:text-white">
-              Disable PIN Requirement?
+              {t('disableDialog.title')}
             </DialogTitle>
             <DialogDescription className="text-text-muted dark:text-text-muted">
-              This will allow children to access their accounts without entering a PIN code.
+              {t('disableDialog.description')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -293,11 +295,10 @@ export default function ChildPinToggle() {
               <span className="text-lg">⚠️</span>
               <div className="flex-1">
                 <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-1">
-                  Reduced Security
+                  {t('disableDialog.warningTitle')}
                 </p>
                 <p className="text-xs text-yellow-800 dark:text-yellow-200">
-                  Anyone with your family code can access any child&apos;s account.
-                  Only disable this if your children&apos;s devices are already secured.
+                  {t('disableDialog.warningDescription')}
                 </p>
               </div>
             </div>
@@ -307,14 +308,14 @@ export default function ChildPinToggle() {
               onClick={() => setShowDisableDialog(false)}
               className="px-6 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold transition-all"
             >
-              Cancel
+              {t('cancel')}
             </button>
             <button
               onClick={handleConfirmDisable}
               disabled={loading}
               className="px-6 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-black font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Disabling...' : 'Disable PIN'}
+              {loading ? t('disabling') : t('disablePin')}
             </button>
           </DialogFooter>
         </DialogContent>

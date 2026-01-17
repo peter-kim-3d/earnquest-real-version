@@ -130,5 +130,20 @@
     "similar": "Similar rewards",
     "higher": "Higher value than most",
     "lower": "Lower value than most"
+  },
+  "pending": {
+    "title": "Pending Rewards",
+    "requestedBy": "Requested by {name}",
+    "granting": "Granting...",
+    "grantReward": "Grant Reward",
+    "toast": {
+      "grantFailed": "Grant Failed",
+      "grantFailedDescription": "Failed to grant reward. Please try again."
+    },
+    "time": {
+      "minutesAgo": "{count}m ago",
+      "hoursAgo": "{count}h ago",
+      "daysAgo": "{count}d ago"
+    }
   }
 }

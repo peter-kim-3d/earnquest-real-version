@@ -123,5 +123,20 @@
     "depositing": "Depositing...",
     "depositXp": "Deposit {amount} XP",
     "deposit": "Deposit"
+  },
+  "client": {
+    "availableToDeposit": "Available to Deposit",
+    "activeGoals": "Active Goals",
+    "achievedGoals": "Achieved Goals",
+    "noGoalsYet": "No Goals Yet",
+    "askParents": "Ask your parents to create a savings goal for you!",
+    "toast": {
+      "goalAchieved": "Goal Achieved!",
+      "goalAchievedDescription": "Congratulations! You reached your goal!",
+      "pointsDeposited": "Points Deposited!",
+      "pointsDepositedDescription": "{amount} XP added to your goal.",
+      "depositFailed": "Deposit Failed",
+      "depositFailedDescription": "Please try again."
+    }
   }
 }

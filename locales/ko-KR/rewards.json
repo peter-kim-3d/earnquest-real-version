@@ -130,5 +130,20 @@
     "similar": "비슷한 보상",
     "higher": "대부분보다 높은 가치",
     "lower": "대부분보다 낮은 가치"
+  },
+  "pending": {
+    "title": "대기 중인 보상",
+    "requestedBy": "{name}이(가) 요청함",
+    "granting": "지급 중...",
+    "grantReward": "보상 지급",
+    "toast": {
+      "grantFailed": "지급 실패",
+      "grantFailedDescription": "보상 지급에 실패했습니다. 다시 시도해주세요."
+    },
+    "time": {
+      "minutesAgo": "{count}분 전",
+      "hoursAgo": "{count}시간 전",
+      "daysAgo": "{count}일 전"
+    }
   }
 }

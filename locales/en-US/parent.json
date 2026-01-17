@@ -184,5 +184,27 @@
     "updated": "Child updated!",
     "added": "Child added!",
     "saveFailed": "Failed to save child"
+  },
+  "childProfileTasks": {
+    "title": "Assigned Tasks",
+    "addTask": "Add Task",
+    "noActiveTasks": "No active tasks assigned",
+    "assignFirstTask": "Assign First Task",
+    "autoApproval": "Auto-approval",
+    "manualApproval": "Manual approval",
+    "completions30d": "{count} completions (30d)",
+    "noRecentActivity": "No recent activity",
+    "removeTask": "Remove task",
+    "removeTaskTitle": "Remove Task?",
+    "removeTaskDescription": "Are you sure you want to remove \"{taskName}\" from {childName}'s task list? This task will no longer appear for this child.",
+    "yesRemove": "Yes, Remove",
+    "noKeep": "No, Keep It",
+    "toast": {
+      "taskRemoved": "Task removed for this child",
+      "taskRemoveFailed": "Failed to remove task",
+      "taskVisible": "Task visible again",
+      "taskHidden": "Task hidden for this child",
+      "taskUpdateFailed": "Failed to update task"
+    }
   }
 }

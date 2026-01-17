@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { FIX_TEMPLATES, type FixRequestTemplate } from '@/lib/types/task';
 
 interface FixRequestModalProps {
@@ -24,6 +25,7 @@ export default function FixRequestModal({
   onClose,
 }: FixRequestModalProps) {
   const router = useRouter();
+  const t = useTranslations('tasks.fixRequest');
   const [loading, setLoading] = useState(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [customMessage, setCustomMessage] = useState('');
@@ -37,7 +39,7 @@ export default function FixRequestModal({
     e.preventDefault();
 
     if (selectedItems.length === 0 && !customMessage.trim()) {
-      toast.error('Selection Required', { description: 'Please select at least one fix item or add a custom message' });
+      toast.error(t('toast.selectionRequired'), { description: t('toast.selectAtLeastOne') });
       return;
     }
 
@@ -65,7 +67,7 @@ export default function FixRequestModal({
       setCustomMessage('');
     } catch (error: any) {
       console.error('Error sending fix request:', error);
-      toast.error('Request Failed', { description: error.message || 'Failed to send fix request. Please try again.' });
+      toast.error(t('toast.requestFailed'), { description: error.message || t('toast.failedToSend') });
     } finally {
       setLoading(false);
     }
@@ -86,7 +88,7 @@ export default function FixRequestModal({
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
-            Request Fixes for &quot;{taskName}&quot;
+            {t('title', { taskName })}
           </DialogTitle>
         </DialogHeader>
 
@@ -94,7 +96,7 @@ export default function FixRequestModal({
           {/* Template Fix Items */}
           <div className="space-y-3">
             <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Quick Fixes (select up to 5)
+              {t('quickFixes')}
             </Label>
             <div className="space-y-2">
               {taskTemplates.map((template: FixRequestTemplate) => {
@@ -131,18 +133,18 @@ export default function FixRequestModal({
           {/* Custom Message */}
           <div className="space-y-2">
             <Label htmlFor="customMessage" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Add Custom Message (Optional)
+              {t('addCustomMessage')}
             </Label>
             <textarea
               id="customMessage"
               value={customMessage}
               onChange={(e) => setCustomMessage(e.target.value)}
-              placeholder="Add any additional notes or instructions..."
+              placeholder={t('customPlaceholder')}
               className="w-full min-h-20 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
               maxLength={200}
             />
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              {customMessage.length}/200 characters
+              {t('characters', { count: customMessage.length })}
             </p>
           </div>
 
@@ -150,7 +152,7 @@ export default function FixRequestModal({
           {selectedItems.length > 0 && (
             <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
               <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                Selected fixes ({selectedItems.length}/5):
+                {t('selectedFixes', { count: selectedItems.length })}
               </p>
               <ul className="space-y-1">
                 {selectedItems.map((item, index) => (
@@ -171,14 +173,14 @@ export default function FixRequestModal({
               disabled={loading}
               className="flex-1"
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               type="submit"
               disabled={loading || (selectedItems.length === 0 && !customMessage.trim())}
               className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
             >
-              {loading ? 'Sending...' : 'Send Fix Request'}
+              {loading ? t('sending') : t('sendRequest')}
             </Button>
           </div>
         </form>

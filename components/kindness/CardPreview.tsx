@@ -4,6 +4,7 @@ import { CardTheme, themes } from './ThemePicker';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Sparkles } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface CardPreviewProps {
   theme: CardTheme;
@@ -14,13 +15,6 @@ interface CardPreviewProps {
   isSending: boolean;
 }
 
-const quickPrompts = [
-  "Thanks for helping out! 💪",
-  "You're so thoughtful! 🌟",
-  "Great job today! 🎉",
-  "You made my day better! 😊",
-];
-
 export function CardPreview({
   theme,
   recipientName,
@@ -29,9 +23,17 @@ export function CardPreview({
   onSend,
   isSending,
 }: CardPreviewProps) {
+  const t = useTranslations('kindness.cardPreview');
   const selectedTheme = themes.find((t) => t.id === theme);
   const charCount = message.length;
   const maxChars = 140;
+
+  const quickPrompts = [
+    t('quickPrompts.helpingOut'),
+    t('quickPrompts.thoughtful'),
+    t('quickPrompts.greatJob'),
+    t('quickPrompts.madeDayBetter'),
+  ];
 
   const handleQuickPrompt = (prompt: string) => {
     if (charCount + prompt.length <= maxChars) {
@@ -43,10 +45,10 @@ export function CardPreview({
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-          Write your message
+          {t('writeYourMessage')}
         </h3>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Tell {recipientName} what you appreciate
+          {t('tellAppreciation', { name: recipientName })}
         </p>
       </div>
 
@@ -62,7 +64,7 @@ export function CardPreview({
         >
           <div className="text-6xl mb-4">{selectedTheme?.icon}</div>
           <h4 className="text-2xl font-bold text-white mb-2">
-            Thank you, {recipientName}!
+            {t('thankYou', { name: recipientName })}
           </h4>
           {message && (
             <p className="text-white/90 text-lg max-w-md italic">
@@ -71,7 +73,7 @@ export function CardPreview({
           )}
           {!message && (
             <p className="text-white/60 text-sm">
-              Your message will appear here...
+              {t('messagePlaceholder')}
             </p>
           )}
         </div>
@@ -87,7 +89,7 @@ export function CardPreview({
                 onMessageChange(e.target.value);
               }
             }}
-            placeholder={`Write a kind message to ${recipientName}...`}
+            placeholder={t('writeKindMessage', { name: recipientName })}
             className="min-h-24 resize-none text-base"
             maxLength={maxChars}
           />
@@ -120,12 +122,12 @@ export function CardPreview({
         {isSending ? (
           <>
             <Sparkles className="w-5 h-5 mr-2 animate-spin" />
-            Sending gratitude...
+            {t('sendingGratitude')}
           </>
         ) : (
           <>
             <Sparkles className="w-5 h-5 mr-2" />
-            Send Gratitude
+            {t('sendGratitude')}
           </>
         )}
       </Button>

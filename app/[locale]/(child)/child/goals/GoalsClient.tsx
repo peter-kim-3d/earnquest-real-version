@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Target, Trophy, Sparkle } from '@phosphor-icons/react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import GoalCard from '@/components/goals/GoalCard';
 import { Tier } from '@/lib/utils/tiers';
 
@@ -41,6 +42,7 @@ export default function GoalsClient({
   weeklyEarnings,
 }: GoalsClientProps) {
   const router = useRouter();
+  const t = useTranslations('goals.client');
   const [balance, setBalance] = useState(availableBalance);
 
   const activeGoals = goals.filter((g) => !g.is_completed);
@@ -69,21 +71,21 @@ export default function GoalsClient({
       setBalance(result.newBalance);
 
       if (result.isCompleted) {
-        toast.success('Goal Achieved!', {
-          description: 'Congratulations! You reached your goal!',
+        toast.success(t('toast.goalAchieved'), {
+          description: t('toast.goalAchievedDescription'),
           icon: '🎉',
         });
       } else {
-        toast.success('Points Deposited!', {
-          description: `${amount} XP added to your goal.`,
+        toast.success(t('toast.pointsDeposited'), {
+          description: t('toast.pointsDepositedDescription', { amount }),
         });
       }
 
       router.refresh();
     } catch (error: any) {
       console.error('Deposit failed:', error);
-      toast.error('Deposit Failed', {
-        description: error.message || 'Please try again.',
+      toast.error(t('toast.depositFailed'), {
+        description: error.message || t('toast.depositFailedDescription'),
       });
       throw error;
     }
@@ -99,7 +101,7 @@ export default function GoalsClient({
       <div className="bg-gradient-to-br from-primary to-green-600 rounded-xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium opacity-80">Available to Deposit</p>
+            <p className="text-sm font-medium opacity-80">{t('availableToDeposit')}</p>
             <p className="text-4xl font-black">{balance.toLocaleString()} XP</p>
           </div>
           <Sparkle size={48} weight="duotone" className="opacity-50" />
@@ -112,7 +114,7 @@ export default function GoalsClient({
           <div className="flex items-center gap-2 mb-4">
             <Target size={24} className="text-primary" />
             <h2 className="text-xl font-bold text-text-main dark:text-white">
-              Active Goals
+              {t('activeGoals')}
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -137,7 +139,7 @@ export default function GoalsClient({
           <div className="flex items-center gap-2 mb-4">
             <Trophy size={24} className="text-yellow-500" />
             <h2 className="text-xl font-bold text-text-main dark:text-white">
-              Achieved Goals
+              {t('achievedGoals')}
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -161,10 +163,10 @@ export default function GoalsClient({
         <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
           <Target size={64} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
           <h3 className="text-xl font-bold text-text-main dark:text-white mb-2">
-            No Goals Yet
+            {t('noGoalsYet')}
           </h3>
           <p className="text-text-muted dark:text-gray-400 mb-4">
-            Ask your parents to create a savings goal for you!
+            {t('askParents')}
           </p>
         </div>
       )}

@@ -123,5 +123,20 @@
     "depositing": "입금 중...",
     "depositXp": "{amount} XP 입금",
     "deposit": "입금"
+  },
+  "client": {
+    "availableToDeposit": "입금 가능",
+    "activeGoals": "진행 중인 목표",
+    "achievedGoals": "달성한 목표",
+    "noGoalsYet": "아직 목표가 없어요",
+    "askParents": "부모님에게 저축 목표를 만들어 달라고 해보세요!",
+    "toast": {
+      "goalAchieved": "목표 달성!",
+      "goalAchievedDescription": "축하해요! 목표에 도달했어요!",
+      "pointsDeposited": "포인트 입금됨!",
+      "pointsDepositedDescription": "{amount} XP가 목표에 추가되었어요.",
+      "depositFailed": "입금 실패",
+      "depositFailedDescription": "다시 시도해주세요."
+    }
   }
 }

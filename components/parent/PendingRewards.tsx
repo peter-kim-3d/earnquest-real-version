@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Gift, Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { AppIcon } from '@/components/ui/AppIcon';
 
 type PendingReward = {
@@ -28,6 +29,7 @@ interface PendingRewardsProps {
 
 export default function PendingRewards({ pendingRewards }: PendingRewardsProps) {
   const router = useRouter();
+  const t = useTranslations('rewards.pending');
   const [loading, setLoading] = useState<string | null>(null);
 
   const handleGrant = async (purchaseId: string) => {
@@ -47,7 +49,7 @@ export default function PendingRewards({ pendingRewards }: PendingRewardsProps) 
       router.refresh();
     } catch (error: any) {
       console.error('Failed to grant reward:', error);
-      toast.error('Grant Failed', { description: error.message || 'Failed to grant reward. Please try again.' });
+      toast.error(t('toast.grantFailed'), { description: error.message || t('toast.grantFailedDescription') });
     } finally {
       setLoading(null);
     }
@@ -59,11 +61,11 @@ export default function PendingRewards({ pendingRewards }: PendingRewardsProps) 
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
 
     if (diffInMinutes < 60) {
-      return `${diffInMinutes}m ago`;
+      return t('time.minutesAgo', { count: diffInMinutes });
     } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)}h ago`;
+      return t('time.hoursAgo', { count: Math.floor(diffInMinutes / 60) });
     } else {
-      return `${Math.floor(diffInMinutes / 1440)}d ago`;
+      return t('time.daysAgo', { count: Math.floor(diffInMinutes / 1440) });
     }
   };
 
@@ -75,7 +77,7 @@ export default function PendingRewards({ pendingRewards }: PendingRewardsProps) 
     <div className="mb-6">
       <h2 className="text-xl font-bold text-text-main dark:text-white mb-4 flex items-center gap-2">
         <Gift className="h-6 w-6 text-purple-500" />
-        Pending Rewards
+        {t('title')}
         <span className="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-sm font-bold">
           {pendingRewards.length}
         </span>
@@ -99,7 +101,7 @@ export default function PendingRewards({ pendingRewards }: PendingRewardsProps) 
                   {purchase.rewards.name}
                 </h3>
                 <p className="text-sm text-text-muted dark:text-gray-400 mb-2">
-                  Requested by {purchase.children.name}
+                  {t('requestedBy', { name: purchase.children.name })}
                 </p>
                 <div className="flex items-center gap-3 text-sm text-text-muted dark:text-gray-500">
                   <span>{formatTime(purchase.purchased_at)}</span>
@@ -124,7 +126,7 @@ export default function PendingRewards({ pendingRewards }: PendingRewardsProps) 
               className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-semibold transition-all disabled:opacity-50"
             >
               <Check className="h-4 w-4" />
-              {loading === purchase.id ? 'Granting...' : 'Grant Reward'}
+              {loading === purchase.id ? t('granting') : t('grantReward')}
             </button>
           </div>
         ))}

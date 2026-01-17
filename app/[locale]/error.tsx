@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { WarningCircle } from '@phosphor-icons/react';
+import { useTranslations } from 'next-intl';
 
 export default function Error({
     error,
@@ -14,6 +15,7 @@ export default function Error({
 }) {
     const pathname = usePathname();
     const locale = pathname?.split('/')[1] || 'en-US';
+    const t = useTranslations('common.errorPage');
 
     useEffect(() => {
         // Log the error to an error reporting service
@@ -26,10 +28,10 @@ export default function Error({
                 <WarningCircle size={48} weight="fill" className="text-red-500 dark:text-red-400" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Something went wrong!
+                {t('title')}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md">
-                We encountered an unexpected error. Don&apos;t worry, we&apos;re already looking into it.
+                {t('description')}
             </p>
             <div className="flex gap-4">
                 <Button
@@ -39,13 +41,13 @@ export default function Error({
                     }
                     className="bg-primary hover:bg-primary/90 text-white font-bold"
                 >
-                    Try Again
+                    {t('tryAgain')}
                 </Button>
                 <Button
                     variant="outline"
                     onClick={() => window.location.href = `/${locale}/dashboard`}
                 >
-                    Go to Dashboard
+                    {t('goToDashboard')}
                 </Button>
             </div>
         </div>

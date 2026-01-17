@@ -227,6 +227,28 @@
     "cancel": "Cancel",
     "completeTask": "Complete Task"
   },
+  "fixRequest": {
+    "title": "Request Fixes for \"{taskName}\"",
+    "quickFixes": "Quick Fixes (select up to 5)",
+    "addCustomMessage": "Add Custom Message (Optional)",
+    "customPlaceholder": "Add any additional notes or instructions...",
+    "characters": "{count}/200 characters",
+    "selectedFixes": "Selected fixes ({count}/5):",
+    "cancel": "Cancel",
+    "sending": "Sending...",
+    "sendRequest": "Send Fix Request",
+    "toast": {
+      "selectionRequired": "Selection Required",
+      "selectAtLeastOne": "Please select at least one fix item or add a custom message",
+      "requestFailed": "Request Failed",
+      "failedToSend": "Failed to send fix request. Please try again."
+    }
+  },
+  "needsWork": {
+    "pleaseCheck": "Please check these items:",
+    "submitting": "Submitting...",
+    "tryAgain": "Try Again! 💪"
+  },
   "taskCard": {
     "submitFailed": "Submit Failed",
     "failedToSubmit": "Failed to submit. Please try again.",

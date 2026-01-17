@@ -166,6 +166,37 @@
     "done": "완료",
     "createFailed": "초대 생성에 실패했습니다"
   },
+  "pinToggle": {
+    "title": "아이에게 PIN 요구",
+    "descriptionEnabled": "아이들이 대시보드에 접근하려면 4자리 PIN을 입력해야 해요",
+    "descriptionDisabled": "아이들이 PIN 없이 대시보드에 접근할 수 있어요",
+    "managePins": "각 아이의 PIN 관리:",
+    "savePin": "PIN 저장",
+    "noChanges": "변경사항이 없어요",
+    "protectionActive": "PIN 보호 활성화",
+    "protectionDisabled": "PIN 보호 비활성화",
+    "infoEnabled": "각 아이는 위의 PIN으로 로그인해요. 기본 PIN은 0000이에요.",
+    "infoDisabled": "가족 코드를 가진 누구나 모든 아이 계정에 접근할 수 있어요. 보안을 위해 PIN을 활성화하는 것을 권장해요.",
+    "disableDialog": {
+      "title": "PIN 요구를 비활성화할까요?",
+      "description": "아이들이 PIN 코드 없이 계정에 접근할 수 있게 됩니다.",
+      "warningTitle": "보안 감소",
+      "warningDescription": "가족 코드를 가진 누구나 모든 아이 계정에 접근할 수 있어요. 아이들의 기기가 이미 보안되어 있는 경우에만 비활성화하세요."
+    },
+    "toast": {
+      "loadFailed": "설정을 불러오지 못했습니다",
+      "enabled": "PIN 요구가 활성화되었습니다",
+      "disabled": "PIN 요구가 비활성화되었습니다",
+      "updateFailed": "설정 업데이트에 실패했습니다",
+      "networkError": "네트워크 오류",
+      "pinMustBe4": "PIN은 4자리여야 합니다",
+      "pinSameAsCurrent": "PIN이 현재와 같습니다",
+      "pinUpdated": "{name}의 PIN이 업데이트되었습니다"
+    },
+    "cancel": "취소",
+    "disabling": "비활성화 중...",
+    "disablePin": "PIN 비활성화"
+  },
   "deviceConnection": {
     "copyCode": "코드 복사",
     "instructions": {

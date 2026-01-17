@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Plus, Trash2 } from 'lucide-react';
@@ -38,6 +39,7 @@ import { AppIcon } from '@/components/ui/AppIcon';
 
 export default function ChildProfileTasks({ child, tasks, completionCounts }: ChildProfileTasksProps) {
     const router = useRouter();
+    const t = useTranslations('parent.childProfileTasks');
     const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
@@ -68,11 +70,11 @@ export default function ChildProfileTasks({ child, tasks, completionCounts }: Ch
             });
 
             if (!response.ok) throw new Error('Failed to remove task');
-            toast.success('Task removed for this child');
+            toast.success(t('toast.taskRemoved'));
             router.refresh();
         } catch (error) {
             console.error('Error removing task:', error);
-            toast.error('Failed to remove task');
+            toast.error(t('toast.taskRemoveFailed'));
         }
     };
 
@@ -89,11 +91,11 @@ export default function ChildProfileTasks({ child, tasks, completionCounts }: Ch
             });
 
             if (!response.ok) throw new Error('Failed to toggle task');
-            toast.success(isEnabled ? 'Task visible again' : 'Task hidden for this child');
+            toast.success(isEnabled ? t('toast.taskVisible') : t('toast.taskHidden'));
             router.refresh(); // Refresh UI
         } catch (error) {
             console.error('Error toggling task:', error);
-            toast.error('Failed to update task');
+            toast.error(t('toast.taskUpdateFailed'));
         }
     };
 
@@ -102,11 +104,11 @@ export default function ChildProfileTasks({ child, tasks, completionCounts }: Ch
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-text-main dark:text-white flex items-center gap-2">
                     <AppIcon name="task_alt" className="text-primary h-6 w-6" />
-                    Assigned Tasks
+                    {t('title')}
                 </h2>
                 <Button onClick={handleCreateTask} size="sm" className="bg-primary hover:bg-primary/90 text-white font-bold h-9">
                     <Plus className="h-4 w-4 mr-1.5" />
-                    Add Task
+                    {t('addTask')}
                 </Button>
             </div>
 
@@ -130,7 +132,7 @@ export default function ChildProfileTasks({ child, tasks, completionCounts }: Ch
                                             <button
                                                 onClick={() => handleTaskDelete(task)}
                                                 className="p-2 rounded-lg bg-white/80 dark:bg-gray-800/80 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-50 dark:hover:bg-red-900/30 shadow-sm"
-                                                title="Remove task"
+                                                title={t('removeTask')}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </button>
@@ -161,14 +163,14 @@ export default function ChildProfileTasks({ child, tasks, completionCounts }: Ch
                             {/* Footer stats */}
                             <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-2 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between text-xs text-text-muted dark:text-gray-400">
                                 <span>
-                                    {task.approval_type === 'auto' ? 'Auto-approval' : 'Manual approval'}
+                                    {task.approval_type === 'auto' ? t('autoApproval') : t('manualApproval')}
                                 </span>
                                 {completionCounts[task.id] ? (
                                     <span className="font-medium text-green-600 dark:text-green-400">
-                                        {completionCounts[task.id]} completions (30d)
+                                        {t('completions30d', { count: completionCounts[task.id] })}
                                     </span>
                                 ) : (
-                                    <span>No recent activity</span>
+                                    <span>{t('noRecentActivity')}</span>
                                 )}
                             </div>
                         </div>
@@ -180,11 +182,11 @@ export default function ChildProfileTasks({ child, tasks, completionCounts }: Ch
                         <AppIcon name="task" className="text-gray-400 dark:text-gray-600 h-8 w-8" size={32} />
                     </div>
                     <p className="text-base font-semibold text-text-muted dark:text-gray-400 mb-4">
-                        No active tasks assigned
+                        {t('noActiveTasks')}
                     </p>
                     <Button onClick={handleCreateTask} variant="outline">
                         <Plus className="h-4 w-4 mr-2" />
-                        Assign First Task
+                        {t('assignFirstTask')}
                     </Button>
                 </div>
             )}
@@ -200,10 +202,10 @@ export default function ChildProfileTasks({ child, tasks, completionCounts }: Ch
                 isOpen={isConfirmOpen}
                 onClose={() => setIsConfirmOpen(false)}
                 onConfirm={confirmDelete}
-                title="Remove Task?"
-                description={`Are you sure you want to remove "${taskToDelete?.name}" from ${child.name}'s task list? This task will no longer appear for this child.`}
-                confirmLabel="Yes, Remove"
-                cancelLabel="No, Keep It"
+                title={t('removeTaskTitle')}
+                description={t('removeTaskDescription', { taskName: taskToDelete?.name || '', childName: child.name })}
+                confirmLabel={t('yesRemove')}
+                cancelLabel={t('noKeep')}
                 variant="danger"
             />
         </div>

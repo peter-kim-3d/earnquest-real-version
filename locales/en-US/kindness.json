@@ -56,6 +56,21 @@
       "gold": "Gold Kindness"
     }
   },
+  "cardPreview": {
+    "writeYourMessage": "Write your message",
+    "tellAppreciation": "Tell {name} what you appreciate",
+    "thankYou": "Thank you, {name}!",
+    "messagePlaceholder": "Your message will appear here...",
+    "writeKindMessage": "Write a kind message to {name}...",
+    "sendingGratitude": "Sending gratitude...",
+    "sendGratitude": "Send Gratitude",
+    "quickPrompts": {
+      "helpingOut": "Thanks for helping out! 💪",
+      "thoughtful": "You're so thoughtful! 🌟",
+      "greatJob": "Great job today! 🎉",
+      "madeDayBetter": "You made my day better! 😊"
+    }
+  },
   "toast": {
     "sent": "Gratitude sent!",
     "sentDesc": "Your gratitude card has been delivered.",

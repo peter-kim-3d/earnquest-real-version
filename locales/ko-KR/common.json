@@ -138,5 +138,11 @@
   "accessibility": {
     "skipToContent": "본문으로 건너뛰기",
     "beta": "베타"
+  },
+  "errorPage": {
+    "title": "문제가 발생했어요!",
+    "description": "예상치 못한 오류가 발생했습니다. 걱정하지 마세요, 이미 확인하고 있어요.",
+    "tryAgain": "다시 시도",
+    "goToDashboard": "대시보드로 가기"
   }
 }
