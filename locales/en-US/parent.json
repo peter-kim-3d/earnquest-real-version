@@ -1,7 +1,7 @@
 {
   "dashboard": {
     "title": "Dashboard",
-    "welcome": "Welcome back{name}! 👋",
+    "welcome": "Welcome back, {name}! 👋",
     "welcomeNoName": "Welcome back! 👋",
     "familyStatus": "The family has {count, plural, one {# child} other {# children}} on their quest journey",
     "yourChildren": "Your Children",
