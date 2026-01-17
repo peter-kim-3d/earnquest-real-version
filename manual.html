@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarnQuest - User Manual</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&family=Noto+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #2bb800;
+            --bright-green: #37ec13;
+            --kindness-orange: #f49d25;
+            --bg-light: #f6f8f6;
+            --card-light: #ffffff;
+            --text-main: #121811;
+            --text-muted: #688961;
+            --border-color: #e0e7e0;
+        }
+
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            color: var(--text-main);
+            background: var(--bg-light);
+            line-height: 1.7;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Lexend', sans-serif;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #2bb800 0%, #37ec13 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .nav-button {
+            padding: 15px 25px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-button:hover, .nav-button.active {
+            color: var(--primary-green);
+            border-bottom-color: var(--primary-green);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        /* Section */
+        .manual-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .manual-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            color: var(--primary-green);
+            margin-bottom: 15px;
+        }
+
+        .section-description {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 1.5rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+            border-left: 5px solid var(--primary-green);
+        }
+
+        .content-card h3 {
+            font-size: 1.8rem;
+            color: var(--primary-green);
+            margin-bottom: 20px;
+        }
+
+        .content-card h4 {
+            font-size: 1.3rem;
+            color: var(--text-main);
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .content-card p {
+            margin-bottom: 15px;
+            color: var(--text-muted);
+        }
+
+        .content-card ul, .content-card ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+            color: var(--text-muted);
+        }
+
+        .content-card li {
+            margin-bottom: 10px;
+        }
+
+        /* Step Cards */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .step-card {
+            background: white;
+            padding: 30px;
+            border-radius: 1.5rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-green);
+            color: white;
+            border-radius: 50%;
+            line-height: 50px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .step-description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Feature Box */
+        .feature-box {
+            background: linear-gradient(135deg, rgba(43, 184, 0, 0.05) 0%, rgba(55, 236, 19, 0.02) 100%);
+            padding: 30px;
+            border-radius: 1rem;
+            margin: 30px 0;
+            border: 2px solid rgba(43, 184, 0, 0.1);
+        }
+
+        .feature-box h4 {
+            color: var(--primary-green);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .feature-box p {
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            background: linear-gradient(135deg, rgba(244, 157, 37, 0.05) 0%, rgba(244, 157, 37, 0.02) 100%);
+            padding: 25px;
+            border-radius: 1rem;
+            margin: 25px 0;
+            border-left: 5px solid var(--kindness-orange);
+        }
+
+        .warning-box h4 {
+            color: var(--kindness-orange);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .warning-box p {
+            color: var(--text-muted);
+        }
+
+        /* Tips Box */
+        .tips-box {
+            background: #f0f9ff;
+            padding: 25px;
+            border-radius: 1rem;
+            margin: 25px 0;
+            border-left: 5px solid #0284c7;
+        }
+
+        .tips-box h4 {
+            color: #0284c7;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .tips-box ul {
+            margin-left: 20px;
+        }
+
+        .tips-box li {
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        /* Table */
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .custom-table thead {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .custom-table th, .custom-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .custom-table tbody tr:hover {
+            background: rgba(43, 184, 0, 0.03);
+        }
+
+        /* FAQ Section */
+        .faq-item {
+            background: white;
+            padding: 25px;
+            margin-bottom: 15px;
+            border-radius: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 4px 15px rgba(43, 184, 0, 0.15);
+        }
+
+        .faq-question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-answer {
+            margin-top: 15px;
+            color: var(--text-muted);
+            display: none;
+        }
+
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+
+        .faq-toggle {
+            font-size: 1.5rem;
+            color: var(--primary-green);
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(45deg);
+        }
+
+        /* Footer */
+        .footer {
+            background: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 2px solid var(--border-color);
+            margin-top: 80px;
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .footer-links {
+            margin-top: 20px;
+        }
+
+        .footer-link {
+            display: inline-block;
+            margin: 0 15px;
+            color: var(--primary-green);
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-link:hover {
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .content-card {
+                padding: 25px;
+            }
+
+            .nav-button {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>🌟 EarnQuest User Manual</h1>
+        <p>Complete Guide for Parents and Children</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <button class="nav-button active" onclick="showSection('getting-started')">Getting Started</button>
+            <button class="nav-button" onclick="showSection('parent-guide')">Parent Guide</button>
+            <button class="nav-button" onclick="showSection('child-guide')">Child Guide</button>
+            <button class="nav-button" onclick="showSection('features')">Key Features</button>
+            <button class="nav-button" onclick="showSection('faq')">FAQ</button>
+        </div>
+    </nav>
+
+    <!-- Container -->
+    <div class="container">
+
+        <!-- Getting Started Section -->
+        <section id="getting-started" class="manual-section active">
+            <div class="section-header">
+                <div class="section-icon">🚀</div>
+                <h2 class="section-title">Getting Started</h2>
+                <p class="section-description">Everything you need to know to begin your EarnQuest journey</p>
+            </div>
+
+            <div class="content-card">
+                <h3>Welcome to EarnQuest!</h3>
+                <p>EarnQuest is a family reward platform designed to help children develop positive habits through motivation, trust, and positive reinforcement. This guide will help you get started and make the most of all features.</p>
+
+                <h4>What You'll Need</h4>
+                <ul>
+                    <li>A smartphone or tablet for each family member</li>
+                    <li>Internet connection</li>
+                    <li>10 minutes for initial setup</li>
+                    <li>An open mind and positive attitude!</li>
+                </ul>
+            </div>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Create Account</h3>
+                    <p class="step-description">Sign up with email or social login (Google/Apple)</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Add Children</h3>
+                    <p class="step-description">Add profiles for each child with name, age, and avatar</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Choose Style</h3>
+                    <p class="step-description">Select parenting style: Easy Start, Balanced, or Learning Focus</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">Set Values</h3>
+                    <p class="step-description">Optional: Define your family values to customize tasks</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">5</div>
+                    <h3 class="step-title">Review Tasks</h3>
+                    <p class="step-description">Review pre-loaded tasks and rewards for your child's age</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">6</div>
+                    <h3 class="step-title">Start Journey!</h3>
+                    <p class="step-description">Begin completing tasks and earning rewards together</p>
+                </div>
+            </div>
+
+            <div class="feature-box">
+                <h4>💡 Quick Tip: Start Simple</h4>
+                <p>For the first week, use the default tasks and rewards. This helps everyone understand the system before customizing. You can always adjust later!</p>
+            </div>
+        </section>
+
+        <!-- Parent Guide Section -->
+        <section id="parent-guide" class="manual-section">
+            <div class="section-header">
+                <div class="section-icon">👨‍👩‍👧</div>
+                <h2 class="section-title">Parent Guide</h2>
+                <p class="section-description">How to manage and optimize your family's EarnQuest experience</p>
+            </div>
+
+            <div class="content-card">
+                <h3>Dashboard Overview</h3>
+                <p>Your parent dashboard is mission control for your family's habit-building journey.</p>
+
+                <h4>Key Areas</h4>
+                <ul>
+                    <li><strong>Pending Approvals:</strong> Tasks waiting for your review</li>
+                    <li><strong>Family Overview:</strong> Summary of all children's progress</li>
+                    <li><strong>Activity Feed:</strong> Recent task completions and requests</li>
+                    <li><strong>Settings:</strong> Manage tasks, rewards, and preferences</li>
+                </ul>
+            </div>
+
+            <div class="content-card">
+                <h3>Managing Tasks</h3>
+
+                <h4>Task Categories</h4>
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Examples</th>
+                            <th>Points Range</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Learning</strong></td>
+                            <td>Homework, Reading, Educational apps</td>
+                            <td>30-50 points</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chores</strong></td>
+                            <td>Room cleanup, Dishes, Laundry help</td>
+                            <td>20-40 points</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Health</strong></td>
+                            <td>Exercise, Hygiene, Sleep routine</td>
+                            <td>20-40 points</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kindness</strong></td>
+                            <td>Helping siblings, Unexpected kindness</td>
+                            <td>Special recognition</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Creating Custom Tasks</h4>
+                <ol>
+                    <li>Navigate to "Manage Tasks" in your dashboard</li>
+                    <li>Click "Add New Task"</li>
+                    <li>Fill in task details (name, category, points)</li>
+                    <li>Choose approval type (manual, automatic, or timer-based)</li>
+                    <li>Assign to specific children or all</li>
+                    <li>Save and activate</li>
+                </ol>
+
+                <div class="tips-box">
+                    <h4>📝 Best Practices for Tasks</h4>
+                    <ul>
+                        <li>Keep tasks specific and measurable</li>
+                        <li>Start with easier tasks to build momentum</li>
+                        <li>Adjust point values based on task difficulty</li>
+                        <li>Use photos for verification when needed</li>
+                        <li>Review and adjust weekly based on completion rates</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Reviewing Task Submissions</h3>
+
+                <h4>Approval Process</h4>
+                <p>When a child completes a task requiring approval, you'll receive a notification. Here's how to review:</p>
+
+                <ol>
+                    <li>Open the Pending Approvals section</li>
+                    <li>Review the task details and any submitted evidence (photos, notes)</li>
+                    <li>Choose to <strong>Approve</strong>, <strong>Reject</strong>, or <strong>Request Changes</strong></li>
+                    <li>Add optional feedback or encouragement</li>
+                </ol>
+
+                <div class="warning-box">
+                    <h4>⚠️ Important: Timely Approvals</h4>
+                    <p>Try to review tasks within 24 hours. Quick feedback keeps children motivated and engaged. If you can't review immediately, enable auto-approval for trusted tasks.</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Managing Rewards</h3>
+
+                <h4>Types of Rewards</h4>
+                <ul>
+                    <li><strong>Screen Time:</strong> Minutes of device usage (most popular!)</li>
+                    <li><strong>Experiences:</strong> Movie night, park visit, special dinner</li>
+                    <li><strong>Privileges:</strong> Later bedtime, choose dinner menu</li>
+                    <li><strong>Items:</strong> Toys, books, treats</li>
+                    <li><strong>Savings Goals:</strong> Long-term rewards like bike, gaming console</li>
+                </ul>
+
+                <h4>Setting Up Rewards</h4>
+                <ol>
+                    <li>Go to "Manage Store" in your dashboard</li>
+                    <li>Add rewards with names, descriptions, and point costs</li>
+                    <li>Set categories and availability</li>
+                    <li>Add images to make rewards visually appealing</li>
+                    <li>Enable or disable rewards as needed</li>
+                </ol>
+
+                <div class="feature-box">
+                    <h4>🎁 Screen Time Integration</h4>
+                    <p>EarnQuest can integrate with device screen time controls. Children earn minutes that unlock automatically, reducing conflicts and teaching balance. Set up in Settings → Screen Time.</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Trust Level System</h3>
+
+                <p>As children consistently complete tasks, they build trust and gain more autonomy.</p>
+
+                <h4>Trust Levels</h4>
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Tasks Completed</th>
+                            <th>Benefits</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>🌱 Beginner</td>
+                            <td>0-20</td>
+                            <td>All tasks require approval</td>
+                        </tr>
+                        <tr>
+                            <td>⭐ Trusted</td>
+                            <td>21-50</td>
+                            <td>Some tasks auto-approve</td>
+                        </tr>
+                        <tr>
+                            <td>🏆 Expert</td>
+                            <td>51-100</td>
+                            <td>Most tasks auto-approve, bonus rewards</td>
+                        </tr>
+                        <tr>
+                            <td>💎 Master</td>
+                            <td>100+</td>
+                            <td>Full autonomy, special privileges</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="tips-box">
+                    <h4>💪 Building Trust</h4>
+                    <ul>
+                        <li>Celebrate trust level milestones together</li>
+                        <li>Explain that trust is earned through consistency</li>
+                        <li>Be patient - everyone progresses at their own pace</li>
+                        <li>Use trust as motivation, not punishment</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Kindness Recognition</h3>
+
+                <p>The Kindness system celebrates prosocial behavior - when kids help others without expecting rewards.</p>
+
+                <h4>How It Works</h4>
+                <ul>
+                    <li>When you notice your child helping others spontaneously, record it in the Kindness section</li>
+                    <li>These are NOT converted to points - they're pure recognition</li>
+                    <li>Children receive special acknowledgments and certificates</li>
+                    <li>Teaches intrinsic motivation and empathy</li>
+                </ul>
+
+                <div class="feature-box">
+                    <h4>💝 Examples of Kindness</h4>
+                    <p>Helping a sibling without being asked • Sharing toys willingly • Comforting someone who's upset • Cleaning up without prompting • Standing up for others</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Child Guide Section -->
+        <section id="child-guide" class="manual-section">
+            <div class="section-header">
+                <div class="section-icon">🎮</div>
+                <h2 class="section-title">Child Guide</h2>
+                <p class="section-description">How kids can use EarnQuest to earn rewards and build great habits!</p>
+            </div>
+
+            <div class="content-card">
+                <h3>Welcome, Young Quester! 🌟</h3>
+                <p>EarnQuest is YOUR app to earn awesome rewards by completing tasks. The more you do, the more you earn!</p>
+
+                <h4>Your Dashboard</h4>
+                <p>When you open the app, you'll see:</p>
+                <ul>
+                    <li><strong>🎯 Your Tasks:</strong> Things you can do today</li>
+                    <li><strong>⭐ Your Points:</strong> How many points you have</li>
+                    <li><strong>🏪 The Store:</strong> Where you spend points on rewards</li>
+                    <li><strong>📊 Your Progress:</strong> How well you're doing</li>
+                </ul>
+            </div>
+
+            <div class="content-card">
+                <h3>How to Complete Tasks</h3>
+
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Pick a Task</h3>
+                        <p class="step-description">Look at your task list and choose what to do</p>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">Do It!</h3>
+                        <p class="step-description">Complete the task - give it your best effort!</p>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">Submit</h3>
+                        <p class="step-description">Tap "Submit" and add a note or photo if needed</p>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <h3 class="step-title">Get Approved</h3>
+                        <p class="step-description">Wait for parent to approve (or automatic approval!)</p>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">5</div>
+                        <h3 class="step-title">Earn Points!</h3>
+                        <p class="step-description">🎉 Points are added to your total!</p>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-number">6</div>
+                        <h3 class="step-title">Spend Wisely</h3>
+                        <p class="step-description">Use points in the store or save for bigger rewards</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Types of Tasks</h3>
+
+                <h4>📚 Learning Tasks</h4>
+                <p>These help you learn and grow smarter:</p>
+                <ul>
+                    <li>Complete homework (usually 40-50 points)</li>
+                    <li>Read for 20 minutes (30 points)</li>
+                    <li>Practice math or use educational apps</li>
+                </ul>
+
+                <h4>🧹 Chore Tasks</h4>
+                <p>These keep your home clean and organized:</p>
+                <ul>
+                    <li>Clean your room (30 points)</li>
+                    <li>Help with dishes (20 points)</li>
+                    <li>Make your bed (15 points)</li>
+                </ul>
+
+                <h4>💪 Health Tasks</h4>
+                <p>These keep you strong and healthy:</p>
+                <ul>
+                    <li>Exercise for 30 minutes (40 points)</li>
+                    <li>Brush teeth (10 points each time)</li>
+                    <li>Eat vegetables at dinner (15 points)</li>
+                </ul>
+
+                <div class="tips-box">
+                    <h4>✨ Pro Tips for Kids</h4>
+                    <ul>
+                        <li>Do tasks early in the day when you have energy</li>
+                        <li>Start with easier tasks to get momentum</li>
+                        <li>Take good photos when submitting tasks</li>
+                        <li>Save points for big rewards you really want</li>
+                        <li>Check the app daily for new opportunities</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>The Store 🏪</h3>
+
+                <p>The Store is where you spend your hard-earned points on awesome rewards!</p>
+
+                <h4>What You Can Get</h4>
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Reward Type</th>
+                            <th>Examples</th>
+                            <th>Typical Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>📱 Screen Time</td>
+                            <td>30 min of device time</td>
+                            <td>50-100 points</td>
+                        </tr>
+                        <tr>
+                            <td>🎬 Experiences</td>
+                            <td>Movie night, park visit</td>
+                            <td>100-200 points</td>
+                        </tr>
+                        <tr>
+                            <td>🎁 Small Items</td>
+                            <td>Treats, small toys</td>
+                            <td>150-300 points</td>
+                        </tr>
+                        <tr>
+                            <td>🏆 Big Items</td>
+                            <td>Video game, bike</td>
+                            <td>1000+ points</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="feature-box">
+                    <h4>💰 Smart Spending</h4>
+                    <p>Think before you spend! Is it a quick reward or are you saving for something amazing? Both are okay - it's YOUR choice!</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Level Up! 🚀</h3>
+
+                <p>The more tasks you complete, the more trusted you become. This means MORE FREEDOM!</p>
+
+                <h4>Trust Levels</h4>
+                <ul>
+                    <li><strong>🌱 Beginner (0-20 tasks):</strong> Just starting, parents check everything</li>
+                    <li><strong>⭐ Trusted (21-50 tasks):</strong> Some tasks approved automatically!</li>
+                    <li><strong>🏆 Expert (51-100 tasks):</strong> Most tasks auto-approved, bonus points</li>
+                    <li><strong>💎 Master (100+ tasks):</strong> Full trust, special rewards unlocked</li>
+                </ul>
+
+                <div class="warning-box">
+                    <h4>⚡ Stay Honest!</h4>
+                    <p>Always tell the truth about completing tasks. If you're dishonest, you might lose trust levels. Remember: trust takes time to build but can be lost quickly!</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <h3>Special: Kindness Recognition 💝</h3>
+
+                <p>This is something EXTRA special! When you help others without expecting anything in return, you might get a Kindness Recognition.</p>
+
+                <h4>What Counts as Kindness?</h4>
+                <ul>
+                    <li>Helping a brother or sister without being asked</li>
+                    <li>Sharing your toys when you don't have to</li>
+                    <li>Comforting someone who is sad</li>
+                    <li>Doing something nice just because</li>
+                </ul>
+
+                <p><strong>Important:</strong> Kindness Recognition doesn't give you points - it gives you something better: pride in being a good person! These get saved in your special Kindness Gallery.</p>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="manual-section">
+            <div class="section-header">
+                <div class="section-icon">⚡</div>
+                <h2 class="section-title">Key Features</h2>
+                <p class="section-description">Detailed explanation of EarnQuest's powerful features</p>
+            </div>
+
+            <div class="content-card">
+                <h3>Age-Based Presets</h3>
+
+                <p>EarnQuest comes with pre-configured task and reward sets for different age groups:</p>
+
+                <h4>Ages 5-7: Easy Start</h4>
+                <ul>
+                    <li>Simple, concrete tasks (put toys away, brush teeth)</li>
+                    <li>Lower point values (10-20 points)</li>
+                    <li>Visual task cards with pictures</li>
+                    <li>Frequent, immediate rewards</li>
+                    <li>Heavy parent involvement</li>
+                </ul>
+
+                <h4>Ages 8-11: Balanced Growth</h4>
+                <ul>
+                    <li>Mix of simple and complex tasks</li>
+                    <li>Medium point values (20-50 points)</li>
+                    <li>Introduction of longer-term goals</li>
+                    <li>Some autonomy with supervision</li>
+                    <li>Focus on habit formation</li>
+                </ul>
+
+                <h4>Ages 12-14: Learning Focus</h4>
+                <ul>
+                    <li>More complex, self-directed tasks</li>
+                    <li>Higher point values (30-100 points)</li>
+                    <li>Emphasis on academic and life skills</li>
+                    <li>Greater independence and trust</li>
+                    <li>Goal-setting and planning skills</li>
+                </ul>
+            </div>
+
+            <div class="content-card">
+                <h3>Screen Time Management</h3>
+
+                <p>One of EarnQuest's most popular features is integrated screen time control.</p>
+
+                <h4>How It Works</h4>
+                <ol>
+                    <li>Set up device screen time limits in your device settings</li>
+                    <li>Connect EarnQuest to these controls (optional)</li>
+                    <li>Children earn "screen time tickets" by completing tasks</li>
+                    <li>Each ticket unlocks a specific amount of device time</li>
+                    <li>System automatically manages permissions</li>
+                </ol>
+
+                <div class="feature-box">
+                    <h4>🎮 Why This Works</h4>
+                    <p>Instead of nagging or conflict over screen time, the system is clear and fair. Kids understand exactly how to earn their device time, and parents don't have to be the "bad guy."</p>
+                </div>
+
+                <h4>Setup Instructions</h4>
+                <ol>
+                    <li>Go to Settings → Screen Time Integration</li>
+                    <li>Enable screen time management</li>
+                    <li>Set daily screen time limits (recommended: 1-2 hours)</li>
+                    <li>Choose point cost per 30 minutes (recommended: 50-100 points)</li>
+                    <li>Connect child's device (requires device permission)</li>
+                </ol>
+            </div>
+
+            <div class="content-card">
+                <h3>Approval Types</h3>
+
+                <p>EarnQuest offers multiple ways to verify task completion:</p>
+
+                <h4>1. Manual Approval</h4>
+                <p>Parent manually reviews and approves. Best for:</p>
+                <ul>
+                    <li>Tasks requiring quality check (room cleaning, homework)</li>
+                    <li>New tasks or new children</li>
+                    <li>High-value tasks</li>
+                </ul>
+
+                <h4>2. Automatic Approval</h4>
+                <p>Task is approved immediately upon submission. Best for:</p>
+                <ul>
+                    <li>Trusted children</li>
+                    <li>Simple, verifiable tasks</li>
+                    <li>Tasks done in parent's presence</li>
+                </ul>
+
+                <h4>3. Timer-Based</h4>
+                <p>Child sets a timer and task approves when time is complete. Best for:</p>
+                <ul>
+                    <li>Reading time</li>
+                    <li>Exercise duration</li>
+                    <li>Study sessions</li>
+                </ul>
+
+                <h4>4. Photo Verification</h4>
+                <p>Child submits photo proof with task. Best for:</p>
+                <ul>
+                    <li>Chores (clean room, organized desk)</li>
+                    <li>Creative projects</li>
+                    <li>Before/after tasks</li>
+                </ul>
+
+                <h4>5. Checklist</h4>
+                <p>Child checks off multiple steps. Best for:</p>
+                <ul>
+                    <li>Multi-step homework</li>
+                    <li>Morning routines</li>
+                    <li>Bedtime routines</li>
+                </ul>
+            </div>
+
+            <div class="content-card">
+                <h3>Family Values Customization</h3>
+
+                <p>During onboarding, you can select family values that influence task suggestions:</p>
+
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Value</th>
+                            <th>Emphasizes</th>
+                            <th>Example Tasks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Academic Excellence</td>
+                            <td>Learning, Reading</td>
+                            <td>Extra homework, educational apps</td>
+                        </tr>
+                        <tr>
+                            <td>Health & Fitness</td>
+                            <td>Exercise, Nutrition</td>
+                            <td>Sports practice, healthy eating</td>
+                        </tr>
+                        <tr>
+                            <td>Creativity</td>
+                            <td>Arts, Music</td>
+                            <td>Art projects, instrument practice</td>
+                        </tr>
+                        <tr>
+                            <td>Responsibility</td>
+                            <td>Chores, Organization</td>
+                            <td>Advanced chores, planning tasks</td>
+                        </tr>
+                        <tr>
+                            <td>Kindness</td>
+                            <td>Helping, Empathy</td>
+                            <td>Sibling help, community service</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="content-card">
+                <h3>Sibling Fairness</h3>
+
+                <p>EarnQuest is designed to work fairly for families with multiple children:</p>
+
+                <h4>Individual Dashboards</h4>
+                <p>Each child has their own space with age-appropriate tasks and progress tracking.</p>
+
+                <h4>Scaled Point Systems</h4>
+                <p>Older children's harder tasks earn proportionally more points, but reward costs are also scaled.</p>
+
+                <h4>Unique Goals</h4>
+                <p>Each child can work toward different rewards based on their interests.</p>
+
+                <h4>Private Progress</h4>
+                <p>Children can't see each other's point totals (unless parents enable it), reducing comparison and competition.</p>
+
+                <div class="tips-box">
+                    <h4>👨‍👩‍👧‍👦 Sibling Tips</h4>
+                    <ul>
+                        <li>Celebrate each child's achievements individually</li>
+                        <li>Don't compare siblings' progress</li>
+                        <li>Adjust tasks if one child is struggling</li>
+                        <li>Consider family challenges where siblings cooperate</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="manual-section">
+            <div class="section-header">
+                <div class="section-icon">💬</div>
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <p class="section-description">Common questions and answers</p>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span>What age is EarnQuest suitable for?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    EarnQuest is designed for children ages 5-14, with specific features and presets for different age groups. Younger children (5-7) need more parent involvement, while older children (12-14) can operate more independently.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span>How many children can I add to one family account?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    You can add unlimited children to your family account. Each child gets their own dashboard, tasks, and rewards. The system is designed to handle multiple children fairly.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span>Can both parents manage the account?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Yes! You can invite your partner to be a co-parent on the account. Both parents can approve tasks, manage rewards, and adjust settings. All changes sync in real-time.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span>What if my child completes a task but I reject it?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    If you reject a task, you can provide feedback on why it wasn't acceptable. The child can then redo the task and resubmit. This teaches quality standards while still being encouraging. Try to reject only when necessary and always explain clearly.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span>Should I use real money as rewards?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    This is a personal choice. Some families include small monetary rewards (like $1 = 100 points), while others stick to experiences and privileges. Consider your family values and financial situation. Many experts recommend emphasizing non-monetary rewards for younger children.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span>How do I prevent my child from "gaming the system"?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    The trust level system helps with this. If a child is dishonest, they lose trust levels and require more supervision. Also, use photo verification and spot checks for high-value tasks. Most importantly, talk about honesty and integrity - the system works best when everyone plays fair.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span>What's the difference between regular tasks and kindness recognition?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Regular tasks are expected responsibilities that earn points. Kindness recognition celebrates unexpected, prosocial behavior that shouldn't be "paid for" - like spontaneously helping a sibling or showing empathy. These earn special acknowledgments but not points, teaching intrinsic motivation.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span>Can I use EarnQuest offline?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Basic features work offline - children can view tasks and mark them complete. However, syncing, approvals, and store purchases require an internet connection. Any offline actions will sync when connection is restored.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span>What if my child loses interest?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Try refreshing the rewards with something exciting, adjusting task difficulty, or taking a short break and reintroducing it. Also ensure you're celebrating successes and keeping the experience positive. Some children need time to adjust to the system.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <span>Is there a cost to use EarnQuest?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    EarnQuest offers a free tier with basic features for one child. Premium plans unlock multiple children, advanced features like screen time integration, custom branding, and priority support. Check the pricing page for current options.
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p><strong>EarnQuest</strong> - Growing Habits, Shining Rewards</p>
+        <p>Building better families, one task at a time.</p>
+        <div class="footer-links">
+            <a href="pamphlet.html" class="footer-link">View Pamphlet</a>
+            <a href="#getting-started" class="footer-link">Getting Started</a>
+            <a href="#faq" class="footer-link">FAQ</a>
+        </div>
+        <p style="margin-top: 20px; font-size: 0.9rem;">&copy; 2026 EarnQuest. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Section Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.manual-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // FAQ Toggle
+        function toggleFaq(element) {
+            element.classList.toggle('active');
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

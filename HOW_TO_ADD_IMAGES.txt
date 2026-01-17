@@ -1,0 +1,40 @@
+========================================
+  이미지 추가 가이드
+========================================
+
+업로드하신 2개의 이미지를 다음과 같이 추가하세요:
+
+1. 첫 번째 이미지 (가족 일러스트):
+   - 파일명: family-growth.png
+   - 저장 위치: public/images/family-growth.png
+
+2. 두 번째 이미지 (여정 인포그래픽):
+   - 파일명: journey-infographic.png  
+   - 저장 위치: public/images/journey-infographic.png
+
+========================================
+  추가 방법
+========================================
+
+방법 1: 파일 탐색기 사용
+1. 채팅에서 이미지 다운로드
+2. public/images/ 폴더로 이동
+3. 위 파일명으로 저장
+
+방법 2: 터미널 사용
+cd /sessions/pensive-gracious-feynman/mnt/earnquest-real-version
+cp [다운로드경로]/image1.png public/images/family-growth.png
+cp [다운로드경로]/image2.png public/images/journey-infographic.png
+
+========================================
+  확인
+========================================
+
+이미지 추가 후:
+npm run dev
+
+브라우저에서:
+http://localhost:3001/pamphlet (영어)
+http://localhost:3001/ko/pamphlet (한글)
+
+========================================
