@@ -165,5 +165,28 @@
     "expiresOn": "이 링크는 {date}에 만료됩니다. 수락하려면 로그인하거나 계정을 만들어야 합니다.",
     "done": "완료",
     "createFailed": "초대 생성에 실패했습니다"
+  },
+  "deviceConnection": {
+    "copyCode": "코드 복사",
+    "instructions": {
+      "childDevice": "아이가 기기에서 앱을 열 때 이 코드를 입력할 수 있어요",
+      "generateNew": "필요할 때 언제든지 새 코드를 생성할 수 있어요"
+    },
+    "generating": "생성 중...",
+    "generateNewCode": "새 코드 생성",
+    "regenerateDialog": {
+      "title": "새 코드를 생성할까요?",
+      "description": "기존 코드가 작동하지 않게 됩니다. 기존 코드를 사용하던 아이는 새 코드로 다시 로그인해야 해요.",
+      "warningTitle": "현재 코드가 비활성화됩니다",
+      "warningDescription": "아이들은 새 코드로 계정에 접근해야 해요"
+    },
+    "cancel": "취소",
+    "toast": {
+      "loadFailed": "가족 코드를 불러오지 못했습니다",
+      "copied": "코드가 클립보드에 복사되었습니다",
+      "generated": "새 코드가 생성되었습니다",
+      "generateFailed": "새 코드 생성에 실패했습니다",
+      "networkError": "네트워크 오류"
+    }
   }
 }

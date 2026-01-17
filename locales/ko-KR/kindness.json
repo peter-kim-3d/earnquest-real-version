@@ -36,7 +36,25 @@
     "earned": "배지 획득!",
     "collection": "배지 컬렉션",
     "noBadges": "아직 배지가 없습니다",
-    "earnBadges": "감사 카드를 받으면 배지를 얻을 수 있어요!"
+    "earnBadges": "감사 카드를 받으면 배지를 얻을 수 있어요!",
+    "yourProgress": "내 진행 상황",
+    "cardsReceived": "감사 카드 {count}장 받음",
+    "cardsReceivedPlural": "감사 카드 {count}장 받음",
+    "nextBadge": "다음 배지: {name}",
+    "moreToUnlock": "{count}장 더 받으면 잠금 해제!",
+    "moreToUnlockPlural": "{count}장 더 받으면 잠금 해제!",
+    "maxLevel": "최고 레벨 달성! 당신은 친절 챔피언이에요!",
+    "gratitudeCards": "감사 카드",
+    "earnedOn": "{date}에 획득",
+    "cards": "{current}/{required}장",
+    "recentCards": "최근 감사 카드",
+    "noCardsYet": "아직 감사 카드가 없어요",
+    "noBadgesYet": "아직 배지를 획득하지 못했어요.",
+    "levels": {
+      "bronze": "브론즈 친절",
+      "silver": "실버 친절",
+      "gold": "골드 친절"
+    }
   },
   "toast": {
     "sent": "감사가 전달되었어요!",

@@ -165,5 +165,28 @@
     "expiresOn": "This link expires on {date}. They'll need to sign in or create an account to accept.",
     "done": "Done",
     "createFailed": "Failed to create invitation"
+  },
+  "deviceConnection": {
+    "copyCode": "Copy code",
+    "instructions": {
+      "childDevice": "Your child can enter this code when opening the app on their device",
+      "generateNew": "Generate a new code anytime if needed"
+    },
+    "generating": "Generating...",
+    "generateNewCode": "Generate New Code",
+    "regenerateDialog": {
+      "title": "Generate New Code?",
+      "description": "This will stop the old code from working. Any child using the old code will need to log in again with the new code.",
+      "warningTitle": "Current code will be disabled",
+      "warningDescription": "Children will need the new code to access their accounts"
+    },
+    "cancel": "Cancel",
+    "toast": {
+      "loadFailed": "Failed to load family code",
+      "copied": "Code copied to clipboard",
+      "generated": "New code generated",
+      "generateFailed": "Failed to generate new code",
+      "networkError": "Network error"
+    }
   }
 }

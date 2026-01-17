@@ -150,6 +150,34 @@
       "okay": "Okay",
       "timeWellSpent": "Time well spent! 🎮",
       "failedToComplete": "Failed to complete"
+    },
+    "card": {
+      "waitingForParent": "Waiting for Parent",
+      "used": "Used",
+      "active": "Active",
+      "pointsSpent": "Points spent:",
+      "screenTime": "Screen time:",
+      "minutes": "{minutes} minutes",
+      "screenTimeRunning": "Screen time already running",
+      "useNow": "Use Now",
+      "askParent": "💡 Ask your parent when you want to use this!",
+      "cancelTicket": "Cancel Ticket",
+      "canceling": "Canceling...",
+      "approveUse": "Approve Use",
+      "markAsGiven": "Mark as Given",
+      "cancelDialog": {
+        "title": "Cancel Ticket?",
+        "description": "Are you sure you want to cancel this ticket? Your points will be refunded to your balance.",
+        "pointsToRefund": "Points to refund:",
+        "goBack": "Go Back",
+        "confirm": "Yes, Cancel Ticket"
+      },
+      "toast": {
+        "canceled": "Ticket canceled",
+        "refunded": "{points} QP refunded!",
+        "cancelFailed": "Cancel failed",
+        "tryAgain": "Please try again."
+      }
     }
   },
   "badges": {

@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useTranslations } from 'next-intl';
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ export default function DepositModal({
   availableBalance,
   isLoading = false,
 }: DepositModalProps) {
+  const t = useTranslations('goals.deposit');
   const [amount, setAmount] = useState<string>('');
   const [error, setError] = useState<string>('');
 
@@ -44,7 +46,7 @@ export default function DepositModal({
     { label: '10 XP', value: 10 },
     { label: '25 XP', value: 25 },
     { label: '50 XP', value: 50 },
-    { label: 'All', value: maxDeposit },
+    { label: t('all'), value: maxDeposit },
   ].filter((p) => p.value <= maxDeposit && p.value > 0);
 
   useEffect(() => {
@@ -71,17 +73,17 @@ export default function DepositModal({
     const numAmount = parseInt(amount, 10);
 
     if (isNaN(numAmount) || numAmount <= 0) {
-      setError('Please enter a valid amount');
+      setError(t('errors.invalidAmount'));
       return;
     }
 
     if (numAmount > availableBalance) {
-      setError('You don\'t have enough points');
+      setError(t('errors.notEnoughPoints'));
       return;
     }
 
     if (numAmount > pointsRemaining) {
-      setError('Amount exceeds goal remaining');
+      setError(t('errors.exceedsRemaining'));
       return;
     }
 
@@ -102,10 +104,10 @@ export default function DepositModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <PiggyBank size={24} className="text-primary" />
-            Deposit to Goal
+            {t('title')}
           </DialogTitle>
           <DialogDescription>
-            Add points to &quot;{goalName}&quot;
+            {t('description', { goalName })}
           </DialogDescription>
         </DialogHeader>
 
@@ -114,7 +116,7 @@ export default function DepositModal({
           <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                Goal Progress
+                {t('goalProgress')}
               </span>
               <span className="text-sm font-medium">
                 {currentProgress.toLocaleString()} / {targetPoints.toLocaleString()} XP
@@ -129,14 +131,14 @@ export default function DepositModal({
               />
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              {pointsRemaining.toLocaleString()} XP remaining
+              {t('xpRemaining', { points: pointsRemaining.toLocaleString() })}
             </p>
           </div>
 
           {/* Available balance */}
           <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
             <span className="text-sm font-medium text-green-700 dark:text-green-400">
-              Your Balance
+              {t('yourBalance')}
             </span>
             <span className="text-lg font-bold text-green-700 dark:text-green-400">
               {availableBalance.toLocaleString()} XP
@@ -146,12 +148,12 @@ export default function DepositModal({
           {/* Amount input */}
           <div>
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
-              Amount to Deposit
+              {t('amountToDeposit')}
             </label>
             <Input
               type="text"
               inputMode="numeric"
-              placeholder="Enter amount"
+              placeholder={t('enterAmount')}
               value={amount}
               onChange={(e) => handleAmountChange(e.target.value)}
               className="text-lg"
@@ -196,14 +198,14 @@ export default function DepositModal({
                       className="text-yellow-500"
                     />
                     <span className="font-bold text-yellow-700 dark:text-yellow-300">
-                      Goal Complete!
+                      {t('preview.goalComplete')}
                     </span>
                   </>
                 ) : (
                   <>
                     <Target size={20} className="text-blue-500" />
                     <span className="font-medium text-blue-700 dark:text-blue-300">
-                      After deposit
+                      {t('preview.afterDeposit')}
                     </span>
                   </>
                 )}
@@ -234,14 +236,14 @@ export default function DepositModal({
             disabled={isLoading}
             className="flex-1"
           >
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             onClick={handleDeposit}
             disabled={isLoading || numAmount <= 0 || numAmount > maxDeposit}
             className="flex-1 bg-primary hover:bg-primary/90"
           >
-            {isLoading ? 'Depositing...' : `Deposit ${numAmount > 0 ? `${numAmount} XP` : ''}`}
+            {isLoading ? t('depositing') : numAmount > 0 ? t('depositXp', { amount: numAmount }) : t('deposit')}
           </Button>
         </div>
       </DialogContent>

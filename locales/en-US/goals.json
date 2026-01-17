@@ -24,8 +24,12 @@
   "completedStatus": "Completed!",
   "unknown": "Unknown",
   "form": {
+    "editTitle": "Edit Goal",
+    "createTitle": "Create New Goal",
+    "forWhichChild": "For which child?",
+    "selectChild": "Please select a child",
     "name": "Goal Name",
-    "namePlaceholder": "e.g., New Bike",
+    "namePlaceholder": "e.g., LEGO Star Wars Set, New Video Game",
     "nameRequired": "Goal name is required",
     "description": "Description",
     "descriptionPlaceholder": "Optional details about the goal",
@@ -33,6 +37,24 @@
     "targetPointsHelp": "Total points needed to reach the goal",
     "child": "Child",
     "childHelp": "Which child is saving for this goal",
+    "quickPresets": "Quick Presets",
+    "presets": {
+      "small": "Small ({points} XP)",
+      "medium": "Medium ({points} XP)",
+      "large": "Large ({points} XP)",
+      "xl": "XL ({points} XP)"
+    },
+    "goalTier": "Goal Tier:",
+    "tierDescriptions": {
+      "small": "A quick goal - achievable in about a week",
+      "medium": "A moderate goal - takes 2-3 weeks of saving",
+      "large": "A bigger goal - requires patience and dedication",
+      "xl": "An ambitious goal - a major milestone to work toward!"
+    },
+    "howGoalsWork": "How Goals Work",
+    "howGoalsWorkDescription": "Your child can deposit points toward this goal from their dashboard. Once they reach the target, the goal is marked complete and they can redeem it!",
+    "cancel": "Cancel",
+    "saving": "Saving...",
     "image": "Image",
     "chooseImage": "Choose Image",
     "uploadCustom": "Upload Custom"
@@ -57,8 +79,11 @@
     "deleting": "Deleting..."
   },
   "toast": {
-    "created": "Goal created successfully",
-    "updated": "Goal updated successfully",
+    "created": "Goal Created",
+    "createdDescription": "\"{name}\" has been created for {childName}.",
+    "updated": "Goal Updated",
+    "updatedDescription": "\"{name}\" has been updated.",
+    "saveFailed": "Save Failed",
     "deleted": "Goal Deleted",
     "deletedDescription": "\"{name}\" has been removed.",
     "deleteFailed": "Delete Failed",
@@ -74,5 +99,28 @@
     "remaining": "remaining",
     "weeksToGo": "~{weeks} weeks to go",
     "almostThere": "Almost there!"
+  },
+  "deposit": {
+    "title": "Deposit to Goal",
+    "description": "Add points to \"{goalName}\"",
+    "goalProgress": "Goal Progress",
+    "xpRemaining": "{points} XP remaining",
+    "yourBalance": "Your Balance",
+    "amountToDeposit": "Amount to Deposit",
+    "enterAmount": "Enter amount",
+    "all": "All",
+    "errors": {
+      "invalidAmount": "Please enter a valid amount",
+      "notEnoughPoints": "You don't have enough points",
+      "exceedsRemaining": "Amount exceeds goal remaining"
+    },
+    "preview": {
+      "goalComplete": "Goal Complete!",
+      "afterDeposit": "After deposit"
+    },
+    "cancel": "Cancel",
+    "depositing": "Depositing...",
+    "depositXp": "Deposit {amount} XP",
+    "deposit": "Deposit"
   }
 }

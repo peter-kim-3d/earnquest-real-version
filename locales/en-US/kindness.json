@@ -36,7 +36,25 @@
     "earned": "Badge Earned!",
     "collection": "Badge Collection",
     "noBadges": "No badges yet",
-    "earnBadges": "Earn badges by receiving gratitude cards!"
+    "earnBadges": "Earn badges by receiving gratitude cards!",
+    "yourProgress": "Your Progress",
+    "cardsReceived": "{count} gratitude card received",
+    "cardsReceivedPlural": "{count} gratitude cards received",
+    "nextBadge": "Next badge: {name}",
+    "moreToUnlock": "{count} more card to unlock!",
+    "moreToUnlockPlural": "{count} more cards to unlock!",
+    "maxLevel": "Maximum level achieved! You're a kindness champion!",
+    "gratitudeCards": "gratitude cards",
+    "earnedOn": "Earned {date}",
+    "cards": "{current}/{required} cards",
+    "recentCards": "Recent Gratitude Cards",
+    "noCardsYet": "No gratitude cards yet",
+    "noBadgesYet": "You haven't earned any badges yet.",
+    "levels": {
+      "bronze": "Bronze Kindness",
+      "silver": "Silver Kindness",
+      "gold": "Gold Kindness"
+    }
   },
   "toast": {
     "sent": "Gratitude sent!",

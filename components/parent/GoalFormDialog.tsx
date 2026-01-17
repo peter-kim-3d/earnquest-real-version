@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { Target } from '@phosphor-icons/react';
 import { getTierForPoints, getTierLabel, TIER_RANGES, Tier } from '@/lib/utils/tiers';
 import { EffortBadge, TierBadge } from '@/components/ui/EffortBadge';
+import { useTranslations } from 'next-intl';
 
 interface Child {
   id: string;
@@ -36,6 +37,7 @@ interface GoalFormDialogProps {
 
 export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: GoalFormDialogProps) {
   const router = useRouter();
+  const t = useTranslations('goals');
   const [loading, setLoading] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [formData, setFormData] = useState({
@@ -96,8 +98,8 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
           throw new Error(error.error || 'Failed to update goal');
         }
 
-        toast.success('Goal Updated', {
-          description: `"${formData.name}" has been updated.`,
+        toast.success(t('toast.updated'), {
+          description: t('toast.updatedDescription', { name: formData.name }),
         });
       } else {
         // Create new goal
@@ -117,8 +119,11 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
           throw new Error(error.error || 'Failed to create goal');
         }
 
-        toast.success('Goal Created', {
-          description: `"${formData.name}" has been created for ${childrenList.find(c => c.id === formData.childId)?.name}.`,
+        toast.success(t('toast.created'), {
+          description: t('toast.createdDescription', {
+            name: formData.name,
+            childName: childrenList.find(c => c.id === formData.childId)?.name || ''
+          }),
         });
       }
 
@@ -126,8 +131,8 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
       onClose();
     } catch (error: any) {
       console.error('Error saving goal:', error);
-      toast.error('Save Failed', {
-        description: error.message || 'Failed to save goal. Please try again.',
+      toast.error(t('toast.saveFailed'), {
+        description: error.message || t('toast.error'),
       });
     } finally {
       setLoading(false);
@@ -139,10 +144,10 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
 
   // Preset target amounts
   const presets = [
-    { label: 'Small (100 XP)', value: 100, tier: 'small' as Tier },
-    { label: 'Medium (250 XP)', value: 250, tier: 'medium' as Tier },
-    { label: 'Large (500 XP)', value: 500, tier: 'large' as Tier },
-    { label: 'XL (1000 XP)', value: 1000, tier: 'xl' as Tier },
+    { label: t('form.presets.small', { points: 100 }), value: 100, tier: 'small' as Tier },
+    { label: t('form.presets.medium', { points: 250 }), value: 250, tier: 'medium' as Tier },
+    { label: t('form.presets.large', { points: 500 }), value: 500, tier: 'large' as Tier },
+    { label: t('form.presets.xl', { points: 1000 }), value: 1000, tier: 'xl' as Tier },
   ];
 
   return (
@@ -151,7 +156,7 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-2xl font-bold">
             <Target size={24} className="text-primary" />
-            {goal ? 'Edit Goal' : 'Create New Goal'}
+            {goal ? t('form.editTitle') : t('form.createTitle')}
           </DialogTitle>
         </DialogHeader>
 
@@ -159,7 +164,7 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
           {/* Child Selection */}
           {!goal && childrenList.length > 1 && (
             <div className="space-y-2">
-              <Label htmlFor="childId">For which child? *</Label>
+              <Label htmlFor="childId">{t('form.forWhichChild')} *</Label>
               <div className="grid grid-cols-2 gap-2">
                 {childrenList.map((child) => (
                   <button
@@ -177,35 +182,35 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
                 ))}
               </div>
               {hasSubmitted && !formData.childId && (
-                <p className="text-sm text-red-500 font-medium">Please select a child</p>
+                <p className="text-sm text-red-500 font-medium">{t('form.selectChild')}</p>
               )}
             </div>
           )}
 
           {/* Goal Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Goal Name *</Label>
+            <Label htmlFor="name">{t('form.name')} *</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g., LEGO Star Wars Set, New Video Game"
+              placeholder={t('form.namePlaceholder')}
               maxLength={100}
               className={hasSubmitted && !formData.name.trim() ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
             {hasSubmitted && !formData.name.trim() && (
-              <p className="text-sm text-red-500 font-medium">Goal name is required</p>
+              <p className="text-sm text-red-500 font-medium">{t('form.nameRequired')}</p>
             )}
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('form.description')}</Label>
             <textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Optional details about the goal"
+              placeholder={t('form.descriptionPlaceholder')}
               className="w-full min-h-20 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
               maxLength={500}
             />
@@ -213,7 +218,7 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
 
           {/* Target Points */}
           <div className="space-y-2">
-            <Label htmlFor="targetPoints">Target Points *</Label>
+            <Label htmlFor="targetPoints">{t('form.targetPoints')} *</Label>
             <Input
               id="targetPoints"
               type="number"
@@ -228,7 +233,7 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
 
           {/* Preset Buttons */}
           <div className="space-y-2">
-            <Label>Quick Presets</Label>
+            <Label>{t('form.quickPresets')}</Label>
             <div className="grid grid-cols-2 gap-2">
               {presets.map((preset) => (
                 <button
@@ -254,17 +259,14 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
           {formData.targetPoints > 0 && (
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Goal Tier:</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('form.goalTier')}</span>
                 <div className="flex items-center gap-2">
                   <TierBadge tier={tier} />
                   <EffortBadge tier={tier} variant="stars" size="sm" />
                 </div>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {tier === 'small' && 'A quick goal - achievable in about a week'}
-                {tier === 'medium' && 'A moderate goal - takes 2-3 weeks of saving'}
-                {tier === 'large' && 'A bigger goal - requires patience and dedication'}
-                {tier === 'xl' && 'An ambitious goal - a major milestone to work toward!'}
+                {t(`form.tierDescriptions.${tier}`)}
               </p>
             </div>
           )}
@@ -272,11 +274,10 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
           {/* Info Box */}
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-sm">
             <p className="font-semibold text-blue-800 dark:text-blue-200 mb-1">
-              How Goals Work
+              {t('form.howGoalsWork')}
             </p>
             <p className="text-blue-700 dark:text-blue-300 leading-relaxed">
-              Your child can deposit points toward this goal from their dashboard.
-              Once they reach the target, the goal is marked complete and they can redeem it!
+              {t('form.howGoalsWorkDescription')}
             </p>
           </div>
 
@@ -289,14 +290,14 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
               disabled={loading}
               className="flex-1"
             >
-              Cancel
+              {t('form.cancel')}
             </Button>
             <Button
               type="submit"
               disabled={loading}
               className="flex-1 bg-primary hover:bg-primary/90"
             >
-              {loading ? 'Saving...' : goal ? 'Update Goal' : 'Create Goal'}
+              {loading ? t('form.saving') : goal ? t('actions.update') : t('actions.create')}
             </Button>
           </div>
         </form>

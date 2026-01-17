@@ -206,5 +206,17 @@
     "deleteDescription": "Are you sure you want to permanently delete \"{name}\"? This will remove it for all children and cannot be undone.",
     "updateFailed": "Failed to update task. Please try again.",
     "deleteFailed": "Failed to delete task. Please try again."
+  },
+  "timer": {
+    "startTimer": "Start Timer",
+    "pause": "Pause",
+    "resume": "Resume",
+    "complete": "Complete!",
+    "running": "Timer running...",
+    "ready": "Ready to start",
+    "finishClaim": "Finish & Claim Points",
+    "doMore": "Do {minutes} More Minutes (+ {points} XP)",
+    "close": "Close",
+    "closeSaveProgress": "Close & Save Progress"
   }
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Copy, Check, RefreshCw, Smartphone } from '@/components/ui/ClientIcons';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 
 export default function DeviceConnection() {
+  const t = useTranslations('settings.deviceConnection');
   const [joinCode, setJoinCode] = useState('');
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -31,11 +33,11 @@ export default function DeviceConnection() {
         const { joinCode: code } = await res.json();
         setJoinCode(code);
       } else {
-        toast.error('Failed to load family code');
+        toast.error(t('toast.loadFailed'));
       }
     } catch (err) {
       console.error('Failed to fetch join code:', err);
-      toast.error('Failed to load family code');
+      toast.error(t('toast.loadFailed'));
     } finally {
       setFetchingCode(false);
     }
@@ -44,7 +46,7 @@ export default function DeviceConnection() {
   const handleCopy = () => {
     navigator.clipboard.writeText(joinCode);
     setCopied(true);
-    toast.success('Code copied to clipboard');
+    toast.success(t('toast.copied'));
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -63,13 +65,13 @@ export default function DeviceConnection() {
       if (res.ok) {
         const { joinCode: newCode } = await res.json();
         setJoinCode(newCode);
-        toast.success('New code generated');
+        toast.success(t('toast.generated'));
       } else {
-        toast.error('Failed to generate new code');
+        toast.error(t('toast.generateFailed'));
       }
     } catch (err) {
       console.error('Failed to regenerate code:', err);
-      toast.error('Network error');
+      toast.error(t('toast.networkError'));
     } finally {
       setLoading(false);
     }
@@ -92,7 +94,7 @@ export default function DeviceConnection() {
             <button
               onClick={handleCopy}
               className="h-14 w-14 flex items-center justify-center rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all"
-              title="Copy code"
+              title={t('copyCode')}
             >
               {copied ? (
                 <Check className="h-5 w-5 text-green-600" />
@@ -106,11 +108,11 @@ export default function DeviceConnection() {
           <div className="space-y-2 mb-4">
             <div className="flex items-start gap-2 text-sm text-text-muted dark:text-text-muted">
               <span className="mt-0.5">📱</span>
-              <span>Your child can enter this code when opening the app on their device</span>
+              <span>{t('instructions.childDevice')}</span>
             </div>
             <div className="flex items-start gap-2 text-sm text-text-muted dark:text-text-muted">
               <span className="mt-0.5">🔄</span>
-              <span>Generate a new code anytime if needed</span>
+              <span>{t('instructions.generateNew')}</span>
             </div>
           </div>
 
@@ -121,7 +123,7 @@ export default function DeviceConnection() {
             className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2 text-sm font-medium text-text-main dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            {loading ? 'Generating...' : 'Generate New Code'}
+            {loading ? t('generating') : t('generateNewCode')}
           </button>
         </>
       )}
@@ -131,11 +133,10 @@ export default function DeviceConnection() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-text-main dark:text-white">
-              Generate New Code?
+              {t('regenerateDialog.title')}
             </DialogTitle>
             <DialogDescription className="text-text-muted dark:text-text-muted">
-              This will stop the old code from working. Any child using the old code
-              will need to log in again with the new code.
+              {t('regenerateDialog.description')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -143,10 +144,10 @@ export default function DeviceConnection() {
               <span className="text-lg">⚠️</span>
               <div className="flex-1">
                 <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-1">
-                  Current code will be disabled
+                  {t('regenerateDialog.warningTitle')}
                 </p>
                 <p className="text-xs text-yellow-800 dark:text-yellow-200">
-                  Children will need the new code to access their accounts
+                  {t('regenerateDialog.warningDescription')}
                 </p>
               </div>
             </div>
@@ -156,14 +157,14 @@ export default function DeviceConnection() {
               onClick={() => setShowRegenerateDialog(false)}
               className="px-6 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold transition-all"
             >
-              Cancel
+              {t('cancel')}
             </button>
             <button
               onClick={handleConfirmRegenerate}
               disabled={loading}
               className="px-6 py-2 rounded-lg bg-primary hover:bg-primary/90 text-black font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Generating...' : 'Generate New Code'}
+              {loading ? t('generating') : t('generateNewCode')}
             </button>
           </DialogFooter>
         </DialogContent>

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Check, Clock, X, Sparkle, Gift } from '@phosphor-icons/react';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -52,6 +53,7 @@ export default function TicketCard({
   hasPendingRequest = false,
 }: TicketCardProps) {
   const router = useRouter();
+  const t = useTranslations('child.tickets.card');
   const [canceling, setCanceling] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
@@ -96,14 +98,14 @@ export default function TicketCard({
       }
 
       const result = await response.json();
-      toast.success('Ticket canceled', {
-        description: `${result.refundedPoints} QP refunded!`,
+      toast.success(t('toast.canceled'), {
+        description: t('toast.refunded', { points: result.refundedPoints }),
       });
       router.refresh();
     } catch (error: any) {
       console.error('Cancel error:', error);
-      toast.error('Cancel failed', {
-        description: error.message || 'Please try again.',
+      toast.error(t('toast.cancelFailed'), {
+        description: error.message || t('toast.tryAgain'),
       });
     } finally {
       setCanceling(false);
@@ -165,21 +167,21 @@ export default function TicketCard({
             <>
               <Clock size={16} className="text-yellow-600 dark:text-yellow-400" />
               <span className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">
-                Waiting for Parent
+                {t('waitingForParent')}
               </span>
             </>
           ) : isUsed ? (
             <>
               <Check size={16} weight="bold" className="text-green-600 dark:text-green-400" />
               <span className="text-sm font-semibold text-green-700 dark:text-green-300">
-                Used
+                {t('used')}
               </span>
             </>
           ) : (
             <>
               <Sparkle size={16} weight="fill" className="text-primary" />
               <span className="text-sm font-semibold text-text-main dark:text-white">
-                Active
+                {t('active')}
               </span>
             </>
           )}
@@ -226,7 +228,7 @@ export default function TicketCard({
 
         <div className="flex items-center justify-between text-sm">
           <span className="text-text-muted dark:text-gray-500">
-            Points spent:
+            {t('pointsSpent')}
           </span>
           <span className="font-bold text-primary">
             {purchase.points_spent} QP
@@ -236,10 +238,10 @@ export default function TicketCard({
         {purchase.reward.screen_minutes && (
           <div className="mt-2 flex items-center justify-between text-sm">
             <span className="text-text-muted dark:text-gray-500">
-              Screen time:
+              {t('screenTime')}
             </span>
             <span className="font-bold text-blue-600 dark:text-blue-400">
-              {purchase.reward.screen_minutes} minutes
+              {t('minutes', { minutes: purchase.reward.screen_minutes })}
             </span>
           </div>
         )}
@@ -256,12 +258,12 @@ export default function TicketCard({
                 {hasPendingRequest ? (
                   <>
                     <Clock size={20} />
-                    Screen time already running
+                    {t('screenTimeRunning')}
                   </>
                 ) : (
                   <>
                     <Sparkle size={20} weight="fill" />
-                    Use Now
+                    {t('useNow')}
                   </>
                 )}
               </button>
@@ -270,7 +272,7 @@ export default function TicketCard({
             {showAskParentMessage && (
               <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
                 <p className="text-sm text-blue-800 dark:text-blue-200 font-medium text-center">
-                  💡 Ask your parent when you want to use this!
+                  {t('askParent')}
                 </p>
               </div>
             )}
@@ -282,7 +284,7 @@ export default function TicketCard({
                 className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <X size={16} />
-                {canceling ? 'Canceling...' : 'Cancel Ticket'}
+                {canceling ? t('canceling') : t('cancelTicket')}
               </button>
             )}
           </>
@@ -297,7 +299,7 @@ export default function TicketCard({
                 className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary hover:bg-primary/90 text-black font-bold transition-all"
               >
                 <Check size={20} weight="bold" />
-                Approve Use
+                {t('approveUse')}
               </button>
             )}
 
@@ -307,7 +309,7 @@ export default function TicketCard({
                 className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-primary text-primary hover:bg-primary/10 font-bold transition-all"
               >
                 <Check size={20} weight="bold" />
-                Mark as Given
+                {t('markAsGiven')}
               </button>
             )}
           </>
@@ -319,17 +321,16 @@ export default function TicketCard({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-text-main dark:text-white">
-              Cancel Ticket?
+              {t('cancelDialog.title')}
             </DialogTitle>
             <DialogDescription className="text-text-muted dark:text-text-muted">
-              Are you sure you want to cancel this ticket? Your points will be
-              refunded to your balance.
+              {t('cancelDialog.description')}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <div className="flex items-center justify-between p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
               <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                Points to refund:
+                {t('cancelDialog.pointsToRefund')}
               </span>
               <span className="text-lg font-bold text-primary">
                 {purchase.points_spent} QP
@@ -341,14 +342,14 @@ export default function TicketCard({
               onClick={() => setShowConfirmDialog(false)}
               className="px-6 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold transition-all"
             >
-              Go Back
+              {t('cancelDialog.goBack')}
             </button>
             <button
               onClick={handleConfirmCancel}
               disabled={canceling}
               className="px-6 py-3 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {canceling ? 'Canceling...' : 'Yes, Cancel Ticket'}
+              {canceling ? t('canceling') : t('cancelDialog.confirm')}
             </button>
           </DialogFooter>
         </DialogContent>

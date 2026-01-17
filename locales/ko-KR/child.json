@@ -150,6 +150,34 @@
       "okay": "확인",
       "timeWellSpent": "잘 보낸 시간! 🎮",
       "failedToComplete": "완료 실패"
+    },
+    "card": {
+      "waitingForParent": "부모님 대기 중",
+      "used": "사용 완료",
+      "active": "사용 가능",
+      "pointsSpent": "사용한 포인트:",
+      "screenTime": "스크린 타임:",
+      "minutes": "{minutes}분",
+      "screenTimeRunning": "스크린 타임 사용 중",
+      "useNow": "지금 사용",
+      "askParent": "💡 사용하고 싶을 때 부모님께 말씀해주세요!",
+      "cancelTicket": "티켓 취소",
+      "canceling": "취소 중...",
+      "approveUse": "사용 승인",
+      "markAsGiven": "제공 완료",
+      "cancelDialog": {
+        "title": "티켓을 취소할까요?",
+        "description": "정말 이 티켓을 취소하시겠어요? 포인트가 환불됩니다.",
+        "pointsToRefund": "환불 포인트:",
+        "goBack": "돌아가기",
+        "confirm": "네, 취소할게요"
+      },
+      "toast": {
+        "canceled": "티켓 취소됨",
+        "refunded": "{points} QP 환불됨!",
+        "cancelFailed": "취소 실패",
+        "tryAgain": "다시 시도해주세요."
+      }
     }
   },
   "badges": {

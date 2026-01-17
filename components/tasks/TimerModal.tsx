@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, RotateCcw, Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface TimerModalProps {
   taskName: string;
@@ -24,6 +25,7 @@ export default function TimerModal({
   onCancel,
   onSave,
 }: TimerModalProps) {
+  const t = useTranslations('tasks.timer');
   const [adjustedMinutes, setAdjustedMinutes] = useState(
     initialState ? Math.ceil(initialState.totalSeconds / 60) : timerMinutes
   );
@@ -187,10 +189,10 @@ export default function TimerModal({
               </div>
               <div className="text-sm text-text-muted dark:text-gray-400 mt-2">
                 {isCompleted
-                  ? '🎉 Complete!'
+                  ? `🎉 ${t('complete')}`
                   : isRunning
-                    ? 'Timer running...'
-                    : 'Ready to start'}
+                    ? t('running')
+                    : t('ready')}
               </div>
             </div>
           </div>
@@ -203,7 +205,7 @@ export default function TimerModal({
                 className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg font-bold shadow-lg"
               >
                 <Play className="h-5 w-5 mr-2" />
-                Start Timer
+                {t('startTimer')}
               </Button>
             )}
 
@@ -214,7 +216,7 @@ export default function TimerModal({
                 className="px-6 py-6 text-lg"
               >
                 <Pause className="h-5 w-5 mr-2" />
-                Pause
+                {t('pause')}
               </Button>
             )}
 
@@ -225,9 +227,9 @@ export default function TimerModal({
                   className="bg-primary hover:bg-primary/90 text-white px-6 py-6 text-lg"
                 >
                   <Play className="h-5 w-5 mr-2" />
-                  Resume
+                  {t('resume')}
                 </Button>
-                {/* User asked for "midway stop... show as progress". 
+                {/* User asked for "midway stop... show as progress".
                     This is effectively the 'Paused' state displayed here.
                     To fully "start again later" after closing, we would need backend persistence.
                     For MVP, keeping the modal open in background or re-opening reset is standard.
@@ -243,7 +245,7 @@ export default function TimerModal({
                   className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg font-bold shadow-lg shadow-green-600/20 w-full"
                 >
                   <Check className="h-5 w-5 mr-2" />
-                  Finish & Claim Points
+                  {t('finishClaim')}
                 </Button>
 
                 {/* "Do More" feature - Extend time */}
@@ -259,7 +261,7 @@ export default function TimerModal({
                   className="w-full"
                 >
                   <RotateCcw className="h-4 w-4 mr-2" />
-                  Do 5 More Minutes (+ {Math.round(5 * 1.5)} XP)
+                  {t('doMore', { minutes: 5, points: Math.round(5 * 1.5) })}
                 </Button>
               </div>
             )}
@@ -277,7 +279,7 @@ export default function TimerModal({
               variant="ghost"
               className="text-gray-600 dark:text-gray-400"
             >
-              {isCompleted ? 'Close' : 'Close & Save Progress'}
+              {isCompleted ? t('close') : t('closeSaveProgress')}
             </Button>
           </div>
         </div>

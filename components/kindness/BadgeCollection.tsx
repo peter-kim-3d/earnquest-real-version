@@ -2,6 +2,7 @@
 
 import { Trophy, Medal, Crown, Star, Sparkle, Lock } from '@/components/ui/ClientIcons';
 import { themes } from './ThemePicker';
+import { useTranslations } from 'next-intl';
 
 interface Badge {
   id: string;
@@ -28,24 +29,24 @@ interface BadgeCollectionProps {
   recentCards: Card[];
 }
 
-const badgeLevels = [
+const badgeLevelsData = [
   {
     level: 1,
-    name: 'Bronze Kindness',
+    nameKey: 'bronze',
     icon: '🥉',
     color: 'from-amber-600 to-orange-700',
     required: 5,
   },
   {
     level: 2,
-    name: 'Silver Kindness',
+    nameKey: 'silver',
     icon: '🥈',
     color: 'from-gray-400 to-gray-600',
     required: 10,
   },
   {
     level: 3,
-    name: 'Gold Kindness',
+    nameKey: 'gold',
     icon: '🥇',
     color: 'from-yellow-400 to-yellow-600',
     required: 20,
@@ -59,7 +60,13 @@ export function BadgeCollection({
   nextBadgeLevel,
   recentCards,
 }: BadgeCollectionProps) {
+  const t = useTranslations('kindness.badge');
   const earnedBadgeLevels = badges.map((b) => b.level);
+
+  const badgeLevels = badgeLevelsData.map((badge) => ({
+    ...badge,
+    name: t(`levels.${badge.nameKey}`),
+  }));
 
   return (
     <div className="space-y-8">
@@ -69,10 +76,12 @@ export function BadgeCollection({
           <Sparkle className="path-primary-kindness w-8 h-8 text-primary-kindness" />
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-              Your Progress
+              {t('yourProgress')}
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {totalCards} gratitude card{totalCards !== 1 ? 's' : ''} received
+              {totalCards !== 1
+                ? t('cardsReceivedPlural', { count: totalCards })
+                : t('cardsReceived', { count: totalCards })}
             </p>
           </div>
         </div>
@@ -81,7 +90,7 @@ export function BadgeCollection({
           <div className="bg-gradient-to-r from-primary-kindness/10 to-orange-600/10 rounded-2xl p-4 border border-primary-kindness/30">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-900 dark:text-white">
-                Next badge: {badgeLevels[nextBadgeLevel - 1].name}
+                {t('nextBadge', { name: badgeLevels[nextBadgeLevel - 1].name })}
               </span>
               <span className="text-sm font-bold text-primary-kindness">
                 {totalCards}/{badgeLevels[nextBadgeLevel - 1].required}
@@ -98,14 +107,15 @@ export function BadgeCollection({
               />
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-              {cardsToNextBadge} more card{cardsToNextBadge !== 1 ? 's' : ''} to
-              unlock!
+              {cardsToNextBadge !== 1
+                ? t('moreToUnlockPlural', { count: cardsToNextBadge })
+                : t('moreToUnlock', { count: cardsToNextBadge })}
             </p>
           </div>
         ) : (
           <div className="bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 rounded-2xl p-4 border border-yellow-500/30">
             <p className="text-center font-semibold text-gray-900 dark:text-white">
-              🎉 Maximum level achieved! You&apos;re a kindness champion!
+              🎉 {t('maxLevel')}
             </p>
           </div>
         )}
@@ -114,7 +124,7 @@ export function BadgeCollection({
       {/* Badges Grid */}
       <div>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Badge Collection
+          {t('collection')}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -159,19 +169,18 @@ export function BadgeCollection({
                   </h3>
 
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                    {badgeLevel.required} gratitude cards
+                    {badgeLevel.required} {t('gratitudeCards')}
                   </p>
 
                   {isEarned && earnedBadge && (
                     <div className="bg-primary-kindness/10 rounded-lg px-3 py-2 text-xs text-primary-kindness font-medium">
-                      Earned{' '}
-                      {new Date(earnedBadge.earned_at).toLocaleDateString()}
+                      {t('earnedOn', { date: new Date(earnedBadge.earned_at).toLocaleDateString() })}
                     </div>
                   )}
 
                   {!isEarned && (
                     <div className="text-xs text-gray-500">
-                      {totalCards}/{badgeLevel.required} cards
+                      {t('cards', { current: totalCards, required: badgeLevel.required })}
                     </div>
                   )}
                 </div>
@@ -185,7 +194,7 @@ export function BadgeCollection({
       {recentCards.length > 0 && (
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Recent Gratitude Cards
+            {t('recentCards')}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -220,10 +229,10 @@ export function BadgeCollection({
         <div className="bg-white dark:bg-gray-800 rounded-3xl p-12 text-center shadow-xl">
           <div className="text-6xl mb-4">💌</div>
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            No gratitude cards yet
+            {t('noCardsYet')}
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            You haven&apos;t earned any badges yet.
+            {t('noBadgesYet')}
           </p>
         </div>
       )}
