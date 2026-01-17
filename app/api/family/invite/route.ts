@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { randomBytes } from 'crypto';
 import { cookies } from 'next/headers';
 
@@ -92,24 +93,31 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
-    // Create invitation
-    const { data: invitation, error } = await supabase
+    // Create invitation using admin client to bypass RLS
+    const adminClient = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const insertData = {
+      family_id: userProfile.family_id,
+      invited_by: user.id,
+      invited_email: email,
+      invite_token: token,
+      expires_at: expiresAt.toISOString(),
+      status: 'pending',
+    };
+
+    const { data: invitation, error } = await adminClient
       .from('family_invitations')
-      .insert({
-        family_id: userProfile.family_id,
-        invited_by: user.id,
-        invited_email: email,
-        invite_token: token,
-        expires_at: expiresAt.toISOString(),
-        status: 'pending',
-      })
+      .insert(insertData)
       .select()
       .single();
 
     if (error) {
       console.error('Create invitation error:', error);
       return NextResponse.json(
-        { error: 'Failed to create invitation' },
+        { error: 'Failed to create invitation', details: error.message },
         { status: 500 }
       );
     }
