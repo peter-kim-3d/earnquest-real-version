@@ -21,7 +21,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
         {/* Logo area */}
         <div className="relative z-10 flex items-center gap-0 text-white">
-          <Image src="/logo.png" alt="EarnQuest Logo" width={48} height={48} className="-mr-1" />
+          <Image src="/logo2.png" alt="EarnQuest Logo" width={48} height={48} className="-mr-1" />
           <h2 className="text-2xl font-bold tracking-tight">EarnQuest</h2>
           <BetaBadge />
         </div>
@@ -45,7 +45,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         {/* Mobile Logo Header */}
         <div className="flex lg:hidden items-center justify-between mb-8">
           <div className="flex items-center gap-0 text-text-main dark:text-white">
-            <Image src="/logo.png" alt="EarnQuest Logo" width={48} height={48} className="-mr-1" />
+            <Image src="/logo2.png" alt="EarnQuest Logo" width={48} height={48} className="-mr-1" />
             <h2 className="text-xl font-bold tracking-tight">EarnQuest</h2>
             <BetaBadge />
           </div>

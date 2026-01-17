@@ -88,7 +88,7 @@ export default function ChildNav({ childName = 'A', childId, avatarUrl = null, p
             {/* Logo */}
             <Link href={`/${locale}/child/dashboard`} className="flex items-center gap-2" aria-label="EarnQuest home - Go to dashboard">
               <div className="flex items-center gap-0">
-                <Image src="/logo.png" alt="EarnQuest Logo" width={48} height={48} className="-mr-1" />
+                <Image src="/logo2.png" alt="EarnQuest Logo" width={48} height={48} className="-mr-1" />
                 <span className="text-xl font-black text-text-main dark:text-white">
                   EarnQuest
                 </span>
