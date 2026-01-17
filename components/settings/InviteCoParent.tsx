@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Envelope as Mail, Copy, Check } from '@/components/ui/ClientIcons';
+import { UserPlus, Copy, Check, Share } from '@/components/ui/ClientIcons';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import {
@@ -18,27 +18,19 @@ import { Label } from '@/components/ui/label';
 export default function InviteCoParent() {
   const t = useTranslations('settings.invite');
   const [isOpen, setIsOpen] = useState(false);
-  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!email.trim()) {
-      toast.error(t('emailRequired'));
-      return;
-    }
-
+  const handleCreateInvite = async () => {
     setLoading(true);
 
     try {
       const response = await fetch('/api/family/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({}),
       });
 
       const data = await response.json();
@@ -49,7 +41,6 @@ export default function InviteCoParent() {
 
       setInviteUrl(data.invitation.inviteUrl);
       setExpiresAt(data.invitation.expiresAt);
-      toast.success(t('createdSuccess'));
     } catch (error: any) {
       console.error('Invite error:', error);
       toast.error(error.message || t('createFailed'));
@@ -58,28 +49,59 @@ export default function InviteCoParent() {
     }
   };
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     if (inviteUrl) {
-      navigator.clipboard.writeText(inviteUrl);
-      setCopied(true);
-      toast.success(t('linkCopied'));
-      setTimeout(() => setCopied(false), 2000);
+      try {
+        await navigator.clipboard.writeText(inviteUrl);
+        setCopied(true);
+        toast.success(t('linkCopied'));
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        toast.error('Failed to copy');
+      }
+    }
+  };
+
+  const handleShare = async () => {
+    if (inviteUrl && navigator.share) {
+      try {
+        await navigator.share({
+          title: t('shareTitle'),
+          text: t('shareText'),
+          url: inviteUrl,
+        });
+      } catch (error: any) {
+        // User cancelled or share failed - ignore
+        if (error.name !== 'AbortError') {
+          console.error('Share error:', error);
+        }
+      }
+    } else {
+      // Fallback to copy
+      handleCopyLink();
     }
   };
 
   const handleReset = () => {
-    setEmail('');
     setInviteUrl(null);
     setExpiresAt(null);
     setCopied(false);
     setIsOpen(false);
   };
 
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (open && !inviteUrl) {
+      // Auto-create invite when dialog opens
+      handleCreateInvite();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className="bg-primary hover:bg-primary/90 text-black font-semibold">
-          <Mail className="h-4 w-4 mr-2" />
+          <UserPlus className="h-4 w-4 mr-2" />
           {t('button')}
         </Button>
       </DialogTrigger>
@@ -89,56 +111,17 @@ export default function InviteCoParent() {
           <DialogTitle>{t('title')}</DialogTitle>
         </DialogHeader>
 
-        {!inviteUrl ? (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">{t('emailLabel')}</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder={t('emailPlaceholder')}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoFocus
-                disabled={loading}
-              />
-              <p className="text-xs text-text-muted dark:text-text-muted">
-                {t('emailHelp')}
-              </p>
-            </div>
-
-            <div className="flex gap-3 justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsOpen(false)}
-                disabled={loading}
-              >
-                {t('cancel')}
-              </Button>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="bg-primary hover:bg-primary/90 text-black"
-              >
-                {loading ? t('creating') : t('createInvitation')}
-              </Button>
-            </div>
-          </form>
-        ) : (
+        {loading ? (
+          <div className="py-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
+            <p className="text-text-muted dark:text-text-muted">{t('creating')}</p>
+          </div>
+        ) : inviteUrl ? (
           <div className="space-y-4">
-            <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-              <div className="flex items-start gap-3">
-                <Check className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5" />
-                <div className="flex-1">
-                  <h4 className="font-semibold text-green-900 dark:text-green-100 mb-1">
-                    {t('created')}
-                  </h4>
-                  <p className="text-sm text-green-700 dark:text-green-300">
-                    {t('shareLink', { email })}
-                  </p>
-                </div>
-              </div>
+            <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                {t('shareInstructions')}
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -156,15 +139,9 @@ export default function InviteCoParent() {
                   variant={copied ? 'default' : 'outline'}
                 >
                   {copied ? (
-                    <>
-                      <Check className="h-4 w-4 mr-2" />
-                      {t('copied')}
-                    </>
+                    <Check className="h-4 w-4" />
                   ) : (
-                    <>
-                      <Copy className="h-4 w-4 mr-2" />
-                      {t('copy')}
-                    </>
+                    <Copy className="h-4 w-4" />
                   )}
                 </Button>
               </div>
@@ -173,11 +150,36 @@ export default function InviteCoParent() {
               </p>
             </div>
 
-            <div className="flex gap-3 justify-end pt-4">
-              <Button onClick={handleReset} className="bg-primary hover:bg-primary/90 text-black">
+            <div className="flex flex-col gap-3 pt-4">
+              {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+                <Button
+                  onClick={handleShare}
+                  className="w-full bg-primary hover:bg-primary/90 text-black"
+                >
+                  <Share className="h-4 w-4 mr-2" />
+                  {t('shareLink')}
+                </Button>
+              )}
+              <Button
+                onClick={handleCopyLink}
+                variant="outline"
+                className="w-full"
+              >
+                <Copy className="h-4 w-4 mr-2" />
+                {copied ? t('copied') : t('copyLink')}
+              </Button>
+              <Button
+                onClick={handleReset}
+                variant="ghost"
+                className="w-full"
+              >
                 {t('done')}
               </Button>
             </div>
+          </div>
+        ) : (
+          <div className="py-8 text-center text-text-muted dark:text-text-muted">
+            {t('createFailed')}
           </div>
         )}
       </DialogContent>

@@ -3,6 +3,7 @@
 export {
     UserCircle,
     User,
+    UserPlus,
     Heart,
     Sword,
     ArrowRight,
@@ -37,4 +38,5 @@ export {
     Lock,
     Eye,
     House,
+    ShareNetwork as Share,
 } from '@phosphor-icons/react/dist/ssr';

@@ -21,25 +21,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { email } = body;
-
-    if (!email) {
-      return NextResponse.json(
-        { error: 'Email is required' },
-        { status: 400 }
-      );
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      );
-    }
-
     // Get user's family
     const { data: userProfile } = await supabase
       .from('users')
@@ -51,38 +32,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'User profile or family not found' },
         { status: 404 }
-      );
-    }
-
-    // Check if email is already a member of this family
-    const { data: existingMember } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', email)
-      .eq('family_id', userProfile.family_id)
-      .single();
-
-    if (existingMember) {
-      return NextResponse.json(
-        { error: 'This email is already a member of your family' },
-        { status: 400 }
-      );
-    }
-
-    // Check for pending invitation
-    const { data: pendingInvite } = await supabase
-      .from('family_invitations')
-      .select('id')
-      .eq('family_id', userProfile.family_id)
-      .eq('invited_email', email)
-      .eq('status', 'pending')
-      .gt('expires_at', new Date().toISOString())
-      .single();
-
-    if (pendingInvite) {
-      return NextResponse.json(
-        { error: 'An invitation has already been sent to this email' },
-        { status: 400 }
       );
     }
 
@@ -102,7 +51,7 @@ export async function POST(request: NextRequest) {
     const insertData = {
       family_id: userProfile.family_id,
       invited_by: user.id,
-      invited_email: email,
+      invited_email: null, // Email not required - anyone with link can join
       invite_token: token,
       expires_at: expiresAt.toISOString(),
       status: 'pending',
@@ -135,7 +84,6 @@ export async function POST(request: NextRequest) {
       success: true,
       invitation: {
         id: invitation.id,
-        email: invitation.invited_email,
         inviteUrl,
         expiresAt: invitation.expires_at,
       },

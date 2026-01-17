@@ -165,12 +165,6 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-text-muted dark:text-text-muted">{t('invitedEmail')}</span>
-                <span className="font-semibold text-text-main dark:text-white">
-                  {invitation.email}
-                </span>
-              </div>
-              <div className="flex justify-between">
                 <span className="text-text-muted dark:text-text-muted">{t('expires')}</span>
                 <div className="text-right">
                   <span className="font-semibold text-text-main dark:text-white block">

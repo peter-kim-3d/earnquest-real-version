@@ -166,14 +166,6 @@ export async function POST(
       );
     }
 
-    // Verify email matches
-    if (user.email?.toLowerCase() !== invitation.invited_email.toLowerCase()) {
-      return NextResponse.json(
-        { error: 'This invitation was sent to a different email address' },
-        { status: 403 }
-      );
-    }
-
     // Check if user already belongs to a family
     const { data: userProfile } = await adminClient
       .from('users')
