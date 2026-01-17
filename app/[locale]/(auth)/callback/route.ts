@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { getOrCreateUserProfile } from '@/lib/services/user';
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
 export async function GET(
   request: Request,
@@ -9,6 +10,10 @@ export async function GET(
   const { locale } = await params;
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
+
+  // Check for pending invite token in cookies
+  const cookieStore = await cookies();
+  const pendingInvite = cookieStore.get('pending_invite')?.value;
 
   if (code) {
     const supabase = await createClient();
@@ -23,6 +28,14 @@ export async function GET(
     if (data.user) {
       try {
         const userProfile = await getOrCreateUserProfile(data.user) as { family_id: string } | null;
+
+        // If there's a pending invite, redirect back to the invite page
+        if (pendingInvite) {
+          // Clear the cookie
+          const response = NextResponse.redirect(`${requestUrl.origin}/${locale}/invite/${pendingInvite}`);
+          response.cookies.delete('pending_invite');
+          return response;
+        }
 
         // Check if user already has children
         if (userProfile && userProfile.family_id) {

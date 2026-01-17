@@ -22,9 +22,12 @@ export default function SignupPage() {
   const enableAppleLogin = process.env.NEXT_PUBLIC_ENABLE_APPLE_LOGIN === 'true';
 
   useEffect(() => {
-    // Store invite token in sessionStorage if present
+    // Store invite token in both sessionStorage and cookie if present
+    // Cookie is needed for OAuth flow (server-side callback)
     if (inviteToken) {
       sessionStorage.setItem('pending_invite', inviteToken);
+      // Set cookie that expires in 1 hour (enough time to complete OAuth)
+      document.cookie = `pending_invite=${inviteToken}; path=/; max-age=3600; SameSite=Lax`;
     }
   }, [inviteToken]);
 
