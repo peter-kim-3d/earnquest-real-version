@@ -16,19 +16,21 @@ export default async function Home({
     <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-24 bg-background-light dark:bg-background-dark">
       <div className="text-center max-w-4xl">
         {/* Logo & Title */}
-        <div className="mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Image src="/logo.png" alt="EarnQuest Logo" width={96} height={96} />
+        <div className="mb-12">
+          <div className="flex items-center justify-center gap-4 mb-2">
+            <Image src="/logo.png" alt="EarnQuest Logo" width={140} height={140} className="drop-shadow-lg" />
+            <div className="text-left">
+              <div className="flex items-center gap-3">
+                <h1 className="text-5xl md:text-6xl font-bold text-text-main dark:text-white font-display">
+                  {t('app.name')}
+                </h1>
+                <BetaBadge />
+              </div>
+              <p className="text-xl md:text-2xl text-text-muted dark:text-text-muted mt-2">
+                {t('app.tagline')}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <h1 className="text-5xl md:text-6xl font-bold text-text-main dark:text-white font-display">
-              {t('app.name')}
-            </h1>
-            <BetaBadge />
-          </div>
-          <p className="text-xl md:text-2xl text-text-muted dark:text-text-muted mb-12">
-            {t('app.tagline')}
-          </p>
         </div>
 
         {/* Selection Cards */}
