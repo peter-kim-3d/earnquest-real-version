@@ -23,7 +23,7 @@ interface Child {
 
 export default function ChildPinToggle() {
   const t = useTranslations('settings.pinToggle');
-  const [requirePin, setRequirePin] = useState(true);
+  const [requirePin, setRequirePin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [showDisableDialog, setShowDisableDialog] = useState(false);
@@ -41,7 +41,7 @@ export default function ChildPinToggle() {
       const res = await fetch('/api/family/settings');
       if (res.ok) {
         const { settings, children: childrenData } = await res.json();
-        setRequirePin(settings.requireChildPin ?? true);
+        setRequirePin(settings.requireChildPin ?? false);
         if (childrenData) {
           setChildren(childrenData);
           // Initialize editing pins with current values

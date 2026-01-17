@@ -53,6 +53,7 @@ export async function createFamily(params?: CreateFamilyParams) {
         language: params?.language || 'en-US',
         autoApprovalHours: 24,
         screenBudgetWeeklyMinutes: 300,
+        requireChildPin: false,
       },
     })
     .select()
