@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { UserCircle, Heart, Sword, ArrowRight } from '@/components/ui/ClientIcons';
+import Image from 'next/image';
+import { UserCircle, Heart, ArrowRight } from '@/components/ui/ClientIcons';
 import BetaBadge from '@/components/BetaBadge';
 import { getTranslations } from 'next-intl/server';
 
@@ -17,7 +18,7 @@ export default async function Home({
         {/* Logo & Title */}
         <div className="mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Sword size={64} weight="duotone" className="text-primary" />
+            <Image src="/logo.png" alt="EarnQuest Logo" width={64} height={64} />
           </div>
           <div className="flex items-center justify-center gap-3 mb-4">
             <h1 className="text-5xl md:text-6xl font-bold text-text-main dark:text-white font-display">

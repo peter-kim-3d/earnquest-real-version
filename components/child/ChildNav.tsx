@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Trophy, Gift, Medal, Ticket, List, X, User, SignOut, CaretDown, Sword, Star, Eye, Target } from '@phosphor-icons/react';
+import Image from 'next/image';
+import { Trophy, Gift, Medal, Ticket, List, X, User, SignOut, CaretDown, Star, Eye, Target } from '@phosphor-icons/react';
 import BetaBadge from '@/components/BetaBadge';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
 import {
@@ -87,7 +88,7 @@ export default function ChildNav({ childName = 'A', childId, avatarUrl = null, p
             {/* Logo */}
             <Link href={`/${locale}/child/dashboard`} className="flex items-center gap-2" aria-label="EarnQuest home - Go to dashboard">
               <div className="flex items-center gap-2">
-                <Sword size={32} weight="duotone" className="text-primary" />
+                <Image src="/logo.png" alt="EarnQuest Logo" width={32} height={32} />
                 <span className="text-xl font-black text-text-main dark:text-white">
                   EarnQuest
                 </span>

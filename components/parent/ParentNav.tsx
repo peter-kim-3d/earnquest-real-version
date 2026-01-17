@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { SquaresFour, Checks, Gift, Heart, Users, List, X, User, Gear, SignOut, CaretDown, Sword, Target } from '@phosphor-icons/react';
+import Image from 'next/image';
+import { SquaresFour, Checks, Gift, Heart, Users, List, X, User, Gear, SignOut, CaretDown, Target } from '@phosphor-icons/react';
 import BetaBadge from '@/components/BetaBadge';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
 import {
@@ -67,7 +68,7 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
             aria-label="EarnQuest home - Go to dashboard"
           >
             <div className="flex items-center gap-2">
-              <Sword size={32} weight="duotone" className="text-primary" />
+              <Image src="/logo.png" alt="EarnQuest Logo" width={32} height={32} />
               <span className="text-xl font-black text-text-main dark:text-white">
                 EarnQuest
               </span>

@@ -1,8 +1,8 @@
 'use client';
 
 import { ReactNode } from 'react';
+import Image from 'next/image';
 import BetaBadge from '@/components/BetaBadge';
-import { Sword } from '@phosphor-icons/react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { ModeToggle } from '@/components/ModeToggle';
 
@@ -21,7 +21,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
         {/* Logo area */}
         <div className="relative z-10 flex items-center gap-3 text-white">
-          <Sword size={32} weight="duotone" className="text-primary" />
+          <Image src="/logo.png" alt="EarnQuest Logo" width={32} height={32} />
           <h2 className="text-2xl font-bold tracking-tight">EarnQuest</h2>
           <BetaBadge />
         </div>
@@ -45,7 +45,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         {/* Mobile Logo Header */}
         <div className="flex lg:hidden items-center justify-between mb-8">
           <div className="flex items-center gap-2 text-text-main dark:text-white">
-            <Sword size={32} weight="duotone" className="text-primary" />
+            <Image src="/logo.png" alt="EarnQuest Logo" width={32} height={32} />
             <h2 className="text-xl font-bold tracking-tight">EarnQuest</h2>
             <BetaBadge />
           </div>
