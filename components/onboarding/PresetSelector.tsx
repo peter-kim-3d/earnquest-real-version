@@ -3,6 +3,7 @@
 import { CheckCircle2, Plus, Star } from 'lucide-react';
 import { PresetKey } from '@/lib/types/task';
 import { PRESETS, getPresetTaskTemplates } from '@/lib/config/presets';
+import { useTranslations } from 'next-intl';
 
 interface PresetSelectorProps {
   selectedPreset: PresetKey;
@@ -10,6 +11,8 @@ interface PresetSelectorProps {
 }
 
 export default function PresetSelector({ selectedPreset, onSelectPreset }: PresetSelectorProps) {
+  const t = useTranslations('onboarding.selectStyle');
+  const tCommon = useTranslations('common');
   const presetOrder: PresetKey[] = ['starter', 'balanced', 'learning_focus'];
 
   return (
@@ -57,7 +60,7 @@ export default function PresetSelector({ selectedPreset, onSelectPreset }: Prese
                 {isRecommended && (
                   <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider rounded-full px-2 py-1 bg-primary text-black">
                     <Star className="h-3 w-3" />
-                    Recommended
+                    {t('recommended')}
                   </span>
                 )}
               </div>
@@ -67,7 +70,7 @@ export default function PresetSelector({ selectedPreset, onSelectPreset }: Prese
                 <span className="text-3xl">{preset.icon}</span>
                 <div className="flex flex-col">
                   <span className="text-text-main dark:text-white text-xl font-black leading-tight tracking-[-0.02em]">
-                    {preset.taskKeys.length} tasks
+                    {t('tasks', { count: preset.taskKeys.length })}
                   </span>
                 </div>
               </div>
@@ -82,7 +85,7 @@ export default function PresetSelector({ selectedPreset, onSelectPreset }: Prese
             {/* Examples */}
             <div className="flex flex-col gap-3 mt-auto">
               <p className="text-xs font-bold text-text-main dark:text-white uppercase tracking-wide opacity-60">
-                Includes
+                {t('includes')}
               </p>
               {examples.slice(0, 3).map((example, index) => (
                 <div
@@ -96,14 +99,14 @@ export default function PresetSelector({ selectedPreset, onSelectPreset }: Prese
               {templates.length > 3 && (
                 <div className="text-sm font-normal leading-normal flex items-start gap-3 text-text-main dark:text-white opacity-50">
                   <Plus className="h-5 w-5 shrink-0 mt-0.5" />
-                  <span>{templates.length - 3} more tasks</span>
+                  <span>{t('moreTasks', { count: templates.length - 3 })}</span>
                 </div>
               )}
             </div>
 
             {/* Daily Points Range */}
             <div className="mt-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-900/50">
-              <p className="text-xs text-text-muted dark:text-text-muted text-center">{totalPoints} XP/day</p>
+              <p className="text-xs text-text-muted dark:text-text-muted text-center">{tCommon('points.perDay', { points: totalPoints })}</p>
             </div>
           </label>
         );

@@ -5,7 +5,13 @@ function getRedirectUrl() {
   const origin = typeof window !== 'undefined'
     ? window.location.origin
     : process.env.NEXT_PUBLIC_APP_URL;
-  return `${origin}/en-US/callback`;
+
+  // Extract locale from current path (e.g., /ko-KR/login -> ko-KR)
+  const locale = typeof window !== 'undefined'
+    ? window.location.pathname.split('/')[1] || 'en-US'
+    : 'en-US';
+
+  return `${origin}/${locale}/callback`;
 }
 
 export async function signInWithGoogle() {

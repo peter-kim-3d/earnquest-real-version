@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Plus, CheckSquare, Pause, Archive } from '@phosphor-icons/react';
+import { useTranslations } from 'next-intl';
 import TaskCard from './TaskCard';
 import TaskFormDialog from './TaskFormDialog';
 
@@ -35,6 +36,7 @@ interface TaskListProps {
 }
 
 export default function TaskList({ tasks, taskCompletions, pendingCounts, childrenData = [] }: TaskListProps) {
+  const t = useTranslations('tasks');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive' | 'archived'>('all');
@@ -97,7 +99,8 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
 
   // Bulk Actions
   const handleBulkArchive = async (archive: boolean) => {
-    if (!confirm(`Are you sure you want to ${archive ? 'archive' : 'unarchive'} ${selectedTaskIds.size} tasks?`)) return;
+    const action = archive ? t('list.archive') : t('list.unarchive');
+    if (!confirm(t('list.confirmArchive', { action, count: selectedTaskIds.size }))) return;
 
     setIsBulkProcessing(true);
     try {
@@ -112,7 +115,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
       window.location.reload(); // Simple refresh for now
     } catch (error) {
       console.error('Bulk archive failed', error);
-      alert('Some tasks failed to update.');
+      alert(t('list.bulkFailed'));
     } finally {
       setIsBulkProcessing(false);
       setIsSelectionMode(false);
@@ -121,7 +124,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
   };
 
   const handleBulkDelete = async () => {
-    if (!confirm(`Are you sure you want to DELETE ${selectedTaskIds.size} tasks? This cannot be undone.`)) return;
+    if (!confirm(t('list.confirmDelete', { count: selectedTaskIds.size }))) return;
 
     setIsBulkProcessing(true);
     try {
@@ -135,7 +138,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
       window.location.reload();
     } catch (error) {
       console.error('Bulk delete failed', error);
-      alert('Some tasks failed to delete.');
+      alert(t('list.bulkFailed'));
     } finally {
       setIsBulkProcessing(false);
       setIsSelectionMode(false);
@@ -152,12 +155,12 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
   }, {} as Record<string, Task[]>);
 
   const categoryLabels: Record<string, string> = {
-    hygiene: '🧼 Hygiene',
-    chores: '🏠 Chores',
-    learning: '📚 Learning',
-    exercise: '💪 Exercise',
-    creativity: '🎨 Creativity',
-    other: '📋 Other',
+    hygiene: t('categoryLabels.hygiene'),
+    chores: t('categoryLabels.chores'),
+    learning: t('categoryLabels.learning'),
+    exercise: t('categoryLabels.exercise'),
+    creativity: t('categoryLabels.creativity'),
+    other: t('categoryLabels.other'),
   };
 
   return (
@@ -173,7 +176,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
               }`}
           >
             <CheckSquare size={16} weight="bold" />
-            All Tasks
+            {t('filter.all')}
           </button>
           <button
             onClick={() => setFilter('active')}
@@ -183,7 +186,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
               }`}
           >
             <CheckSquare size={16} weight="fill" />
-            Active
+            {t('filter.active')}
           </button>
           <button
             onClick={() => setFilter('inactive')}
@@ -193,7 +196,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
               }`}
           >
             <Pause size={16} weight="bold" />
-            Inactive
+            {t('filter.inactive')}
           </button>
           <button
             onClick={() => setFilter('archived')}
@@ -203,7 +206,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
               }`}
           >
             <Archive size={16} weight="bold" />
-            Archived
+            {t('filter.archived')}
           </button>
         </div>
 
@@ -215,14 +218,14 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
                 onClick={toggleSelectionMode}
                 className="px-4 py-2 rounded-full border-2 border-gray-200 dark:border-gray-700 text-text-main dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
               >
-                Select
+                {t('list.select')}
               </button>
               <button
                 onClick={handleNew}
                 className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all flex items-center gap-2"
               >
                 <Plus size={18} weight="bold" />
-                New Task
+                {t('newTask')}
               </button>
             </>
           ) : (
@@ -231,13 +234,13 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
                 onClick={selectAll}
                 className="px-4 py-2 rounded-full border-2 border-gray-200 dark:border-gray-700 text-text-main dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
               >
-                {selectedTaskIds.size === filteredTasks.length ? 'Deselect All' : 'Select All'}
+                {selectedTaskIds.size === filteredTasks.length ? t('list.deselectAll') : t('list.selectAll')}
               </button>
               <button
                 onClick={toggleSelectionMode}
                 className="px-4 py-2 rounded-full border-2 border-gray-200 dark:border-gray-700 text-text-main dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
               >
-                Done
+                {t('list.done')}
               </button>
             </div>
           )}
@@ -248,7 +251,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
       {isSelectionMode && selectedTaskIds.size > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white dark:bg-gray-800 rounded-full shadow-xl border border-gray-200 dark:border-gray-700 p-2 px-6 flex items-center gap-4 animate-in slide-in-from-bottom-4">
           <span className="text-sm font-semibold text-text-main dark:text-white whitespace-nowrap">
-            {selectedTaskIds.size} selected
+            {t('list.selected', { count: selectedTaskIds.size })}
           </span>
           <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
 
@@ -258,7 +261,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
               disabled={isBulkProcessing}
               className="text-sm font-medium text-text-muted hover:text-primary transition-colors"
             >
-              Archive
+              {t('list.archive')}
             </button>
           ) : (
             <button
@@ -266,7 +269,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
               disabled={isBulkProcessing}
               className="text-sm font-medium text-text-muted hover:text-primary transition-colors"
             >
-              Unarchive
+              {t('list.unarchive')}
             </button>
           )}
 
@@ -275,7 +278,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
             disabled={isBulkProcessing}
             className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors"
           >
-            Delete
+            {t('list.delete')}
           </button>
         </div>
       )}

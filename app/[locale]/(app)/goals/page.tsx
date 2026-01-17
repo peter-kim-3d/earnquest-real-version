@@ -1,15 +1,22 @@
 import { Target, Trophy, TrendUp } from '@phosphor-icons/react/dist/ssr';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import GoalList from '@/components/parent/GoalList';
 
-export default async function GoalsManagementPage() {
+export default async function GoalsManagementPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations('goals');
   const supabase = await createClient();
 
   // Get authenticated user
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    redirect('/en-US/login');
+    redirect(`/${locale}/login`);
   }
 
   // Get user's family
@@ -20,7 +27,7 @@ export default async function GoalsManagementPage() {
     .single();
 
   if (!userProfile?.family_id) {
-    redirect('/en-US/onboarding/add-child');
+    redirect(`/${locale}/onboarding/add-child`);
   }
 
   // Get children
@@ -67,10 +74,10 @@ export default async function GoalsManagementPage() {
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-black text-text-main dark:text-white mb-2">
-          Goals Management
+          {t('pageTitle')}
         </h1>
         <p className="text-lg text-text-muted dark:text-gray-400">
-          Create savings goals for your children to work toward
+          {t('pageSubtitle')}
         </p>
       </div>
 
@@ -82,7 +89,7 @@ export default async function GoalsManagementPage() {
               <Target size={24} className="text-primary" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
-              Active Goals
+              {t('stats.activeGoals')}
             </h3>
           </div>
           <p className="text-4xl font-black text-text-main dark:text-white">
@@ -96,7 +103,7 @@ export default async function GoalsManagementPage() {
               <Trophy size={24} className="text-yellow-600 dark:text-yellow-400" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
-              Completed
+              {t('stats.completed')}
             </h3>
           </div>
           <p className="text-4xl font-black text-text-main dark:text-white">
@@ -110,7 +117,7 @@ export default async function GoalsManagementPage() {
               <TrendUp size={24} className="text-green-600 dark:text-green-400" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
-              Total Saved
+              {t('stats.totalSaved')}
             </h3>
           </div>
           <p className="text-4xl font-black text-text-main dark:text-white">

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import TaskList from '@/components/parent/TaskList';
 import TaskCard from '@/components/tasks/TaskCard';
 import { Checks, CheckCircle, TrendUp, ListChecks } from '@/components/ui/ClientIcons';
@@ -22,13 +23,19 @@ type Task = {
   child_id: string | null;
 };
 
-export default async function TaskManagementPage() {
+export default async function TaskManagementPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations('tasks');
   const supabase = await createClient();
 
   // Get authenticated user
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    redirect('/en-US/login');
+    redirect(`/${locale}/login`);
   }
 
   // Get user's family
@@ -39,7 +46,7 @@ export default async function TaskManagementPage() {
     .single() as { data: { family_id: string; full_name: string } | null };
 
   if (!userProfile?.family_id) {
-    redirect('/en-US/onboarding/add-child');
+    redirect(`/${locale}/onboarding/add-child`);
   }
 
   // Get all tasks for this family (exclude deleted)
@@ -85,10 +92,10 @@ export default async function TaskManagementPage() {
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-black text-text-main dark:text-white mb-2">
-          Task Management
+          {t('pageTitle')}
         </h1>
         <p className="text-lg text-text-muted dark:text-gray-400">
-          Create and manage tasks for your family
+          {t('pageSubtitle')}
         </p>
       </div>
 
@@ -100,7 +107,7 @@ export default async function TaskManagementPage() {
               <Checks size={24} className="text-primary" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
-              Total Tasks
+              {t('stats.totalTasks')}
             </h3>
           </div>
           <p className="text-4xl font-black text-text-main dark:text-white">
@@ -114,11 +121,11 @@ export default async function TaskManagementPage() {
               <CheckCircle size={24} weight="fill" className="text-green-600 dark:text-green-400" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
-              Active Tasks
+              {t('stats.activeTasks')}
             </h3>
           </div>
           <p className="text-4xl font-black text-text-main dark:text-white">
-            {tasks?.filter((t) => t.is_active).length || 0}
+            {tasks?.filter((task) => task.is_active).length || 0}
           </p>
         </div>
 
@@ -128,7 +135,7 @@ export default async function TaskManagementPage() {
               <TrendUp size={24} className="text-purple-600 dark:text-purple-400" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
-              Completions (30d)
+              {t('stats.completions30d')}
             </h3>
           </div>
           <p className="text-4xl font-black text-text-main dark:text-white">
@@ -153,10 +160,10 @@ export default async function TaskManagementPage() {
             <ListChecks size={48} className="text-gray-400 dark:text-gray-600" />
           </div>
           <p className="text-lg font-semibold text-text-muted dark:text-gray-400 mb-2">
-            No tasks yet
+            {t('noTasks')}
           </p>
           <p className="text-sm text-text-muted dark:text-gray-500">
-            Click &quot;New Task&quot; above to create your first task!
+            {t('clickNewTask')}
           </p>
         </div>
       )}

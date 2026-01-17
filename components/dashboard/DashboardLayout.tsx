@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Gear, Eye, EyeSlash } from '@phosphor-icons/react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -24,13 +25,7 @@ interface DashboardLayoutProps {
 
 type WidgetId = 'stats' | 'actionCenter' | 'pendingTickets' | 'activityFeed' | 'transactionHistory';
 
-const WIDGET_LABELS: Record<WidgetId, string> = {
-    stats: 'Quick Stats',
-    actionCenter: 'Action Center',
-    pendingTickets: 'Pending Tickets',
-    activityFeed: 'Activity Feed',
-    transactionHistory: 'Point History',
-};
+const WIDGET_IDS: WidgetId[] = ['stats', 'actionCenter', 'pendingTickets', 'activityFeed', 'transactionHistory'];
 
 const STORAGE_KEY = 'earnquest_dashboard_settings';
 
@@ -43,6 +38,7 @@ export default function DashboardLayout({
     childrenList,
     transactionHistory,
 }: DashboardLayoutProps) {
+    const t = useTranslations('parent.dashboard');
     const [mounted, setMounted] = useState(false);
     const [visibleWidgets, setVisibleWidgets] = useState<Record<WidgetId, boolean>>({
         stats: true,
@@ -100,19 +96,19 @@ export default function DashboardLayout({
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" size="sm" className="gap-2">
                                 <Gear size={16} />
-                                Customize
+                                {t('customize')}
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                            <DropdownMenuLabel>Dashboard Widgets</DropdownMenuLabel>
+                            <DropdownMenuLabel>{t('widgets')}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            {(Object.keys(WIDGET_LABELS) as WidgetId[]).map((id) => (
+                            {WIDGET_IDS.map((id) => (
                                 <DropdownMenuCheckboxItem
                                     key={id}
                                     checked={visibleWidgets[id]}
                                     onCheckedChange={() => toggleWidget(id)}
                                 >
-                                    <span className="flex-1">{WIDGET_LABELS[id]}</span>
+                                    <span className="flex-1">{t(`widgetLabels.${id}`)}</span>
                                     {visibleWidgets[id] ? (
                                         <Eye size={14} className="ml-2 opacity-50" />
                                     ) : (

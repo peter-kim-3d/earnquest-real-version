@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { Users, Check, X, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -16,6 +16,8 @@ interface InvitationData {
 
 export default function InvitePage({ params }: { params: Promise<{ token: string }> }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'en-US';
   const [token, setToken] = useState<string>('');
   const [invitation, setInvitation] = useState<InvitationData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,7 +83,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
       }
 
       toast.success('Welcome to the family!');
-      router.push('/en-US/dashboard');
+      router.push(`/${locale}/dashboard`);
     } catch (error: any) {
       console.error('Accept error:', error);
       toast.error(error.message || 'Failed to accept invitation');
@@ -116,7 +118,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
               {error}
             </p>
             <Link
-              href="/en-US"
+              href={`/${locale}`}
               className="inline-block px-6 py-3 bg-primary hover:bg-primary/90 text-black font-bold rounded-lg transition-colors"
             >
               Go to Home
@@ -210,13 +212,13 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
                 Please sign in or create an account to accept this invitation
               </p>
               <Link
-                href={`/en-US/login?invite=${token}`}
+                href={`/${locale}/login?invite=${token}`}
                 className="w-full flex items-center justify-center px-6 py-4 bg-primary hover:bg-primary/90 text-black font-bold rounded-lg transition-colors shadow-lg"
               >
                 Sign In
               </Link>
               <Link
-                href={`/en-US/signup?invite=${token}`}
+                href={`/${locale}/signup?invite=${token}`}
                 className="w-full flex items-center justify-center px-6 py-4 border-2 border-gray-300 dark:border-gray-600 text-text-main dark:text-white font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 Create Account
@@ -228,7 +230,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
         {/* Footer */}
         <p className="text-center text-sm text-text-muted dark:text-text-muted mt-6">
           Questions?{' '}
-          <Link href="/en-US" className="text-primary hover:underline font-semibold">
+          <Link href={`/${locale}`} className="text-primary hover:underline font-semibold">
             Visit our homepage
           </Link>
         </p>

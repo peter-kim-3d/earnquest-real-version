@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Plus, PencilSimple as Edit2, Trophy, Eye } from '@/components/ui/ClientIcons';
 import { ChildFormDialog } from './ChildFormDialog';
@@ -22,6 +23,8 @@ interface ChildrenListProps {
 }
 
 export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
+  const t = useTranslations('settings.children');
+  const locale = useLocale();
   const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
@@ -43,12 +46,8 @@ export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
   };
 
   const getAgeGroupLabel = (ageGroup: string) => {
-    const labels: Record<string, string> = {
-      '5-7': 'Mini Earners (5-7)',
-      '8-11': 'Pro Earners (8-11)',
-      '12-14': 'Teen Earners (12-14)',
-    };
-    return labels[ageGroup] || ageGroup;
+    const key = `ageGroupLabels.${ageGroup}` as const;
+    return t.has(key) ? t(key) : ageGroup;
   };
 
   return (
@@ -59,7 +58,7 @@ export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
         className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white"
       >
         <Plus className="w-4 h-4 mr-2" />
-        Add Child
+        {t('addChild')}
       </Button>
 
       {/* Children Grid */}
@@ -106,13 +105,13 @@ export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
 
                         if (!response.ok) throw new Error('Failed to switch view');
 
-                        window.location.href = '/en-US/child/dashboard';
+                        window.location.href = `/${locale}/child/dashboard`;
                       } catch (error) {
                         console.error(error);
                       }
                     }}
                     className="hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                    title="View as Child"
+                    title={t('viewAsChild')}
                   >
                     <Eye className="w-4 h-4" />
                   </Button>
@@ -132,7 +131,7 @@ export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
                 <div className="flex items-center gap-2 mb-1">
                   <Trophy className="w-5 h-5 text-yellow-600 dark:text-yellow-500" />
                   <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Quest Points
+                    {t('questPoints')}
                   </span>
                 </div>
                 <p className="text-2xl font-black text-yellow-900 dark:text-yellow-100">
@@ -142,7 +141,7 @@ export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
 
               {/* Member Since */}
               <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-                Member since {new Date(child.created_at).toLocaleDateString()}
+                {t('memberSince', { date: new Date(child.created_at).toLocaleDateString(locale) })}
               </div>
             </div>
           ))}
@@ -150,10 +149,10 @@ export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
       ) : (
         <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-xl">
           <p className="text-lg font-semibold text-gray-600 dark:text-gray-400 mb-2">
-            No children added yet
+            {t('noChildren')}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-500">
-            Click &quot;Add Child&quot; to get started
+            {t('addFirst')}
           </p>
         </div>
       )}

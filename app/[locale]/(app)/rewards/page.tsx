@@ -2,16 +2,23 @@ import { Gift, Plus, ShoppingCart } from '@phosphor-icons/react/dist/ssr';
 import { getUser } from '@/lib/services/user';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import RewardList from '@/components/parent/RewardList';
 import { CheckCircle, Ticket, Package } from '@/components/ui/ClientIcons';
 
-export default async function RewardManagementPage() {
+export default async function RewardManagementPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations('rewards');
   const supabase = await createClient();
 
   // Get authenticated user
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    redirect('/en-US/login');
+    redirect(`/${locale}/login`);
   }
 
 
@@ -22,7 +29,7 @@ export default async function RewardManagementPage() {
   const userProfile = await getUser(user.id) as { family_id: string } | null;
 
   if (!userProfile) {
-    redirect('/en-US/onboarding/add-child');
+    redirect(`/${locale}/onboarding/add-child`);
   }
 
   // Get all rewards for this family (exclude deleted)
@@ -58,10 +65,10 @@ export default async function RewardManagementPage() {
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-black text-text-main dark:text-white mb-2">
-          Reward Management
+          {t('pageTitle')}
         </h1>
         <p className="text-lg text-text-muted dark:text-gray-400">
-          Create and manage rewards your children can redeem
+          {t('pageSubtitle')}
         </p>
       </div>
 
@@ -73,7 +80,7 @@ export default async function RewardManagementPage() {
               <Gift size={24} className="text-purple-600 dark:text-purple-400" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
-              Total Rewards
+              {t('pageStats.totalRewards')}
             </h3>
           </div>
           <p className="text-4xl font-black text-text-main dark:text-white">
@@ -87,7 +94,7 @@ export default async function RewardManagementPage() {
               <CheckCircle size={24} weight="fill" className="text-green-600 dark:text-green-400" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
-              Active Rewards
+              {t('pageStats.activeRewards')}
             </h3>
           </div>
           <p className="text-4xl font-black text-text-main dark:text-white">
@@ -101,7 +108,7 @@ export default async function RewardManagementPage() {
               <Ticket size={24} className="text-orange-600 dark:text-orange-400" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
-              Purchases (30d)
+              {t('pageStats.purchases30d')}
             </h3>
           </div>
           <p className="text-4xl font-black text-text-main dark:text-white">
@@ -120,10 +127,10 @@ export default async function RewardManagementPage() {
             <Package size={48} className="text-gray-400 dark:text-gray-600" />
           </div>
           <p className="text-lg font-semibold text-text-muted dark:text-gray-400 mb-2">
-            No rewards yet
+            {t('noRewards')}
           </p>
           <p className="text-sm text-text-muted dark:text-gray-500">
-            Click &quot;New Reward&quot; above to create your first reward!
+            {t('clickNewReward')}
           </p>
         </div>
       )}

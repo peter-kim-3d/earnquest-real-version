@@ -6,6 +6,7 @@ import { Camera, Plus, X, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { AppIcon } from '@/components/ui/AppIcon';
+import { useLocale, useTranslations } from 'next-intl';
 
 type AgeGroup = '5-7' | '8-11' | '12-14';
 
@@ -38,6 +39,9 @@ function getAgeGroupFromAge(age: number | null): AgeGroup {
 
 export default function AddChildPage() {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations('onboarding.addChild');
+  const tCommon = useTranslations('common');
   const [children, setChildren] = useState<ChildForm[]>([
     { id: '1', name: '', birthdate: '', age: null, ageGroup: '8-11' }
   ]);
@@ -64,7 +68,7 @@ export default function AddChildPage() {
             .eq('family_id', userProfile.family_id as string);
 
           if (count && count > 0) {
-            router.replace('/en-US/dashboard');
+            router.replace(`/${locale}/dashboard`);
           }
         }
       }
@@ -94,7 +98,7 @@ export default function AddChildPage() {
 
   const handleRemove = (id: string) => {
     if (children.length === 1) {
-      toast.error('You must have at least one child');
+      toast.error(t('mustHaveOneChild'));
       return;
     }
     setChildren(children.filter(child => child.id !== id));
@@ -107,7 +111,7 @@ export default function AddChildPage() {
     // Validate all children
     const invalidChildren = children.filter(child => !child.name.trim() || !child.birthdate);
     if (invalidChildren.length > 0) {
-      toast.error('Please fill in all child names and birthdates');
+      toast.error(t('fillAllFields'));
       return;
     }
 
@@ -151,13 +155,13 @@ export default function AddChildPage() {
 
       const firstChildId = savedChildren[0]?.id;
 
-      toast.success(`${children.length} ${children.length === 1 ? 'child' : 'children'} added successfully!`);
+      toast.success(t('childrenAdded', { count: children.length }));
 
       // Navigate to next step
-      router.push(`/en-US/onboarding/select-style?childId=${firstChildId}`);
+      router.push(`/${locale}/onboarding/select-style?childId=${firstChildId}`);
     } catch (error) {
       console.error('Failed to add children:', error);
-      toast.error('Failed to add children. Please try again.');
+      toast.error(t('addFailed'));
     } finally {
       setLoading(false);
     }
@@ -165,9 +169,9 @@ export default function AddChildPage() {
 
   const getAgeGroupLabel = (ageGroup: AgeGroup) => {
     const labels = {
-      '5-7': { emoji: '🐣', label: 'Mini Earners' },
-      '8-11': { emoji: '🚀', label: 'Pro Earners' },
-      '12-14': { emoji: '🎓', label: 'Teen Earners' },
+      '5-7': { emoji: '🐣', label: t('ageGroups.mini') },
+      '8-11': { emoji: '🚀', label: t('ageGroups.pro') },
+      '12-14': { emoji: '🎓', label: t('ageGroups.teen') },
     };
     return labels[ageGroup];
   };
@@ -182,10 +186,10 @@ export default function AddChildPage() {
             <AppIcon name="face" size={32} weight="duotone" className="text-primary" />
           </div>
           <h1 className="text-text-main dark:text-white tracking-tight text-3xl font-bold leading-tight mb-2">
-            Who is joining EarnQuest?
+            {t('title')}
           </h1>
           <p className="text-text-muted dark:text-text-muted text-base">
-            Add your children&apos;s details to customize their rewards and tasks.
+            {t('subtitle')}
           </p>
         </div>
 
@@ -212,7 +216,7 @@ export default function AddChildPage() {
               <div className="mb-4">
                 <span className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary text-sm font-bold rounded-full">
                   <AppIcon name="face" size={16} weight="duotone" />
-                  Child #{index + 1}
+                  {t('childNumber', { number: index + 1 })}
                 </span>
               </div>
 
@@ -224,12 +228,12 @@ export default function AddChildPage() {
                       className="block text-sm font-bold text-text-main dark:text-white mb-2"
                       htmlFor={`child-name-${child.id}`}
                     >
-                      Child&apos;s First Name
+                      {t('nameLabel')}
                     </label>
                     <input
                       autoFocus={index === 0}
                       id={`child-name-${child.id}`}
-                      placeholder="What's their name?"
+                      placeholder={t('namePlaceholder')}
                       type="text"
                       value={child.name}
                       onChange={(e) => handleNameChange(child.id, e.target.value)}
@@ -240,7 +244,7 @@ export default function AddChildPage() {
                     />
                     {hasSubmitted && !child.name.trim() && (
                       <p className="mt-1 text-xs text-red-500 font-medium">
-                        Name is required
+                        {t('nameRequired')}
                       </p>
                     )}
                   </div>
@@ -251,7 +255,7 @@ export default function AddChildPage() {
                       className="block text-sm font-bold text-text-main dark:text-white mb-2"
                       htmlFor={`child-birthdate-${child.id}`}
                     >
-                      Date of Birth
+                      {t('birthdateLabel')}
                     </label>
                     <input
                       id={`child-birthdate-${child.id}`}
@@ -266,7 +270,7 @@ export default function AddChildPage() {
                     />
                     {hasSubmitted && !child.birthdate && (
                       <p className="mt-1 text-xs text-red-500 font-medium">
-                        Birthdate is required
+                        {t('birthdateRequired')}
                       </p>
                     )}
                   </div>
@@ -279,10 +283,10 @@ export default function AddChildPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                        Calculated Info
+                        {t('calculatedInfo')}
                       </p>
                       <p className="text-lg font-bold text-text-main dark:text-white">
-                        {child.age} years old
+                        {t('yearsOld', { age: child.age })}
                       </p>
                     </div>
                     <div className="text-right">
@@ -290,7 +294,7 @@ export default function AddChildPage() {
                         <span className="text-2xl">{getAgeGroupLabel(child.ageGroup).emoji}</span>
                         <div className="text-left">
                           <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">
-                            Age Group
+                            {t('ageGroupLabel')}
                           </p>
                           <p className="text-sm font-bold text-primary">
                             {getAgeGroupLabel(child.ageGroup).label}
@@ -311,7 +315,7 @@ export default function AddChildPage() {
             className="w-full flex items-center justify-center gap-2 h-12 px-6 bg-transparent border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary hover:bg-primary/5 text-text-muted dark:text-gray-400 hover:text-primary text-sm font-bold rounded-lg transition-all group"
           >
             <Plus className="h-5 w-5 group-hover:scale-110 transition-transform" />
-            Add Another Child
+            {t('addAnother')}
           </button>
 
           {/* Divider */}
@@ -323,18 +327,18 @@ export default function AddChildPage() {
             disabled={loading}
             className="w-full flex items-center justify-center h-12 px-6 bg-primary hover:bg-primary/90 text-black text-base font-bold rounded-lg transition-colors shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Saving...' : `Save ${children.length} ${children.length === 1 ? 'Child' : 'Children'} & Continue`}
+            {loading ? tCommon('status.saving') : t('saveAndContinue', { count: children.length })}
           </button>
         </form>
 
         {/* Footer Links */}
         <div className="flex justify-center gap-6 text-sm text-text-muted mt-6">
           <a className="hover:underline hover:text-primary" href="#">
-            Privacy Policy
+            {tCommon('form.privacyPolicy')}
           </a>
           <span>•</span>
           <a className="hover:underline hover:text-primary" href="#">
-            Terms of Service
+            {tCommon('form.termsOfService')}
           </a>
         </div>
       </div>

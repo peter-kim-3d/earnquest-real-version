@@ -15,6 +15,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { ModeToggle } from '@/components/ModeToggle';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useTranslations } from 'next-intl';
 
 interface ChildNavProps {
   childName?: string;
@@ -27,8 +29,13 @@ interface ChildNavProps {
 export default function ChildNav({ childName = 'A', childId, avatarUrl = null, points = 0, isParentView = false }: ChildNavProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations('child.nav');
+  const tCommon = useTranslations('common');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  // Extract locale from pathname (e.g., /ko-KR/child/dashboard -> ko-KR)
+  const locale = pathname.split('/')[1] || 'en-US';
 
   const handleLogoutClick = () => {
     setShowLogoutConfirm(true);
@@ -38,18 +45,18 @@ export default function ChildNav({ childName = 'A', childId, avatarUrl = null, p
     try {
       // Clear child session
       await fetch('/api/auth/child-logout', { method: 'POST' });
-      router.push('/en-US/child-login');
+      router.push(`/${locale}/child-login`);
     } catch (error) {
       console.error('Logout failed:', error);
     }
   };
 
   const navItems = [
-    { href: '/en-US/child/dashboard', label: 'Quests', icon: Trophy },
-    { href: '/en-US/child/store', label: 'Rewards', icon: Gift },
-    { href: '/en-US/child/goals', label: 'Goals', icon: Target },
-    { href: '/en-US/child/tickets', label: 'My Tickets', icon: Ticket },
-    { href: '/en-US/child/badges', label: 'Badges', icon: Medal, isKindness: true },
+    { href: `/${locale}/child/dashboard`, label: t('quests'), icon: Trophy },
+    { href: `/${locale}/child/store`, label: t('rewards'), icon: Gift },
+    { href: `/${locale}/child/goals`, label: t('goals'), icon: Target },
+    { href: `/${locale}/child/tickets`, label: t('myTickets'), icon: Ticket },
+    { href: `/${locale}/child/badges`, label: t('badges'), icon: Medal, isKindness: true },
   ];
 
   return (
@@ -58,19 +65,19 @@ export default function ChildNav({ childName = 'A', childId, avatarUrl = null, p
         <div className="bg-blue-600 text-white px-4 py-2 text-sm font-medium flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
             <Eye className="w-4 h-4" />
-            <span>Viewing as {childName}</span>
+            <span>{t('viewingAs', { name: childName })}</span>
           </div>
           <button
             onClick={() => {
               // Clear cookies and go back to parent dashboard
               document.cookie = 'parent_view=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
               fetch('/api/auth/child-logout', { method: 'POST' }).then(() => {
-                window.location.href = '/en-US/dashboard';
+                window.location.href = `/${locale}/dashboard`;
               });
             }}
             className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-xs font-bold transition-colors"
           >
-            Exit View
+            {t('exitView')}
           </button>
         </div>
       )}
@@ -78,7 +85,7 @@ export default function ChildNav({ childName = 'A', childId, avatarUrl = null, p
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <Link href="/en-US/child/dashboard" className="flex items-center gap-2" aria-label="EarnQuest home - Go to dashboard">
+            <Link href={`/${locale}/child/dashboard`} className="flex items-center gap-2" aria-label="EarnQuest home - Go to dashboard">
               <div className="flex items-center gap-2">
                 <Sword size={32} weight="duotone" className="text-primary" />
                 <span className="text-xl font-black text-text-main dark:text-white">
@@ -115,8 +122,9 @@ export default function ChildNav({ childName = 'A', childId, avatarUrl = null, p
 
             {/* Right side - XP Badge & Avatar */}
             <div className="flex items-center gap-4">
-              {/* Mode Toggle */}
-              <div className="hidden sm:flex">
+              {/* Language & Mode Toggle */}
+              <div className="hidden sm:flex items-center gap-1">
+                <LanguageSwitcher />
                 <ModeToggle />
               </div>
 
@@ -149,15 +157,15 @@ export default function ChildNav({ childName = 'A', childId, avatarUrl = null, p
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/en-US/child/profile" className="flex items-center gap-2 cursor-pointer">
+                    <Link href={`/${locale}/child/profile`} className="flex items-center gap-2 cursor-pointer">
                       <User size={18} />
-                      Profile
+                      {t('profile')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogoutClick} className="flex items-center gap-2 cursor-pointer text-red-600 dark:text-red-400">
                     <SignOut size={18} />
-                    Logout
+                    {tCommon('nav.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -208,10 +216,10 @@ export default function ChildNav({ childName = 'A', childId, avatarUrl = null, p
         isOpen={showLogoutConfirm}
         onClose={() => setShowLogoutConfirm(false)}
         onConfirm={performLogout}
-        title="Log Out?"
-        description="Are you sure you want to log out?"
-        confirmLabel="Log Out"
-        cancelLabel="Cancel"
+        title={t('logoutTitle')}
+        description={t('logoutDescription')}
+        confirmLabel={tCommon('nav.logout')}
+        cancelLabel={tCommon('buttons.cancel')}
       />
     </header>
   );

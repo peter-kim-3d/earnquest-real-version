@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { WarningCircle } from '@phosphor-icons/react';
 
@@ -11,6 +12,9 @@ export default function Error({
     error: Error & { digest?: string };
     reset: () => void;
 }) {
+    const pathname = usePathname();
+    const locale = pathname?.split('/')[1] || 'en-US';
+
     useEffect(() => {
         // Log the error to an error reporting service
         console.error(error);
@@ -39,7 +43,7 @@ export default function Error({
                 </Button>
                 <Button
                     variant="outline"
-                    onClick={() => window.location.href = '/en-US/dashboard'}
+                    onClick={() => window.location.href = `/${locale}/dashboard`}
                 >
                     Go to Dashboard
                 </Button>

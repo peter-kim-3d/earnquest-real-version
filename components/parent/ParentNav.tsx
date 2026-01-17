@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { SquaresFour, Checks, Gift, Heart, Users, List, X, User, Gear, SignOut, CaretDown, Sword, Target } from '@phosphor-icons/react';
@@ -16,8 +16,8 @@ import {
 import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { ModeToggle } from '@/components/ModeToggle';
 import { NotificationBadge } from '@/components/ui/notification-badge';
-// Language switcher disabled for beta - will be enabled after Korean translation is complete
-// import LanguageSwitcher from '@/components/LanguageSwitcher';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useTranslations } from 'next-intl';
 
 interface ParentNavProps {
   parentName?: string;
@@ -27,8 +27,12 @@ interface ParentNavProps {
 export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: ParentNavProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations('common');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  // Extract locale from pathname (e.g., /ko-KR/dashboard -> ko-KR)
+  const locale = pathname.split('/')[1] || 'en-US';
 
   const handleLogoutClick = () => {
     setShowLogoutConfirm(true);
@@ -37,19 +41,19 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
   const performLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-      router.push('/en-US/login');
+      router.push(`/${locale}/login`);
     } catch (error) {
       console.error('Logout failed:', error);
     }
   };
 
   const navItems = [
-    { href: '/en-US/dashboard', label: 'Dashboard', icon: SquaresFour },
-    { href: '/en-US/tasks', label: 'Tasks', icon: Checks },
-    { href: '/en-US/rewards', label: 'Rewards', icon: Gift },
-    { href: '/en-US/goals', label: 'Goals', icon: Target },
-    { href: '/en-US/settings/children', label: 'Children', icon: Users },
-    { href: '/en-US/kindness/send', label: 'Kindness', icon: Heart, isKindness: true },
+    { href: `/${locale}/dashboard`, label: t('nav.dashboard'), icon: SquaresFour },
+    { href: `/${locale}/tasks`, label: t('nav.tasks'), icon: Checks },
+    { href: `/${locale}/rewards`, label: t('nav.rewards'), icon: Gift },
+    { href: `/${locale}/goals`, label: t('nav.goals'), icon: Target },
+    { href: `/${locale}/settings/children`, label: t('nav.children'), icon: Users },
+    { href: `/${locale}/kindness/send`, label: t('nav.kindness'), icon: Heart, isKindness: true },
   ];
 
   return (
@@ -58,7 +62,7 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link
-            href="/en-US/dashboard"
+            href={`/${locale}/dashboard`}
             className="flex items-center gap-2"
             aria-label="EarnQuest home - Go to dashboard"
           >
@@ -76,8 +80,8 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href ||
-                (item.isKindness && pathname.startsWith('/en-US/kindness')) ||
-                (item.href === '/en-US/settings/children' && pathname.startsWith('/en-US/settings/children'));
+                (item.isKindness && pathname.startsWith(`/${locale}/kindness`)) ||
+                (item.href === `/${locale}/settings/children` && pathname.startsWith(`/${locale}/settings/children`));
               const activeColor = item.isKindness ? 'bg-primary-kindness/10 text-primary-kindness' : 'bg-primary/10 text-primary';
               return (
                 <Link
@@ -107,8 +111,9 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
 
           {/* Right side - Profile Avatar */}
           <div className="flex items-center gap-4">
-            {/* Mode Toggle (Language switcher disabled for beta) */}
+            {/* Mode Toggle & Language Switcher */}
             <div className="hidden md:flex items-center gap-1">
+              <LanguageSwitcher />
               <ModeToggle />
             </div>
 
@@ -134,21 +139,21 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/en-US/profile" className="flex items-center gap-2 cursor-pointer">
+                  <Link href={`/${locale}/profile`} className="flex items-center gap-2 cursor-pointer">
                     <User size={18} />
-                    Profile
+                    {t('nav.profile')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/en-US/settings" className="flex items-center gap-2 cursor-pointer">
+                  <Link href={`/${locale}/settings`} className="flex items-center gap-2 cursor-pointer">
                     <Gear size={18} />
-                    Settings
+                    {t('nav.settings')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogoutClick} className="flex items-center gap-2 cursor-pointer text-red-600 dark:text-red-400">
                   <SignOut size={18} />
-                  Logout
+                  {t('nav.logout')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -157,7 +162,7 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden h-12 w-12 flex items-center justify-center text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-label={mobileMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
               aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X size={24} /> : <List size={24} />}
@@ -171,8 +176,8 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href ||
-                (item.isKindness && pathname.startsWith('/en-US/kindness')) ||
-                (item.href === '/en-US/settings/children' && pathname.startsWith('/en-US/settings/children'));
+                (item.isKindness && pathname.startsWith(`/${locale}/kindness`)) ||
+                (item.href === `/${locale}/settings/children` && pathname.startsWith(`/${locale}/settings/children`));
               const activeColor = item.isKindness
                 ? 'bg-primary-kindness/10 text-primary-kindness border-l-4 border-primary-kindness'
                 : 'bg-primary/10 text-primary border-l-4 border-primary';
@@ -199,13 +204,14 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
             {/* Mobile Actions Footer */}
             <div className="flex items-center justify-between px-4 py-4 mt-2 border-t border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-2">
+                <LanguageSwitcher />
                 <ModeToggle />
               </div>
               <button
                 onClick={handleLogoutClick}
                 className="px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-400 rounded-lg bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors"
               >
-                Sign Out
+                {t('nav.signOut')}
               </button>
             </div>
           </nav>
@@ -215,11 +221,11 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
         isOpen={showLogoutConfirm}
         onClose={() => setShowLogoutConfirm(false)}
         onConfirm={performLogout}
-        title="Log Out?"
-        description="Are you sure you want to log out of specific parent account?"
-        confirmLabel="Log Out"
-        cancelLabel="Cancel"
-        variant="default" // Logout is not 'danger' usually, but 'default' is fine. Maybe text-red? 'danger' is better for semantics.
+        title={t('nav.logoutTitle')}
+        description={t('nav.logoutDescription')}
+        confirmLabel={t('nav.logout')}
+        cancelLabel={t('buttons.cancel')}
+        variant="default"
       />
     </header>
   );

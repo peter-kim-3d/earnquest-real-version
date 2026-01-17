@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { ArrowLeft, Loader2, HelpCircle, X } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -19,6 +19,8 @@ type Step = 'code' | 'selection' | 'pin' | 'logging';
 
 export default function ChildLoginPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'en-US';
   const searchParams = useSearchParams();
 
   // State management
@@ -150,7 +152,7 @@ export default function ChildLoginPage() {
 
       // Success! Redirect to child dashboard
       toast.success(`Welcome back, ${child.name}!`);
-      router.push('/en-US/child/dashboard');
+      router.push(`/${locale}/child/dashboard`);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed';
       console.error('Login failed:', err);
@@ -181,7 +183,7 @@ export default function ChildLoginPage() {
 
       // Success! Redirect to child dashboard
       toast.success(`Welcome back, ${selectedChild.name}!`);
-      router.push('/en-US/child/dashboard');
+      router.push(`/${locale}/child/dashboard`);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Incorrect PIN';
       console.error('Login failed:', err);
@@ -227,7 +229,7 @@ export default function ChildLoginPage() {
       setEnteredPin('');
       setError('');
     } else {
-      router.push('/en-US');
+      router.push(`/${locale}`);
     }
   };
 
@@ -463,7 +465,7 @@ export default function ChildLoginPage() {
         {/* Footer */}
         <p className="text-center text-sm text-text-muted dark:text-text-muted mt-6">
           Are you a parent?{' '}
-          <Link href="/en-US/login" className="text-primary hover:underline font-semibold">
+          <Link href={`/${locale}/login`} className="text-primary hover:underline font-semibold">
             Parent Login
           </Link>
         </p>

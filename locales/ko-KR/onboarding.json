@@ -1,0 +1,159 @@
+{
+  "welcome": {
+    "title": "EarnQuest에 오신 것을 환영합니다!",
+    "subtitle": "가족의 퀘스트를 설정해보세요",
+    "getStarted": "시작하기"
+  },
+  "addChild": {
+    "title": "누가 EarnQuest에 참여하나요?",
+    "subtitle": "보상과 할 일을 맞춤 설정하기 위해 아이들의 정보를 추가하세요.",
+    "nameLabel": "아이 이름",
+    "namePlaceholder": "이름이 뭐예요?",
+    "nameRequired": "이름을 입력해주세요",
+    "birthdateLabel": "생년월일",
+    "birthdateRequired": "생년월일을 입력해주세요",
+    "ageGroupLabel": "연령대",
+    "ageGroups": {
+      "5-7": "5-7세",
+      "8-11": "8-11세",
+      "12-14": "12-14세",
+      "mini": "꼬마 어너",
+      "pro": "프로 어너",
+      "teen": "틴 어너"
+    },
+    "calculatedInfo": "계산된 정보",
+    "yearsOld": "{age}세",
+    "childNumber": "아이 #{number}",
+    "addAnother": "다른 아이 추가",
+    "saveAndContinue": "{count}명 저장 후 계속하기",
+    "mustHaveOneChild": "최소 1명의 아이가 필요합니다",
+    "fillAllFields": "모든 이름과 생년월일을 입력해주세요",
+    "childrenAdded": "{count}명의 아이가 추가되었습니다!",
+    "addFailed": "아이 추가에 실패했습니다. 다시 시도해주세요.",
+    "avatar": "아바타 선택",
+    "addChild": "아이 추가",
+    "continue": "계속",
+    "skip": "나중에 하기"
+  },
+  "selectStyle": {
+    "title": "할 일 프리셋 선택",
+    "subtitle": "목표에 맞는 시작점을 선택하세요. 나중에 언제든지 할 일을 맞춤 설정할 수 있어요.",
+    "stepTitle": "스타일 선택",
+    "optionalAddons": "선택 추가 모듈",
+    "totalDailyPoints": "일일 포인트 잠재량:",
+    "helpMeChoose": "무엇을 선택할지 모르시겠어요? 선택을 도와드릴게요",
+    "nextSetValues": "다음: 가치관 설정",
+    "childRequired": "아이 정보 필요",
+    "childRequiredDescription": "먼저 아이를 추가해주세요",
+    "saveFailed": "저장 실패",
+    "presets": {
+      "starter": {
+        "name": "스타터",
+        "tagline": "핵심 습관으로 간단하게 시작"
+      },
+      "balanced": {
+        "name": "밸런스",
+        "tagline": "균형 잡힌 일상 루틴"
+      },
+      "learningFocus": {
+        "name": "학습 우선",
+        "tagline": "학업 우수성을 우선으로"
+      }
+    },
+    "recommended": "추천",
+    "tasks": "{count}개 할 일",
+    "includes": "포함 항목",
+    "moreTasks": "+{count}개 더"
+  },
+  "modules": {
+    "title": "선택 모듈 추가",
+    "subtitle": "선택 추가 모듈입니다. 나중에 설정에서 변경할 수 있어요.",
+    "hygiene": {
+      "name": "위생 루틴",
+      "description": "아침, 저녁 위생 습관"
+    },
+    "fitness": {
+      "name": "운동",
+      "description": "신체 활동과 야외 활동"
+    },
+    "hobby": {
+      "name": "취미",
+      "description": "음악, 미술, 창작 활동"
+    },
+    "tasksCount": "{count}개 할 일"
+  },
+  "familyValues": {
+    "title": "기준 세우기",
+    "subtitle": "가정에서 반드시 지켜야 할 가치들을 선택하세요. 이 활동들은 포인트가 아닌 존중을 얻습니다.",
+    "stepTitle": "가치관",
+    "whyNoPoints": "왜 포인트가 없나요?",
+    "whyNoPointsDescription": "내재적 동기를 강화하면 아이들이 일부 행동은 \"대가를 받는\" 별도의 과제가 아니라 가족 구성원으로서 당연히 해야 할 일이라는 것을 이해하게 됩니다.",
+    "addCustomValue": "맞춤 가치 추가",
+    "skipForNow": "나중에 하기",
+    "completeSelection": "선택 완료",
+    "saveFailed": "저장 실패",
+    "items": {
+      "gratitude": {
+        "title": "감사 표현하기",
+        "description": "상기시켜주지 않아도 제발, 고맙습니다라고 말하기."
+      },
+      "greetings": {
+        "title": "가족 인사",
+        "description": "모든 가족에게 좋은 아침, 안녕히 주무세요 인사하기."
+      },
+      "honesty": {
+        "title": "정직",
+        "description": "어려울 때도 진실을 말하기."
+      },
+      "respect": {
+        "title": "존중",
+        "description": "다른 사람이 말할 때 경청하기."
+      },
+      "cleanSpaces": {
+        "title": "깨끗한 공간",
+        "description": "식사 후 자기 그릇을 싱크대에 놓기."
+      }
+    },
+    "values": {
+      "responsibility": "책임감",
+      "kindness": "친절",
+      "creativity": "창의성",
+      "health": "건강",
+      "learning": "학습",
+      "teamwork": "협동"
+    },
+    "selectAtLeast": "최소 1개 이상 선택하세요",
+    "selected": "{count}개 선택됨"
+  },
+  "complete": {
+    "title": "준비 완료!",
+    "subtitle": "모든 설정이 완료되었어요! 아이의 첫 번째 할 일이 기다리고 있어요. 함께 좋은 습관을 만들어가요.",
+    "configSummary": "설정 요약",
+    "childProfile": "아이 프로필",
+    "childAdded": "아이 추가됨",
+    "childNameWithAge": "{name} ({age}세)",
+    "childrenNames": "{name} 외 {count}명",
+    "dailyTasks": "일일 할 일",
+    "tasksSet": "{count}개 할 일 설정됨",
+    "weeklyGoal": "주간 목표",
+    "pointsGoal": "{points} 포인트",
+    "startNow": "지금 시작하기",
+    "adjustTasksRewards": "할 일/보상 조정하기",
+    "reassurance": "걱정하지 마세요, 설정 메뉴에서 언제든지 이 설정을 변경할 수 있어요.",
+    "summary": {
+      "children": "{count}명의 아이 추가됨",
+      "tasks": "{count}개 할 일 준비됨",
+      "style": "{style} 프리셋 사용 중"
+    },
+    "tips": {
+      "title": "빠른 팁",
+      "tip1": "아이들은 대시보드에서 할 일을 완료할 수 있어요",
+      "tip2": "액션 센터에서 할 일 완료를 승인하세요",
+      "tip3": "스토어에서 보상을 교환할 수 있어요"
+    },
+    "goToDashboard": "대시보드로 가기"
+  },
+  "progress": {
+    "step": "{total}단계 중 {current}단계"
+  }
+}

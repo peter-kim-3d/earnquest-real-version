@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { signInWithGoogle, signInWithApple, signUp } from '@/lib/services/auth';
@@ -9,9 +9,11 @@ import { CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'en-US';
   const searchParams = useSearchParams();
   const inviteToken = searchParams.get('invite');
-  const t = useTranslations('auth');
+  const t = useTranslations('auth.signup');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,7 +34,7 @@ export default function SignupPage() {
       setError(null);
       await signInWithGoogle();
     } catch (err: any) {
-      setError(err.message || 'Failed to sign in with Google');
+      setError(err.message || t('errors.signupFailed'));
     } finally {
       setLoading(false);
     }
@@ -44,7 +46,7 @@ export default function SignupPage() {
       setError(null);
       await signInWithApple();
     } catch (err: any) {
-      setError(err.message || 'Failed to sign in with Apple');
+      setError(err.message || t('errors.signupFailed'));
     } finally {
       setLoading(false);
     }
@@ -54,12 +56,12 @@ export default function SignupPage() {
     e.preventDefault();
 
     if (!email || !password) {
-      setError('Please fill in all fields');
+      setError(t('errors.emailRequired'));
       return;
     }
 
     if (password.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError(t('errors.passwordTooShort'));
       return;
     }
 
@@ -72,7 +74,7 @@ export default function SignupPage() {
       // Check if email confirmation is required
       if (result.user && !result.user.email_confirmed_at) {
         // Email confirmation required
-        setSuccess('Account created! Please check your email to verify your account before logging in.');
+        setSuccess(t('success.accountCreated'));
         setEmail('');
         setPassword('');
         return;
@@ -82,12 +84,12 @@ export default function SignupPage() {
       const pendingInvite = sessionStorage.getItem('pending_invite');
       if (pendingInvite) {
         sessionStorage.removeItem('pending_invite');
-        router.push(`/en-US/invite/${pendingInvite}`);
+        router.push(`/${locale}/invite/${pendingInvite}`);
       } else {
-        router.push('/en-US/onboarding/add-child');
+        router.push(`/${locale}/onboarding/add-child`);
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to create account');
+      setError(err.message || t('errors.signupFailed'));
     } finally {
       setLoading(false);
     }
@@ -97,10 +99,10 @@ export default function SignupPage() {
     <div className="w-full max-w-md mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-black text-text-main dark:text-white tracking-[-0.033em] mb-2">
-          Create your Family Quest
+          {t('title')}
         </h1>
         <p className="text-gray-500 dark:text-gray-400 font-medium">
-          The first step to building good habits starts here.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -130,7 +132,7 @@ export default function SignupPage() {
             />
           </svg>
           <span className="text-sm font-bold text-text-main dark:text-white">
-            Continue with Google
+            {t('continueWithGoogle')}
           </span>
         </button>
 
@@ -148,7 +150,7 @@ export default function SignupPage() {
               <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.74 1.18 0 2.45-1.11 4.37-1.14 1.05-.01 2.47.49 3.2 1.53-2.68 1.63-2.12 5.38.83 6.75-.48 2.37-2.05 4.35-3.48 5.09zm-3.66-15.3c.6-1.07 1.84-1.85 2.96-1.85.08 1.4-1.12 2.86-2.3 3.29-1.06.41-2.29-.32-2.73-1.44z" />
             </svg>
             <span className="text-sm font-bold text-text-main dark:text-white">
-              Continue with Apple
+              {t('continueWithApple')}
             </span>
           </button>
         )}
@@ -161,7 +163,7 @@ export default function SignupPage() {
         </div>
         <div className="relative flex justify-center text-sm">
           <span className="bg-background-light dark:bg-background-dark px-3 text-gray-500 font-medium">
-            or sign up with email
+            {t('orSignUpWithEmail')}
           </span>
         </div>
       </div>
@@ -187,13 +189,13 @@ export default function SignupPage() {
             className="text-sm font-bold text-text-main dark:text-white ml-1"
             htmlFor="email"
           >
-            Parent&apos;s Email
+            {t('email')}
           </label>
           <div className="relative">
             <input
               className="peer block w-full rounded-xl border-gray-200 bg-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm h-12 px-4 dark:bg-card-dark dark:border-primary/20 dark:text-white dark:focus:ring-primary/50"
               id="email"
-              placeholder="you@example.com"
+              placeholder={t('emailPlaceholder')}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -210,13 +212,13 @@ export default function SignupPage() {
             className="text-sm font-bold text-text-main dark:text-white ml-1"
             htmlFor="password"
           >
-            Create Password
+            {t('password')}
           </label>
           <div className="relative">
             <input
               className="block w-full rounded-xl border-gray-200 bg-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm h-12 px-4 dark:bg-card-dark dark:border-primary/20 dark:text-white dark:focus:ring-primary/50"
               id="password"
-              placeholder="8+ characters"
+              placeholder={t('passwordPlaceholder')}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -231,23 +233,23 @@ export default function SignupPage() {
             type="submit"
             disabled={loading}
           >
-            {loading ? 'Creating Account...' : 'Create Family Account'}
+            {loading ? t('submitting') : t('submit')}
             {!loading && <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />}
           </button>
           <p className="mt-4 text-center text-xs text-gray-500 dark:text-gray-400">
-            By clicking create, you agree to our{' '}
+            {t('agreeToTerms')}{' '}
             <Link
               href="/terms"
               className="font-bold underline decoration-gray-300 hover:decoration-primary underline-offset-2 hover:text-primary transition-colors"
             >
-              Terms
+              {t('termsOfService')}
             </Link>{' '}
-            and{' '}
+            {t('and')}{' '}
             <Link
               href="/privacy"
               className="font-bold underline decoration-gray-300 hover:decoration-primary underline-offset-2 hover:text-primary transition-colors"
             >
-              Privacy Policy
+              {t('privacyPolicy')}
             </Link>
             .
           </p>
@@ -257,12 +259,12 @@ export default function SignupPage() {
       {/* Footer Links */}
       <div className="mt-8 text-center pt-6 border-t border-gray-100 dark:border-primary/10">
         <p className="text-sm text-gray-600 dark:text-gray-300">
-          Already have an account?{' '}
+          {t('hasAccount')}{' '}
           <Link
-            href="/en-US/login"
+            href={`/${locale}/login`}
             className="font-bold text-text-main dark:text-primary hover:underline decoration-2 decoration-primary underline-offset-2 ml-1"
           >
-            Log in
+            {t('logIn')}
           </Link>
         </p>
       </div>

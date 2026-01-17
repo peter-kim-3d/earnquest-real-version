@@ -1,4 +1,7 @@
+'use client';
+
 import { Lightning, CheckCircle, TrendUp } from '@/components/ui/ClientIcons';
+import { useTranslations } from 'next-intl';
 
 interface DashboardStatsProps {
     activeTasksCount: number;
@@ -11,6 +14,7 @@ export default function DashboardStats({
     pendingApprovalsCount,
     totalWeeklyXP,
 }: DashboardStatsProps) {
+    const t = useTranslations('parent.stats');
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             {/* Active Tasks */}
@@ -20,7 +24,7 @@ export default function DashboardStats({
                 </div>
                 <div>
                     <p className="text-sm font-medium text-text-muted dark:text-gray-400">
-                        Active Tasks
+                        {t('activeTasks')}
                     </p>
                     <p className="text-2xl font-black text-text-main dark:text-white">
                         {activeTasksCount}
@@ -42,7 +46,7 @@ export default function DashboardStats({
                 </div>
                 <div>
                     <p className="text-sm font-medium text-text-muted dark:text-gray-400">
-                        Pending Approvals
+                        {t('pendingApprovals')}
                     </p>
                     <p className="text-2xl font-black text-text-main dark:text-white">
                         {pendingApprovalsCount}
@@ -57,7 +61,7 @@ export default function DashboardStats({
                 </div>
                 <div>
                     <p className="text-sm font-medium text-text-muted dark:text-gray-400">
-                        Family Weekly XP
+                        {t('weeklyXP')}
                     </p>
                     <p className="text-2xl font-black text-text-main dark:text-white">
                         {totalWeeklyXP}

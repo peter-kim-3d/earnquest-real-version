@@ -3,6 +3,7 @@
 import { Check, Info } from 'lucide-react';
 import { ModuleKey } from '@/lib/types/task';
 import { MODULES, getModuleTaskTemplates } from '@/lib/config/modules';
+import { useTranslations } from 'next-intl';
 
 interface ModuleSelectorProps {
   enabledModules: ModuleKey[];
@@ -10,6 +11,8 @@ interface ModuleSelectorProps {
 }
 
 export default function ModuleSelector({ enabledModules, onToggle }: ModuleSelectorProps) {
+  const t = useTranslations('onboarding.modules');
+  const tCommon = useTranslations('common');
   const moduleOrder: ModuleKey[] = ['hygiene', 'fitness', 'hobby'];
 
   return (
@@ -17,7 +20,7 @@ export default function ModuleSelector({ enabledModules, onToggle }: ModuleSelec
       {/* Header */}
       <div className="flex items-center gap-2 text-sm text-text-muted dark:text-text-muted">
         <Info className="h-4 w-4" />
-        <span>Optional add-ons. You can change these later in Settings.</span>
+        <span>{t('subtitle')}</span>
       </div>
 
       {/* Module Cards */}
@@ -52,15 +55,15 @@ export default function ModuleSelector({ enabledModules, onToggle }: ModuleSelec
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xl">{taskModule.icon}</span>
-                  <h3 className="font-bold text-text-main dark:text-white">{taskModule.name}</h3>
+                  <h3 className="font-bold text-text-main dark:text-white">{t(`${key}.name`)}</h3>
                 </div>
-                <p className="text-sm text-text-muted dark:text-text-muted mb-2">{taskModule.description}</p>
+                <p className="text-sm text-text-muted dark:text-text-muted mb-2">{t(`${key}.description`)}</p>
                 <div className="flex items-center gap-2 text-xs">
                   <span className="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-text-muted">
-                    +{taskModule.taskKeys.length} tasks
+                    +{t('tasksCount', { count: taskModule.taskKeys.length })}
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-text-muted">
-                    +{additionalPoints} XP/day
+                    +{tCommon('points.perDay', { points: additionalPoints })}
                   </span>
                 </div>
               </div>

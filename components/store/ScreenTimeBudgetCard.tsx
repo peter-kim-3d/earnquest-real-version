@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { DeviceTabletSpeaker, Play, Pause, Timer } from '@phosphor-icons/react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 
 interface ScreenTimeBudgetCardProps {
@@ -29,6 +30,7 @@ export default function ScreenTimeBudgetCard({
   onEndSession,
   isLoading = false,
 }: ScreenTimeBudgetCardProps) {
+  const t = useTranslations('child.store.screenBudget');
   const [sessionMinutes, setSessionMinutes] = useState(0);
 
   const totalWeeklyMinutes = baseMinutes + bonusMinutes;
@@ -66,7 +68,7 @@ export default function ScreenTimeBudgetCard({
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
-            Screen Time
+            {t('title')}
           </h3>
           <DeviceTabletSpeaker size={24} weight="duotone" className="text-white/80" />
         </div>
@@ -76,13 +78,13 @@ export default function ScreenTimeBudgetCard({
           {formatTime(availableNow)}
         </p>
         <p className="text-lg text-white/80 font-medium mb-4">
-          Available Now
+          {t('availableNow')}
         </p>
 
         {/* Daily Gauge */}
         <div className="mb-3">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs font-medium text-white/70">Today</span>
+            <span className="text-xs font-medium text-white/70">{t('today')}</span>
             <span className="text-xs font-semibold text-white">
               {formatTime(usedTodayMinutes)} / {formatTime(dailyLimitMinutes)}
             </span>
@@ -104,7 +106,7 @@ export default function ScreenTimeBudgetCard({
         {/* Weekly Gauge */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs font-medium text-white/70">This Week</span>
+            <span className="text-xs font-medium text-white/70">{t('thisWeek')}</span>
             <span className="text-xs font-semibold text-white">
               {formatTime(usedMinutes)} / {formatTime(totalWeeklyMinutes)}
             </span>
@@ -127,7 +129,7 @@ export default function ScreenTimeBudgetCard({
         {bonusMinutes > 0 && (
           <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-400/20 backdrop-blur-sm">
             <span className="text-xs font-semibold text-green-300">
-              +{formatTime(bonusMinutes)} bonus earned!
+              {t('bonusEarned', { time: formatTime(bonusMinutes) })}
             </span>
           </div>
         )}
@@ -138,7 +140,7 @@ export default function ScreenTimeBudgetCard({
             <div className="space-y-3">
               <div className="flex items-center justify-center gap-2 py-3 bg-white/20 rounded-lg">
                 <Timer size={20} weight="fill" className="text-white animate-pulse" />
-                <span className="font-bold text-white">Session Active</span>
+                <span className="font-bold text-white">{t('sessionActive')}</span>
               </div>
               <Button
                 onClick={handleEndSession}
@@ -146,7 +148,7 @@ export default function ScreenTimeBudgetCard({
                 className="w-full bg-white text-purple-600 hover:bg-white/90"
               >
                 <Pause size={18} weight="bold" className="mr-2" />
-                {isLoading ? 'Ending...' : 'End Session'}
+                {isLoading ? t('ending') : t('endSession')}
               </Button>
             </div>
           ) : (
@@ -156,15 +158,15 @@ export default function ScreenTimeBudgetCard({
               className="w-full bg-white text-purple-600 hover:bg-white/90"
             >
               <Play size={18} weight="fill" className="mr-2" />
-              {isLoading ? 'Starting...' : 'Start Timer'}
+              {isLoading ? t('starting') : t('startTimer')}
             </Button>
           )
         ) : (
           <div className="flex items-center justify-center gap-2 py-3 bg-white/10 rounded-lg">
             <span className="text-sm font-medium text-white/70">
               {remainingWeekly <= 0
-                ? "Weekly limit reached"
-                : "Daily limit reached"}
+                ? t('weeklyLimitReached')
+                : t('dailyLimitReached')}
             </span>
           </div>
         )}

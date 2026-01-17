@@ -1,0 +1,130 @@
+{
+  "title": "Tasks",
+  "pageTitle": "Task Management",
+  "subtitle": "Manage your family's tasks",
+  "pageSubtitle": "Create and manage tasks for your family",
+  "create": "Create Task",
+  "newTask": "New Task",
+  "edit": "Edit Task",
+  "noTasks": "No tasks yet",
+  "createFirst": "Create your first task to get started!",
+  "clickNewTask": "Click \"New Task\" above to create your first task!",
+  "stats": {
+    "totalTasks": "Total Tasks",
+    "activeTasks": "Active Tasks",
+    "completions30d": "Completions (30d)"
+  },
+  "form": {
+    "name": "Task Name",
+    "namePlaceholder": "e.g., Make Bed",
+    "nameRequired": "Task name is required",
+    "description": "Description",
+    "descriptionPlaceholder": "Optional details about the task",
+    "points": "Points",
+    "pointsHelp": "Points earned when completed",
+    "category": "Category",
+    "frequency": "Frequency",
+    "icon": "Icon",
+    "image": "Image",
+    "chooseIcon": "Choose Icon",
+    "uploadImage": "Upload Image",
+    "defaultImages": "Default Images",
+    "uploadCustom": "Upload Custom",
+    "assignTo": "Assign To",
+    "assignToAll": "All Children",
+    "assignToChild": "Specific Child",
+    "timeContext": "When to do",
+    "timeContextHelp": "Helps organize tasks by time of day",
+    "requiresApproval": "Requires Approval",
+    "requiresApprovalHelp": "Parent must approve completion",
+    "isActive": "Active",
+    "isActiveHelp": "Inactive tasks won't appear for children"
+  },
+  "categories": {
+    "learning": "Learning",
+    "life": "Life Skills",
+    "health": "Health",
+    "hygiene": "Hygiene",
+    "chores": "Chores",
+    "exercise": "Exercise",
+    "creativity": "Creativity",
+    "other": "Other",
+    "all": "All Categories"
+  },
+  "categoryLabels": {
+    "hygiene": "🧼 Hygiene",
+    "chores": "🏠 Chores",
+    "learning": "📚 Learning",
+    "exercise": "💪 Exercise",
+    "creativity": "🎨 Creativity",
+    "other": "📋 Other"
+  },
+  "frequencies": {
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "oneTime": "One-time"
+  },
+  "timeContexts": {
+    "morning": "Morning",
+    "afterSchool": "After School",
+    "evening": "Evening",
+    "anytime": "Anytime"
+  },
+  "actions": {
+    "save": "Save Task",
+    "saving": "Saving...",
+    "create": "Create Task",
+    "creating": "Creating...",
+    "update": "Update Task",
+    "delete": "Delete Task",
+    "duplicate": "Duplicate",
+    "enable": "Enable",
+    "disable": "Disable",
+    "assignToChild": "Assign to Child",
+    "removeFromChild": "Remove from Child"
+  },
+  "confirm": {
+    "deleteTitle": "Delete Task?",
+    "deleteDescription": "Are you sure you want to delete \"{name}\"? This cannot be undone.",
+    "removeTitle": "Remove Task?",
+    "removeDescription": "Are you sure you want to remove \"{taskName}\" from {childName}'s task list?"
+  },
+  "toast": {
+    "created": "Task created successfully",
+    "updated": "Task updated successfully",
+    "deleted": "Task deleted successfully",
+    "enabled": "Task enabled",
+    "disabled": "Task disabled for this child",
+    "removed": "Task removed for this child",
+    "error": "Failed to save task. Please try again."
+  },
+  "filter": {
+    "all": "All Tasks",
+    "active": "Active",
+    "inactive": "Inactive",
+    "archived": "Archived",
+    "byCategory": "By Category",
+    "byFrequency": "By Frequency"
+  },
+  "list": {
+    "select": "Select",
+    "done": "Done",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "selected": "{count} selected",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "delete": "Delete",
+    "confirmArchive": "Are you sure you want to {action} {count} tasks?",
+    "confirmDelete": "Are you sure you want to DELETE {count} tasks? This cannot be undone.",
+    "bulkFailed": "Some tasks failed to update."
+  },
+  "bulk": {
+    "selected": "{count} selected",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "deleteSelected": "Delete Selected",
+    "enableSelected": "Enable Selected",
+    "disableSelected": "Disable Selected"
+  }
+}

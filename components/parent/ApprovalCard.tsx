@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, Clock, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import FixRequestModal from './FixRequestModal';
 
 type TaskCompletion = {
@@ -37,6 +38,7 @@ interface ApprovalCardProps {
 
 export default function ApprovalCard({ completion, onApprove, onFixRequest }: ApprovalCardProps) {
   const router = useRouter();
+  const t = useTranslations('parent.actionCenter');
   const [loading, setLoading] = useState(false);
   const [showFixRequestModal, setShowFixRequestModal] = useState(false);
 
@@ -60,7 +62,7 @@ export default function ApprovalCard({ completion, onApprove, onFixRequest }: Ap
       router.refresh();
     } catch (error) {
       console.error('Failed to approve:', error);
-      toast.error('Approval Failed', { description: 'Failed to approve. Please try again.' });
+      toast.error(t('approvalFailed'), { description: t('approvalFailedDescription') });
     } finally {
       setLoading(false);
     }
@@ -77,11 +79,11 @@ export default function ApprovalCard({ completion, onApprove, onFixRequest }: Ap
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
 
     if (diffInMinutes < 60) {
-      return `${diffInMinutes}m ago`;
+      return t('minutesAgo', { count: diffInMinutes });
     } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)}h ago`;
+      return t('hoursAgo', { count: Math.floor(diffInMinutes / 60) });
     } else {
-      return `${Math.floor(diffInMinutes / 1440)}d ago`;
+      return t('daysAgo', { count: Math.floor(diffInMinutes / 1440) });
     }
   };
 
@@ -107,7 +109,7 @@ export default function ApprovalCard({ completion, onApprove, onFixRequest }: Ap
                   {completion.tasks.name}
                 </h3>
                 <p className="text-sm text-text-muted dark:text-gray-400">
-                  by {completion.children.name}
+                  {t('by', { name: completion.children.name })}
                 </p>
               </div>
               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10">
@@ -125,7 +127,7 @@ export default function ApprovalCard({ completion, onApprove, onFixRequest }: Ap
 
             <div className="flex items-center gap-3 text-sm text-text-muted dark:text-gray-500">
               <Clock className="h-4 w-4" />
-              <span>Submitted {formatTime(completion.requested_at)}</span>
+              <span>{t('submitted', { time: formatTime(completion.requested_at) })}</span>
             </div>
           </div>
         </div>
@@ -138,7 +140,7 @@ export default function ApprovalCard({ completion, onApprove, onFixRequest }: Ap
             className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 hover:shadow-xl transition-all disabled:opacity-50"
           >
             <Check className="h-5 w-5" />
-            Confirm Complete
+            {t('confirmComplete')}
           </button>
           <button
             onClick={() => setShowFixRequestModal(true)}
@@ -146,7 +148,7 @@ export default function ApprovalCard({ completion, onApprove, onFixRequest }: Ap
             className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-semibold transition-all disabled:opacity-50"
           >
             <MessageSquare className="h-5 w-5" />
-            Request Fix
+            {t('requestFix')}
           </button>
         </div>
       </div>

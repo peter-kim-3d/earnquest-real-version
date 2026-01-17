@@ -3,7 +3,12 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import TicketsClientPage from '@/components/child/TicketsClientPage';
 
-export default async function ChildTicketsPage() {
+export default async function ChildTicketsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const supabase = await createClient();
 
   // Get child session from cookie
@@ -11,7 +16,7 @@ export default async function ChildTicketsPage() {
   const childSessionCookie = cookieStore.get('child_session');
 
   if (!childSessionCookie) {
-    redirect('/en-US/child-login');
+    redirect(`/${locale}/child-login`);
   }
 
   let childSession;
@@ -19,13 +24,13 @@ export default async function ChildTicketsPage() {
     childSession = JSON.parse(childSessionCookie.value);
   } catch (error) {
     console.error('Invalid child session cookie:', error);
-    redirect('/en-US/child-login');
+    redirect(`/${locale}/child-login`);
   }
 
   const { childId } = childSession;
 
   if (!childId) {
-    redirect('/en-US/child-login');
+    redirect(`/${locale}/child-login`);
   }
 
   // Get tickets for this child

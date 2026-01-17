@@ -10,8 +10,29 @@ export default getRequestConfig(async ({ requestLocale }) => {
     locale = 'en-US';
   }
 
+  // Load all namespaces and merge them
+  const [common, auth, onboarding, parent, child, tasks, rewards, settings] = await Promise.all([
+    import(`@/locales/${locale}/common.json`),
+    import(`@/locales/${locale}/auth.json`),
+    import(`@/locales/${locale}/onboarding.json`),
+    import(`@/locales/${locale}/parent.json`),
+    import(`@/locales/${locale}/child.json`),
+    import(`@/locales/${locale}/tasks.json`),
+    import(`@/locales/${locale}/rewards.json`),
+    import(`@/locales/${locale}/settings.json`),
+  ]);
+
   return {
     locale,
-    messages: (await import(`@/locales/${locale}/common.json`)).default,
+    messages: {
+      common: common.default,
+      auth: auth.default,
+      onboarding: onboarding.default,
+      parent: parent.default,
+      child: child.default,
+      tasks: tasks.default,
+      rewards: rewards.default,
+      settings: settings.default,
+    },
   };
 });

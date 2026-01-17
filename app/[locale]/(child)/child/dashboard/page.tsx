@@ -4,8 +4,15 @@ import { cookies } from 'next/headers';
 import TaskList from '@/components/child/TaskList';
 import StatsCard from '@/components/child/StatsCard';
 import MotivationalBanner from '@/components/child/MotivationalBanner';
+import { getTranslations } from 'next-intl/server';
 
-export default async function ChildDashboardPage() {
+export default async function ChildDashboardPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations('child.dashboard');
   const supabase = await createClient();
 
   // Get child session from cookie
@@ -13,7 +20,7 @@ export default async function ChildDashboardPage() {
   const childSessionCookie = cookieStore.get('child_session');
 
   if (!childSessionCookie) {
-    redirect('/en-US/child-login');
+    redirect(`/${locale}/child-login`);
   }
 
   let childSession;
@@ -21,13 +28,13 @@ export default async function ChildDashboardPage() {
     childSession = JSON.parse(childSessionCookie.value);
   } catch (error) {
     console.error('Invalid child session cookie:', error);
-    redirect('/en-US/child-login');
+    redirect(`/${locale}/child-login`);
   }
 
   const { childId } = childSession;
 
   if (!childId) {
-    redirect('/en-US/child-login');
+    redirect(`/${locale}/child-login`);
   }
 
   // Get the specific child from session
@@ -39,7 +46,7 @@ export default async function ChildDashboardPage() {
     .single();
 
   if (!child) {
-    redirect('/en-US/child-login');
+    redirect(`/${locale}/child-login`);
   }
 
   // Get tasks for this child
@@ -78,10 +85,10 @@ export default async function ChildDashboardPage() {
         {/* Greeting */}
         <div className="mb-6">
           <h1 className="text-3xl font-black text-text-main dark:text-white mb-2">
-            Ready for today&apos;s quests, {child.name}?
+            {t('readyForQuests', { name: child.name })}
           </h1>
           <p className="text-lg text-text-muted dark:text-gray-400">
-            Complete tasks to earn points and unlock rewards!
+            {t('earnPointsSubtitle')}
           </p>
         </div>
 

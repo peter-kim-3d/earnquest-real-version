@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Bell, CheckSquare, Square, CheckCircle } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import ApprovalCard from './ApprovalCard';
 
 type PendingCompletion = {
@@ -32,6 +33,7 @@ interface ActionCenterProps {
 
 export default function ActionCenter({ pendingCompletions }: ActionCenterProps) {
   const router = useRouter();
+  const t = useTranslations('parent.actionCenter');
   const count = pendingCompletions.length;
   const [selectedCompletions, setSelectedCompletions] = useState<string[]>([]);
   const [batchLoading, setBatchLoading] = useState(false);
@@ -72,14 +74,14 @@ export default function ActionCenter({ pendingCompletions }: ActionCenterProps) 
       }
 
       const result = await response.json();
-      toast.success('Tasks Approved', {
-        description: result.message || `${result.approvedCount} task${result.approvedCount === 1 ? '' : 's'} approved successfully!`,
+      toast.success(t('tasksApproved'), {
+        description: result.message || t('tasksApprovedDescription', { count: result.approvedCount }),
       });
       setSelectedCompletions([]);
       router.refresh();
     } catch (error: any) {
       console.error('Batch approve error:', error);
-      toast.error('Approval Failed', { description: error.message || 'Failed to approve tasks. Please try again.' });
+      toast.error(t('approvalFailed'), { description: error.message || t('approvalFailedDescription') });
     } finally {
       setBatchLoading(false);
     }
@@ -91,13 +93,13 @@ export default function ActionCenter({ pendingCompletions }: ActionCenterProps) 
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-bold text-text-main dark:text-white">
-            Action Center
+            {t('title')}
           </h2>
           {count > 0 && (
             <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800">
               <Bell size={16} weight="fill" className="text-orange-600 dark:text-orange-400" />
               <span className="text-sm font-bold text-orange-600 dark:text-orange-400">
-                {count} New
+                {t('new', { count })}
               </span>
             </span>
           )}
@@ -117,7 +119,7 @@ export default function ActionCenter({ pendingCompletions }: ActionCenterProps) 
                 <Square size={20} className="text-gray-400" />
               )}
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Select All
+                {t('selectAll')}
               </span>
             </button>
 
@@ -129,8 +131,8 @@ export default function ActionCenter({ pendingCompletions }: ActionCenterProps) 
                 className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20"
               >
                 {batchLoading
-                  ? 'Approving...'
-                  : `Approve ${selectedCompletions.length} Task${selectedCompletions.length === 1 ? '' : 's'}`}
+                  ? t('approving')
+                  : t('approveTasks', { count: selectedCompletions.length })}
               </Button>
             )}
           </div>
@@ -185,10 +187,10 @@ export default function ActionCenter({ pendingCompletions }: ActionCenterProps) 
               <CheckCircle size={32} weight="fill" className="text-green-600 dark:text-green-400" />
             </div>
             <h3 className="text-lg font-bold text-text-main dark:text-white mb-2">
-              All caught up!
+              {t('allCaughtUp')}
             </h3>
             <p className="text-sm text-text-muted dark:text-gray-400">
-              No tasks waiting for approval. When your children complete tasks, they&apos;ll appear here for review.
+              {t('noTasksDescription')}
             </p>
           </div>
         </div>

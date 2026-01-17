@@ -1,6 +1,7 @@
 'use client';
 
 import { RocketLaunch, Medal, Fire, Trophy } from '@phosphor-icons/react/dist/ssr';
+import { useTranslations } from 'next-intl';
 
 // ...
 
@@ -14,31 +15,33 @@ interface MotivationalBannerProps {
 }
 
 export default function MotivationalBanner({ child }: MotivationalBannerProps) {
+  const t = useTranslations('child.motivation');
+
   // Get motivational message based on points
   const getMessage = () => {
     const points = child.points_balance;
     if (points === 0) {
       return {
-        title: `Let's start your first quest, ${child.name}!`,
-        subtitle: 'Complete a task to earn your first Quest Points',
+        title: t('startQuest', { name: child.name }),
+        subtitle: t('startQuestSubtitle'),
         Icon: RocketLaunch,
       };
     } else if (points < 100) {
       return {
-        title: `Great start, ${child.name}! 🌟`,
-        subtitle: 'Keep completing quests to unlock awesome rewards',
+        title: t('greatStart', { name: child.name }),
+        subtitle: t('greatStartSubtitle'),
         Icon: Medal,
       };
     } else if (points < 300) {
       return {
-        title: `You're on fire, ${child.name}! 🔥`,
-        subtitle: 'Amazing progress! Keep up the great work',
+        title: t('onFire', { name: child.name }),
+        subtitle: t('onFireSubtitle'),
         Icon: Fire,
       };
     } else {
       return {
-        title: `Incredible work, ${child.name}! 🏆`,
-        subtitle: "You're a Quest Master! Ready for more challenges?",
+        title: t('incredible', { name: child.name }),
+        subtitle: t('incredibleSubtitle'),
         Icon: Trophy,
       };
     }

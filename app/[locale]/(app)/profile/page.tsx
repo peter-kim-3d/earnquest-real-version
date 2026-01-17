@@ -5,7 +5,12 @@ import Link from 'next/link';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
 import { getUser } from '@/lib/services/user';
 
-export default async function ProfilePage() {
+export default async function ProfilePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const supabase = await createClient();
 
   // Check authentication
@@ -14,7 +19,7 @@ export default async function ProfilePage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/en-US/login');
+    redirect(`/${locale}/login`);
   }
 
 
@@ -126,7 +131,7 @@ export default async function ProfilePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Settings */}
           <Link
-            href="/en-US/settings"
+            href={`/${locale}/settings`}
             className="flex items-center gap-3 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all group"
           >
             <Settings className="h-6 w-6 text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors" />
@@ -142,7 +147,7 @@ export default async function ProfilePage() {
 
           {/* Manage Children */}
           <Link
-            href="/en-US/settings/children"
+            href={`/${locale}/settings/children`}
             className="flex items-center gap-3 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all group"
           >
             <Users className="h-6 w-6 text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors" />
@@ -158,7 +163,7 @@ export default async function ProfilePage() {
 
           {/* Child Device Access */}
           <Link
-            href="/en-US/settings#device-access"
+            href={`/${locale}/settings#device-access`}
             className="flex items-center gap-3 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all group"
           >
             <Smartphone className="h-6 w-6 text-gray-600 dark:text-gray-400 group-hover:text-primary transition-colors" />

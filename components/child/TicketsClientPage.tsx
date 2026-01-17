@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles, Clock, Check, Play } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import TicketCard from '@/components/store/TicketCard';
 import ScreenTimeTimer from '@/components/child/ScreenTimeTimer';
 
@@ -45,6 +46,7 @@ export default function TicketsClientPage({
   initialTickets,
 }: TicketsClientPageProps) {
   const router = useRouter();
+  const t = useTranslations('child.tickets');
   const [tickets, setTickets] = useState<GroupedTickets>(initialTickets);
   const [activeTab, setActiveTab] = useState<TicketStatus>('active');
   const [requestingUse, setRequestingUse] = useState<string | null>(null);
@@ -74,8 +76,8 @@ export default function TicketsClientPage({
         });
       }
 
-      toast.success('Screen time started!', {
-        description: 'Enjoy your time! 🎮',
+      toast.success(t('screenTimeStarted'), {
+        description: t('enjoyYourTime'),
       });
 
       // Switch to playing tab to show the timer
@@ -85,7 +87,7 @@ export default function TicketsClientPage({
       router.refresh();
     } catch (error: any) {
       console.error('Request use error:', error);
-      toast.error('Request failed', {
+      toast.error(t('requestFailed'), {
         description: error.message || 'Please try again.',
       });
     } finally {
@@ -115,25 +117,25 @@ export default function TicketsClientPage({
   const tabs = [
     {
       id: 'active' as TicketStatus,
-      label: 'Active',
+      label: t('active'),
       icon: Sparkles,
       count: tickets.active.length,
     },
     {
       id: 'use_requested' as TicketStatus,
-      label: 'Waiting',
+      label: t('waiting'),
       icon: Clock,
       count: tickets.use_requested.length,
     },
     {
       id: 'in_use' as TicketStatus,
-      label: 'Playing',
+      label: t('playing'),
       icon: Play,
       count: tickets.in_use.length,
     },
     {
       id: 'used' as TicketStatus,
-      label: 'Used',
+      label: t('used'),
       icon: Check,
       count: tickets.used.length,
     },
@@ -144,10 +146,10 @@ export default function TicketsClientPage({
       {/* Page Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-text-main dark:text-white mb-2">
-          My Tickets
+          {t('title')}
         </h1>
         <p className="text-text-muted dark:text-gray-400">
-          Your purchased rewards are here!
+          {t('subtitle')}
         </p>
       </div>
 
@@ -198,8 +200,8 @@ export default function TicketsClientPage({
             {tickets.active.length === 0 ? (
               <EmptyState
                 icon="🎟️"
-                message="No active tickets"
-                description="Buy something from the store to get started!"
+                message={t('noActiveTickets')}
+                description={t('buyFromStore')}
               />
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -222,8 +224,8 @@ export default function TicketsClientPage({
             {tickets.use_requested.length === 0 ? (
               <EmptyState
                 icon="⏳"
-                message="No pending requests"
-                description="Request to use a screen reward and it will appear here."
+                message={t('noPendingRequests')}
+                description={t('requestScreenReward')}
               />
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -244,8 +246,8 @@ export default function TicketsClientPage({
             {tickets.in_use.length === 0 ? (
               <EmptyState
                 icon="🎮"
-                message="No active screen time"
-                description="Once approved by your parent, your screen time will appear here."
+                message={t('noActiveScreenTime')}
+                description={t('onceApproved')}
               />
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -270,8 +272,8 @@ export default function TicketsClientPage({
             {tickets.used.length === 0 ? (
               <EmptyState
                 icon="✅"
-                message="No used tickets yet"
-                description="Tickets you've used will appear here as history."
+                message={t('noUsedTickets')}
+                description={t('ticketsHistory')}
               />
             ) : (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

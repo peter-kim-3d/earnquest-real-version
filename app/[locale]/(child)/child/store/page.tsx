@@ -4,20 +4,24 @@ import WalletCard from '@/components/store/WalletCard';
 import RewardCard from '@/components/store/RewardCard';
 import CategoryFilters from '@/components/store/CategoryFilters';
 import ScreenTimeBudgetCard from '@/components/store/ScreenTimeBudgetCard';
+import { getTranslations } from 'next-intl/server';
 
 export default async function StorePage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ category?: string }>;
 }) {
+  const { locale } = await params;
   const supabase = await createClient();
-  const params = await searchParams;
-  const categoryFilter = params.category || 'all';
+  const queryParams = await searchParams;
+  const categoryFilter = queryParams.category || 'all';
 
   // Get authenticated user
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    redirect('/en-US/login');
+    redirect(`/${locale}/login`);
   }
 
   // Get user's family
@@ -28,7 +32,7 @@ export default async function StorePage({
     .single();
 
   if (!userProfile) {
-    redirect('/en-US/onboarding/add-child');
+    redirect(`/${locale}/onboarding/add-child`);
   }
 
   // Get first child
@@ -41,7 +45,7 @@ export default async function StorePage({
     .single();
 
   if (!child) {
-    redirect('/en-US/onboarding/add-child');
+    redirect(`/${locale}/onboarding/add-child`);
   }
 
   // Get all active rewards
@@ -97,15 +101,17 @@ export default async function StorePage({
     ? rewards
     : rewards?.filter((reward) => reward.category === categoryFilter);
 
+  const t = await getTranslations('child.store');
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-black text-text-main dark:text-white mb-2">
-          Reward Store
+          {t('title')}
         </h1>
         <p className="text-lg text-text-muted dark:text-gray-400">
-          Spend your Quest Points on awesome rewards!
+          {t('subtitle')}
         </p>
       </div>
 
@@ -145,10 +151,10 @@ export default async function StorePage({
       {filteredRewards?.length === 0 && (
         <div className="text-center py-12">
           <p className="text-lg font-semibold text-text-muted dark:text-gray-400">
-            {categoryFilter === 'all' ? 'No rewards available yet' : `No ${categoryFilter} rewards available`}
+            {categoryFilter === 'all' ? t('noRewards') : t('noCategoryRewards', { category: categoryFilter })}
           </p>
           <p className="text-sm text-text-muted dark:text-gray-500 mt-2">
-            {categoryFilter === 'all' ? 'Ask your parents to add some rewards!' : 'Try selecting a different category'}
+            {categoryFilter === 'all' ? t('askParents') : t('tryDifferentCategory')}
           </p>
         </div>
       )}

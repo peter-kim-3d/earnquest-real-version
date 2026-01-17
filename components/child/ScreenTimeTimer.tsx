@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Clock, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface ScreenTimeTimerProps {
   purchaseId: string;
@@ -23,6 +24,7 @@ export default function ScreenTimeTimer({
   onComplete,
 }: ScreenTimeTimerProps) {
   const router = useRouter();
+  const t = useTranslations('child.tickets.screenTimer');
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [isCompleting, setIsCompleting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -169,8 +171,8 @@ export default function ScreenTimeTimer({
         // If ticket is already used/completed, silently succeed (race condition)
         if (data.error && typeof data.error === 'string' && data.error.includes('not in use')) {
           console.log('Ticket already completed, treating as success');
-          toast.success('Screen time complete!', {
-            description: 'Time well spent! 🎮',
+          toast.success(t('screenTimeComplete'), {
+            description: t('timeWellSpent'),
           });
 
           // Call onComplete callback for optimistic UI update
@@ -185,8 +187,8 @@ export default function ScreenTimeTimer({
         throw new Error(data.error || 'Failed to complete screen time');
       }
 
-      toast.success('Screen time complete!', {
-        description: 'Time well spent! 🎮',
+      toast.success(t('screenTimeComplete'), {
+        description: t('timeWellSpent'),
       });
 
       // Call onComplete callback for optimistic UI update
@@ -200,7 +202,7 @@ export default function ScreenTimeTimer({
       // Only show error if it's not the "already completed" case
       if (!error.message?.includes('not in use')) {
         console.error('Complete screen time error:', error);
-        toast.error('Failed to complete', {
+        toast.error(t('failedToComplete'), {
           description: error.message || 'Please refresh the page.',
         });
       }
@@ -228,7 +230,7 @@ export default function ScreenTimeTimer({
             <Sparkles className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-lg font-bold">Time&apos;s Up! 🎉</h3>
+            <h3 className="text-lg font-bold">{t('timesUp')}</h3>
             <p className="text-sm text-white/80">{rewardName}</p>
           </div>
         </div>
@@ -236,10 +238,10 @@ export default function ScreenTimeTimer({
         {/* Message */}
         <div className="text-center mb-6">
           <div className="text-3xl font-black mb-2">
-            Screen time complete!
+            {t('screenTimeComplete')}
           </div>
           <p className="text-sm text-white/80">
-            Auto-closing in {autoCloseSeconds} seconds
+            {t('autoClosingIn', { seconds: autoCloseSeconds })}
           </p>
         </div>
 
@@ -250,11 +252,11 @@ export default function ScreenTimeTimer({
           className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white text-orange-600 font-bold text-lg transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
         >
           {isCompleting ? (
-            <>Processing...</>
+            <>{t('processing')}</>
           ) : (
             <>
               <Sparkles className="h-5 w-5" />
-              Okay
+              {t('okay')}
             </>
           )}
         </button>
@@ -278,7 +280,7 @@ export default function ScreenTimeTimer({
           <Clock className="h-6 w-6" />
         </div>
         <div>
-          <h3 className="text-lg font-bold">Screen Time Active</h3>
+          <h3 className="text-lg font-bold">{t('screenTimeActive')}</h3>
           <p className="text-sm text-white/80">{rewardName}</p>
         </div>
       </div>
@@ -288,7 +290,7 @@ export default function ScreenTimeTimer({
         <div className="text-5xl font-black mb-2">
           {formatTime(timeRemaining)}
         </div>
-        <p className="text-sm text-white/80">Remaining</p>
+        <p className="text-sm text-white/80">{t('remainingLabel')}</p>
       </div>
 
       {/* Progress Bar */}
@@ -302,7 +304,7 @@ export default function ScreenTimeTimer({
       {/* Status */}
       <div className="flex items-center justify-center gap-2 text-sm text-white/90">
         <Sparkles className="h-4 w-4" />
-        <span>Enjoy your time!</span>
+        <span>{t('enjoyYourTime')}</span>
       </div>
     </div>
   );

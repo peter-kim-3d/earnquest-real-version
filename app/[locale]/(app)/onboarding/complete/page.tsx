@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Rocket, CheckCircle2, User, ListChecks, Star } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { AppIcon } from '@/components/ui/AppIcon';
+import { useLocale, useTranslations } from 'next-intl';
 
 interface ChildInfo {
   name: string;
@@ -13,6 +14,9 @@ interface ChildInfo {
 
 export default function OnboardingCompletePage() {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations('onboarding.complete');
+  const tCommon = useTranslations('common');
   const [childInfo, setChildInfo] = useState<ChildInfo | null>(null);
   const [totalChildren, setTotalChildren] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -62,11 +66,11 @@ export default function OnboardingCompletePage() {
   }, []);
 
   const handleStartNow = () => {
-    router.push('/en-US/dashboard');
+    router.push(`/${locale}/dashboard`);
   };
 
   const handleAdjustSettings = () => {
-    router.push('/en-US/tasks');
+    router.push(`/${locale}/tasks`);
   };
 
   return (
@@ -95,17 +99,16 @@ export default function OnboardingCompletePage() {
 
         {/* Header Text */}
         <h1 className="text-4xl md:text-5xl font-bold mb-4 text-text-main dark:text-white">
-          Ready! <span className="text-primary">🎉</span>
+          {t('title')} <span className="text-primary">🎉</span>
         </h1>
         <p className="text-lg md:text-xl text-text-muted dark:text-text-muted mb-10 max-w-lg mx-auto">
-          You&apos;re all set up! {totalChildren > 1 ? 'Your children\'s' : 'Your child\'s'} first tasks are waiting. Let&apos;s start
-          building those good habits together.
+          {t('subtitle', { childCount: totalChildren })}
         </p>
 
         {/* Status Card Summary */}
         <div className="bg-white dark:bg-card-dark/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-10 text-left shadow-lg max-w-md mx-auto">
           <h3 className="text-xs font-bold uppercase tracking-wider text-text-muted dark:text-text-muted mb-4">
-            Configuration Summary
+            {t('configSummary')}
           </h3>
           <div className="space-y-4">
             <div className="flex items-center gap-4">
@@ -114,14 +117,14 @@ export default function OnboardingCompletePage() {
               </div>
               <div className="flex-1">
                 <p className="text-sm text-text-muted dark:text-text-muted">
-                  Child Profile
+                  {t('childProfile')}
                 </p>
                 <p className="font-semibold text-text-main dark:text-white">
-                  {loading ? 'Loading...' : childInfo ? (
+                  {loading ? tCommon('status.loading') : childInfo ? (
                     totalChildren > 1
-                      ? `${childInfo.name} and ${totalChildren - 1} other${totalChildren > 2 ? 's' : ''}`
-                      : `${childInfo.name}${childInfo.age ? ` (Age ${childInfo.age})` : ''}`
-                  ) : 'Child Added'}
+                      ? t('childrenNames', { name: childInfo.name, count: totalChildren - 1 })
+                      : childInfo.age ? t('childNameWithAge', { name: childInfo.name, age: childInfo.age }) : childInfo.name
+                  ) : t('childAdded')}
                 </p>
               </div>
               <CheckCircle2 className="h-5 w-5 text-primary" />
@@ -135,10 +138,10 @@ export default function OnboardingCompletePage() {
               </div>
               <div className="flex-1">
                 <p className="text-sm text-text-muted dark:text-text-muted">
-                  Daily Tasks
+                  {t('dailyTasks')}
                 </p>
                 <p className="font-semibold text-text-main dark:text-white">
-                  3 Tasks Set
+                  {t('tasksSet', { count: 3 })}
                 </p>
               </div>
               <CheckCircle2 className="h-5 w-5 text-primary" />
@@ -152,10 +155,10 @@ export default function OnboardingCompletePage() {
               </div>
               <div className="flex-1">
                 <p className="text-sm text-text-muted dark:text-text-muted">
-                  Weekly Goal
+                  {t('weeklyGoal')}
                 </p>
                 <p className="font-semibold text-text-main dark:text-white">
-                  500 Points
+                  {t('pointsGoal', { points: 500 })}
                 </p>
               </div>
               <CheckCircle2 className="h-5 w-5 text-primary" />
@@ -170,20 +173,19 @@ export default function OnboardingCompletePage() {
             className="w-full md:w-auto px-8 py-4 bg-primary text-black font-bold text-lg rounded-lg shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"
           >
             <Rocket className="h-5 w-5" />
-            Start Now
+            {t('startNow')}
           </button>
           <button
             onClick={handleAdjustSettings}
             className="w-full md:w-auto px-8 py-4 bg-transparent border-2 border-gray-200 dark:border-gray-700 text-text-muted dark:text-text-muted font-semibold text-lg rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
           >
-            Adjust Tasks/Rewards
+            {t('adjustTasksRewards')}
           </button>
         </div>
 
         {/* Reassurance Text */}
         <p className="mt-6 text-sm text-text-muted dark:text-text-muted">
-          Don&apos;t worry, you can change these settings anytime from the settings
-          menu.
+          {t('reassurance')}
         </p>
       </div>
     </div>

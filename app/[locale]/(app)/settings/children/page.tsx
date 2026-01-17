@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { ChildrenList } from '@/components/settings/ChildrenList';
 
 export default async function ChildrenSettingsPage({
@@ -8,6 +9,7 @@ export default async function ChildrenSettingsPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const t = await getTranslations('settings.children');
   const supabase = await createClient();
 
   // Check authentication
@@ -42,10 +44,10 @@ export default async function ChildrenSettingsPage({
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-          Manage Children
+          {t('title')}
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Add, edit, or remove children from your family
+          {t('subtitle')}
         </p>
       </div>
 

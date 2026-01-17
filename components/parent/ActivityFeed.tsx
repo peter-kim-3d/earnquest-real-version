@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 type Completion = {
   id: string;
   completed_at: string | null;
@@ -18,26 +20,28 @@ interface ActivityFeedProps {
 }
 
 export default function ActivityFeed({ completions }: ActivityFeedProps) {
+  const t = useTranslations('parent.activity');
+
   const formatTime = (dateString: string | null) => {
-    if (!dateString) return 'recently';
+    if (!dateString) return t('recently');
 
     const date = new Date(dateString);
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
 
     if (diffInMinutes < 60) {
-      return `${diffInMinutes}m ago`;
+      return t('minutesAgo', { count: diffInMinutes });
     } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)}h ago`;
+      return t('hoursAgo', { count: Math.floor(diffInMinutes / 60) });
     } else {
-      return `${Math.floor(diffInMinutes / 1440)}d ago`;
+      return t('daysAgo', { count: Math.floor(diffInMinutes / 1440) });
     }
   };
 
   return (
     <div className="rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
       <h3 className="text-lg font-bold text-text-main dark:text-white mb-4">
-        Recent Activity
+        {t('title')}
       </h3>
 
       {completions.length > 0 ? (
@@ -59,9 +63,9 @@ export default function ActivityFeed({ completions }: ActivityFeedProps) {
               {/* Content */}
               <div className="flex-1 pb-4">
                 <p className="text-sm text-text-main dark:text-white">
-                  <span className="font-semibold">{completion.children?.name || 'Someone'}</span>
-                  {' completed '}
-                  <span className="font-semibold">{completion.tasks?.name || 'a task'}</span>
+                  <span className="font-semibold">{completion.children?.name || t('someone')}</span>
+                  {' ' + t('completed') + ' '}
+                  <span className="font-semibold">{completion.tasks?.name || t('aTask')}</span>
                 </p>
                 <div className="flex items-center gap-3 mt-1">
                   <span className="text-xs text-text-muted dark:text-gray-500">
@@ -80,7 +84,7 @@ export default function ActivityFeed({ completions }: ActivityFeedProps) {
       ) : (
         <div className="text-center py-8">
           <p className="text-sm text-text-muted dark:text-gray-400">
-            No recent activity
+            {t('noActivity')}
           </p>
         </div>
       )}

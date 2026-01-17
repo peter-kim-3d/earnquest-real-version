@@ -1,0 +1,112 @@
+{
+  "title": "Rewards",
+  "pageTitle": "Reward Management",
+  "subtitle": "Manage your family's rewards",
+  "pageSubtitle": "Create and manage rewards your children can redeem",
+  "create": "Create Reward",
+  "newReward": "New Reward",
+  "edit": "Edit Reward",
+  "noRewards": "No rewards yet",
+  "createFirst": "Create your first reward to get started!",
+  "clickNewReward": "Click \"New Reward\" above to create your first reward!",
+  "pageStats": {
+    "totalRewards": "Total Rewards",
+    "activeRewards": "Active Rewards",
+    "purchases30d": "Purchases (30d)"
+  },
+  "form": {
+    "name": "Reward Name",
+    "namePlaceholder": "e.g., 30 Minutes TV Time",
+    "nameRequired": "Reward name is required",
+    "description": "Description",
+    "descriptionPlaceholder": "Optional details about the reward",
+    "cost": "Points Cost",
+    "costHelp": "Points required to redeem",
+    "category": "Category",
+    "icon": "Icon",
+    "image": "Image",
+    "chooseIcon": "Choose Icon",
+    "uploadImage": "Upload Image",
+    "defaultImages": "Default Images",
+    "uploadCustom": "Upload Custom",
+    "screenMinutes": "Screen Time (minutes)",
+    "screenMinutesHelp": "For screen time rewards",
+    "weeklyLimit": "Weekly Purchase Limit",
+    "weeklyLimitHelp": "Maximum purchases per week",
+    "isActive": "Active",
+    "isActiveHelp": "Inactive rewards won't appear in store"
+  },
+  "categories": {
+    "screen": "Screen Time",
+    "autonomy": "Power Ups",
+    "experience": "Fun Stuff",
+    "savings": "Savings",
+    "other": "Other",
+    "all": "All Categories"
+  },
+  "categoryLabels": {
+    "screen": "📺 Screen Time",
+    "autonomy": "🔓 Power Ups",
+    "experience": "🎉 Fun Stuff",
+    "savings": "💰 Savings",
+    "other": "🎁 Other"
+  },
+  "filter": {
+    "all": "All Rewards",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "categoryInfo": {
+    "screen": {
+      "title": "How Screen Time Works:",
+      "description": "Child requests usage → Parent approves → Timer starts automatically."
+    },
+    "autonomy": {
+      "title": "Instant Redemption:",
+      "description": "Reward is marked \"Used\" immediately upon purchase. No parent approval needed."
+    },
+    "savings": {
+      "title": "Instant Deduction:",
+      "description": "Points are deducted immediately. Great for long-term saving goals."
+    },
+    "experience": {
+      "title": "Manual Fulfillment:",
+      "description": "Child purchases this reward → Parent marks it as \"Given\" when fulfilled."
+    }
+  },
+  "actions": {
+    "save": "Save Reward",
+    "saving": "Saving...",
+    "create": "Create Reward",
+    "creating": "Creating...",
+    "update": "Update Reward",
+    "delete": "Delete Reward",
+    "activate": "Activate",
+    "deactivate": "Deactivate"
+  },
+  "confirm": {
+    "deleteTitle": "Delete Reward Permanently?",
+    "deleteDescription": "Are you sure you want to permanently delete \"{name}\"? This will remove it from all children and cannot be undone."
+  },
+  "toast": {
+    "created": "Reward created successfully",
+    "updated": "Reward updated successfully",
+    "deleted": "Reward deleted successfully",
+    "activated": "Reward activated",
+    "deactivated": "Reward deactivated",
+    "error": "Failed to save reward. Please try again."
+  },
+  "stats": {
+    "purchased30d": "Purchased (30d)",
+    "cost": "Cost",
+    "screenTime": "Screen Time",
+    "weeklyLimit": "Weekly Limit"
+  },
+  "valueContext": {
+    "title": "Value Context",
+    "comparison": "Compared to other rewards",
+    "similar": "Similar rewards",
+    "higher": "Higher value than most",
+    "lower": "Lower value than most"
+  }
+}

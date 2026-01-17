@@ -7,6 +7,7 @@ import TaskCardPending from '@/components/tasks/TaskCardPending';
 import TaskCardNeedsWork from '@/components/tasks/TaskCardNeedsWork';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { TaskTimeContext, TIME_CONTEXT_INFO } from '@/lib/types/task';
+import { useTranslations } from 'next-intl';
 
 type Task = {
   id: string;
@@ -55,6 +56,7 @@ const TIME_CONTEXT_ORDER: TaskTimeContext[] = ['morning', 'after_school', 'eveni
 
 export default function TaskList({ tasks, completions, childId, childName }: TaskListProps) {
   const router = useRouter();
+  const t = useTranslations('child.tasks');
   const [activeTab, setActiveTab] = useState<TabType>('todo');
   const [optimisticCompletedIds, setOptimisticCompletedIds] = useState<Set<string>>(new Set());
 
@@ -155,9 +157,9 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
   };
 
   const tabs = [
-    { id: 'todo' as TabType, label: 'To Do', count: todoTasks.length + fixRequestedTasks.length },
-    { id: 'pending' as TabType, label: 'Parent Checking', count: pendingTasks.length },
-    { id: 'completed' as TabType, label: 'Completed', count: completedTasks.length },
+    { id: 'todo' as TabType, label: t('toDo'), count: todoTasks.length + fixRequestedTasks.length },
+    { id: 'pending' as TabType, label: t('parentChecking'), count: pendingTasks.length },
+    { id: 'completed' as TabType, label: t('completed'), count: completedTasks.length },
   ];
 
   return (
@@ -204,7 +206,7 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
                 <div className="flex items-center gap-2">
                   <span className="text-lg">⚠️</span>
                   <h3 className="text-sm font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wide">
-                    Needs Your Attention
+                    {t('needsAttention')}
                   </h3>
                 </div>
                 {fixRequestedTasks.map((task) => {
@@ -252,10 +254,10 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
             {todoTasks.length === 0 && fixRequestedTasks.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-lg font-semibold text-text-muted dark:text-gray-400">
-                  All caught up! 🎉
+                  {t('allCaughtUp')}
                 </p>
                 <p className="text-sm text-text-muted dark:text-gray-500 mt-2">
-                  Check back tomorrow for new quests
+                  {t('checkBackTomorrow')}
                 </p>
               </div>
             )}
@@ -273,7 +275,7 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
             {pendingTasks.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-lg font-semibold text-text-muted dark:text-gray-400">
-                  No tasks waiting for approval
+                  {t('noTasksWaiting')}
                 </p>
               </div>
             )}
@@ -300,7 +302,7 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
                       />
                       <div>
                         <h3 className="font-bold text-text-main dark:text-white">{task.name}</h3>
-                        <p className="text-sm text-text-muted dark:text-gray-400">Completed today</p>
+                        <p className="text-sm text-text-muted dark:text-gray-400">{t('completedToday')}</p>
                       </div>
                     </div>
                     <span className="text-sm font-bold text-green-600 dark:text-green-400">
@@ -314,10 +316,10 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
             {completedTasks.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-lg font-semibold text-text-muted dark:text-gray-400">
-                  No completed tasks today
+                  {t('noCompletedToday')}
                 </p>
                 <p className="text-sm text-text-muted dark:text-gray-500 mt-2">
-                  Start completing quests to earn points!
+                  {t('startCompleting')}
                 </p>
               </div>
             )}

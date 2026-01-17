@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, Bell, Package, Ticket } from '@phosphor-icons/react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import TicketCard from '@/components/store/TicketCard';
 
 type Purchase = {
@@ -38,6 +39,7 @@ export default function PendingTicketsSection({
   activeTickets,
 }: PendingTicketsSectionProps) {
   const router = useRouter();
+  const t = useTranslations('parent.pendingTickets');
   const [approving, setApproving] = useState<string | null>(null);
   const [fulfilling, setFulfilling] = useState<string | null>(null);
 
@@ -53,15 +55,15 @@ export default function PendingTicketsSection({
         throw new Error(error.error || 'Failed to approve');
       }
 
-      toast.success('Approved!', {
-        description: 'Have fun!',
+      toast.success(t('approved'), {
+        description: t('haveFun'),
       });
 
       router.refresh();
     } catch (error: any) {
       console.error('Approve error:', error);
-      toast.error('Approval failed', {
-        description: error.message || 'Please try again.',
+      toast.error(t('approvalFailed'), {
+        description: error.message || t('pleaseTryAgain'),
       });
     } finally {
       setApproving(null);
@@ -80,15 +82,15 @@ export default function PendingTicketsSection({
         throw new Error(error.error || 'Failed to fulfill');
       }
 
-      toast.success('Marked as given!', {
-        description: 'Ticket has been fulfilled.',
+      toast.success(t('markedAsGiven'), {
+        description: t('ticketFulfilled'),
       });
 
       router.refresh();
     } catch (error: any) {
       console.error('Fulfill error:', error);
-      toast.error('Fulfillment failed', {
-        description: error.message || 'Please try again.',
+      toast.error(t('fulfillmentFailed'), {
+        description: error.message || t('pleaseTryAgain'),
       });
     } finally {
       setFulfilling(null);
@@ -110,12 +112,10 @@ export default function PendingTicketsSection({
         </div>
         <div>
           <h2 className="text-xl font-bold text-text-main dark:text-white">
-            🎫 Tickets to Handle
+            🎫 {t('ticketsTitle')}
           </h2>
           <p className="text-sm text-text-muted dark:text-gray-400">
-            {pendingTickets.length + activeTickets.length} ticket
-            {pendingTickets.length + activeTickets.length === 1 ? '' : 's'}{' '}
-            need your attention
+            {t('ticketsNeedAttention', { count: pendingTickets.length + activeTickets.length })}
           </p>
         </div>
       </div>
@@ -126,7 +126,7 @@ export default function PendingTicketsSection({
           <div className="flex items-center gap-2 mb-4">
             <Bell size={20} weight="fill" className="text-yellow-600 dark:text-yellow-400" />
             <h3 className="font-bold text-yellow-700 dark:text-yellow-300">
-              Use Requests ({pendingTickets.length})
+              {t('useRequests', { count: pendingTickets.length })}
             </h3>
           </div>
           <div className="grid gap-3">
@@ -151,7 +151,7 @@ export default function PendingTicketsSection({
           <div className="flex items-center gap-2 mb-4">
             <Package size={20} weight="fill" className="text-blue-600 dark:text-blue-400" />
             <h3 className="font-bold text-blue-700 dark:text-blue-300">
-              Ready to Give ({activeTickets.length})
+              {t('readyToGive', { count: activeTickets.length })}
             </h3>
           </div>
           <div className="grid gap-3">

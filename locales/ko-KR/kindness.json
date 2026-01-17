@@ -1,0 +1,40 @@
+{
+  "send": {
+    "pageTitle": "감사 보내기",
+    "pageSubtitle": "친절을 축하하고 누군가의 하루를 밝게 해주세요",
+    "noChildren": "아이를 찾을 수 없습니다",
+    "noChildrenDesc": "감사 카드를 보내려면 가족에 아이를 추가하세요."
+  },
+  "form": {
+    "selectRecipient": "받는 사람 선택",
+    "selectRecipientDesc": "누구에게 감사를 보내시겠습니까?",
+    "selectTheme": "테마 선택",
+    "selectThemeDesc": "카드 스타일을 선택하세요",
+    "writeMessage": "메시지 작성",
+    "writeMessageDesc": "개인적인 터치를 더하세요",
+    "messagePlaceholder": "여기에 감사 메시지를 작성하세요...",
+    "preview": "미리보기",
+    "send": "감사 보내기",
+    "sending": "보내는 중..."
+  },
+  "themes": {
+    "thankYou": "고마워요",
+    "appreciation": "감사",
+    "kindness": "친절",
+    "helper": "도우미 스타",
+    "teamwork": "팀워크",
+    "encouragement": "격려"
+  },
+  "badge": {
+    "earned": "배지 획득!",
+    "collection": "배지 컬렉션",
+    "noBadges": "아직 배지가 없습니다",
+    "earnBadges": "감사 카드를 받으면 배지를 얻을 수 있어요!"
+  },
+  "toast": {
+    "sent": "감사가 전달되었어요!",
+    "sentDesc": "감사 카드가 전달되었습니다.",
+    "error": "전송 실패",
+    "errorDesc": "다시 시도해 주세요."
+  }
+}

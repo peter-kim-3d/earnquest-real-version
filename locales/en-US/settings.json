@@ -1,0 +1,129 @@
+{
+  "title": "Settings",
+  "subtitle": "Manage your account and preferences",
+  "sections": {
+    "profile": "Profile",
+    "children": "Children",
+    "family": "Family",
+    "notifications": "Notifications",
+    "appearance": "Appearance",
+    "language": "Language",
+    "security": "Security",
+    "about": "About"
+  },
+  "profile": {
+    "title": "Profile Settings",
+    "name": "Full Name",
+    "email": "Email",
+    "avatar": "Profile Picture",
+    "changeAvatar": "Change Picture",
+    "removeAvatar": "Remove Picture",
+    "save": "Save Changes"
+  },
+  "children": {
+    "title": "Manage Children",
+    "subtitle": "Add, edit, or remove children from your family",
+    "addChild": "Add Child",
+    "editChild": "Edit Child",
+    "noChildren": "No children added yet",
+    "addFirst": "Click \"Add Child\" to get started",
+    "name": "Name",
+    "ageGroup": "Age Group",
+    "pin": "PIN Code",
+    "setPin": "Set PIN",
+    "changePin": "Change PIN",
+    "removePin": "Remove PIN",
+    "pinInfo": "PIN is used for child login on shared devices",
+    "delete": "Remove Child",
+    "deleteConfirm": "Are you sure you want to remove {name}? This will delete all their data.",
+    "avatar": "Avatar",
+    "viewAsChild": "View as Child",
+    "questPoints": "Quest Points",
+    "memberSince": "Member since {date}",
+    "ageGroups": {
+      "4-6": "4-6 years",
+      "7-9": "7-9 years",
+      "10-12": "10-12 years",
+      "13+": "13+ years"
+    },
+    "ageGroupLabels": {
+      "5-7": "Mini Earners (5-7)",
+      "8-11": "Pro Earners (8-11)",
+      "12-14": "Teen Earners (12-14)"
+    }
+  },
+  "family": {
+    "title": "Family Settings",
+    "familyName": "Family Name",
+    "inviteParent": "Invite Another Parent",
+    "inviteLink": "Invite Link",
+    "copyLink": "Copy Link",
+    "linkCopied": "Link copied!",
+    "members": "Family Members",
+    "role": "Role",
+    "parent": "Parent",
+    "child": "Child",
+    "remove": "Remove",
+    "leave": "Leave Family"
+  },
+  "notifications": {
+    "title": "Notification Settings",
+    "push": "Push Notifications",
+    "email": "Email Notifications",
+    "taskCompleted": "Task Completions",
+    "taskCompletedDesc": "Get notified when a child completes a task",
+    "rewardPurchased": "Reward Purchases",
+    "rewardPurchasedDesc": "Get notified when a child purchases a reward",
+    "weeklyReport": "Weekly Report",
+    "weeklyReportDesc": "Receive a weekly summary of family activity"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "title": "Language",
+    "current": "Current Language",
+    "select": "Select Language",
+    "english": "English",
+    "korean": "한국어"
+  },
+  "security": {
+    "title": "Security",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "twoFactor": "Two-Factor Authentication",
+    "twoFactorDesc": "Add an extra layer of security",
+    "sessions": "Active Sessions",
+    "logoutAll": "Log out all devices"
+  },
+  "about": {
+    "title": "About EarnQuest",
+    "version": "Version",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "help": "Help & Support",
+    "feedback": "Send Feedback",
+    "rateApp": "Rate the App"
+  },
+  "danger": {
+    "title": "Danger Zone",
+    "deleteAccount": "Delete Account",
+    "deleteAccountDesc": "Permanently delete your account and all associated data",
+    "deleteConfirm": "This action cannot be undone. All your data will be permanently deleted."
+  },
+  "toast": {
+    "saved": "Settings saved successfully",
+    "error": "Failed to save settings",
+    "pinSet": "PIN code set successfully",
+    "pinChanged": "PIN code changed successfully",
+    "pinRemoved": "PIN code removed",
+    "avatarUpdated": "Avatar updated",
+    "profileUpdated": "Profile updated"
+  }
+}

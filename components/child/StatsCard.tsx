@@ -2,6 +2,7 @@
 
 import { Flame, TrendingUp } from 'lucide-react';
 import { formatPoints, formatPercentage } from '@/lib/format';
+import { useTranslations } from 'next-intl';
 
 type Child = {
   name: string;
@@ -16,6 +17,7 @@ interface StatsCardProps {
 }
 
 export default function StatsCard({ child }: StatsCardProps) {
+  const t = useTranslations('child.stats');
   const weeklyGoal = child.settings?.weeklyGoal || 500;
   const currentPoints = child.points_balance;
   const progressPercentage = Math.min((currentPoints / weeklyGoal) * 100, 100);
@@ -26,7 +28,7 @@ export default function StatsCard({ child }: StatsCardProps) {
       <div className="rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 shadow-card">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
-            Total XP
+            {t('totalXp')}
           </h3>
           <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
         </div>
@@ -34,7 +36,7 @@ export default function StatsCard({ child }: StatsCardProps) {
           {formatPoints(currentPoints)}
         </p>
         <p className="text-sm text-text-muted dark:text-gray-400">
-          Quest Points
+          {t('questPoints')}
         </p>
       </div>
 
@@ -42,12 +44,12 @@ export default function StatsCard({ child }: StatsCardProps) {
       <div className="rounded-xl bg-gradient-to-br from-orange-500 to-red-500 p-6 shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
-            Day Streak
+            {t('dayStreak')}
           </h3>
           <Flame className="h-6 w-6 text-white" />
         </div>
         <p className="text-5xl font-black text-white mb-1">0</p>
-        <p className="text-sm text-white/80">Keep it going!</p>
+        <p className="text-sm text-white/80">{t('keepGoing')}</p>
       </div>
 
       {/* Weekly Goal Card */}
@@ -55,7 +57,7 @@ export default function StatsCard({ child }: StatsCardProps) {
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
-              Weekly Goal
+              {t('weeklyGoal')}
             </h3>
             <span className="text-sm font-bold text-primary">
               {formatPercentage(progressPercentage)}
@@ -74,18 +76,18 @@ export default function StatsCard({ child }: StatsCardProps) {
         </p>
         <p className="text-sm text-text-muted dark:text-gray-400">
           {weeklyGoal - currentPoints > 0
-            ? `${weeklyGoal - currentPoints} XP left to goal`
-            : 'Goal reached! 🎉'}
+            ? t('xpLeftToGoal', { points: weeklyGoal - currentPoints })
+            : t('goalReached')}
         </p>
 
         {/* Tip Card */}
         {progressPercentage < 50 && (
           <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
             <p className="text-xs font-semibold text-blue-900 dark:text-blue-100">
-              💡 Pro Tip
+              💡 {t('proTip')}
             </p>
             <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-              Complete 2-3 quests per day to reach your weekly goal!
+              {t('proTipMessage')}
             </p>
           </div>
         )}

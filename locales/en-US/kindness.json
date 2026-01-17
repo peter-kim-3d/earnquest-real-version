@@ -1,0 +1,40 @@
+{
+  "send": {
+    "pageTitle": "Send Gratitude",
+    "pageSubtitle": "Celebrate kindness and make someone's day brighter",
+    "noChildren": "No children found",
+    "noChildrenDesc": "Add children to your family to send gratitude cards."
+  },
+  "form": {
+    "selectRecipient": "Select Recipient",
+    "selectRecipientDesc": "Who would you like to send gratitude to?",
+    "selectTheme": "Select Theme",
+    "selectThemeDesc": "Choose a card style",
+    "writeMessage": "Write Message",
+    "writeMessageDesc": "Add a personal touch",
+    "messagePlaceholder": "Write your gratitude message here...",
+    "preview": "Preview",
+    "send": "Send Gratitude",
+    "sending": "Sending..."
+  },
+  "themes": {
+    "thankYou": "Thank You",
+    "appreciation": "Appreciation",
+    "kindness": "Kindness",
+    "helper": "Helper Star",
+    "teamwork": "Teamwork",
+    "encouragement": "Encouragement"
+  },
+  "badge": {
+    "earned": "Badge Earned!",
+    "collection": "Badge Collection",
+    "noBadges": "No badges yet",
+    "earnBadges": "Earn badges by receiving gratitude cards!"
+  },
+  "toast": {
+    "sent": "Gratitude sent!",
+    "sentDesc": "Your gratitude card has been delivered.",
+    "error": "Failed to send",
+    "errorDesc": "Please try again."
+  }
+}

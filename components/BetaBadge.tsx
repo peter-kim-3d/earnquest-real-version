@@ -1,9 +1,14 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
+
 interface BetaBadgeProps {
   className?: string;
   size?: 'sm' | 'md' | 'lg';
 }
 
 export default function BetaBadge({ className = '', size = 'md' }: BetaBadgeProps) {
+  const t = useTranslations('common.accessibility');
   const showBeta = process.env.NEXT_PUBLIC_SHOW_BETA === 'true';
 
   if (!showBeta) return null;
@@ -16,7 +21,7 @@ export default function BetaBadge({ className = '', size = 'md' }: BetaBadgeProp
 
   return (
     <span className={`inline-flex items-center rounded-md font-bold bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-sm ${sizeClasses[size]} ${className}`}>
-      BETA
+      {t('beta')}
     </span>
   );
 }

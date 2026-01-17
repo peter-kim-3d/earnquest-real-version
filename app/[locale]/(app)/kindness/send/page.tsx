@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { getTranslations } from 'next-intl/server';
 import { SendGratitudeForm } from '@/components/kindness/SendGratitudeForm';
 
 export default async function SendGratitudePage({
@@ -8,6 +9,7 @@ export default async function SendGratitudePage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const t = await getTranslations('kindness.send');
   const supabase = await createClient();
 
   // Check authentication
@@ -41,9 +43,9 @@ export default async function SendGratitudePage({
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="text-center py-12">
-          <h2 className="text-2xl font-semibold mb-4">No children found</h2>
+          <h2 className="text-2xl font-semibold mb-4">{t('noChildren')}</h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Add children to your family to send gratitude cards.
+            {t('noChildrenDesc')}
           </p>
         </div>
       </div>
@@ -56,10 +58,10 @@ export default async function SendGratitudePage({
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            Send Gratitude ❤️
+            {t('pageTitle')} ❤️
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Celebrate kindness and make someone&apos;s day brighter
+            {t('pageSubtitle')}
           </p>
         </div>
 

@@ -1,0 +1,159 @@
+{
+  "welcome": {
+    "title": "Welcome to EarnQuest!",
+    "subtitle": "Let's set up your family's quest",
+    "getStarted": "Get Started"
+  },
+  "addChild": {
+    "title": "Who is joining EarnQuest?",
+    "subtitle": "Add your children's details to customize their rewards and tasks.",
+    "nameLabel": "Child's First Name",
+    "namePlaceholder": "What's their name?",
+    "nameRequired": "Name is required",
+    "birthdateLabel": "Date of Birth",
+    "birthdateRequired": "Birthdate is required",
+    "ageGroupLabel": "Age Group",
+    "ageGroups": {
+      "5-7": "5-7 years",
+      "8-11": "8-11 years",
+      "12-14": "12-14 years",
+      "mini": "Mini Earners",
+      "pro": "Pro Earners",
+      "teen": "Teen Earners"
+    },
+    "calculatedInfo": "Calculated Info",
+    "yearsOld": "{age} years old",
+    "childNumber": "Child #{number}",
+    "addAnother": "Add Another Child",
+    "saveAndContinue": "Save {count, plural, one {# Child} other {# Children}} & Continue",
+    "mustHaveOneChild": "You must have at least one child",
+    "fillAllFields": "Please fill in all child names and birthdates",
+    "childrenAdded": "{count, plural, one {# child} other {# children}} added successfully!",
+    "addFailed": "Failed to add children. Please try again.",
+    "avatar": "Choose an Avatar",
+    "addChild": "Add Child",
+    "continue": "Continue",
+    "skip": "Skip for now"
+  },
+  "selectStyle": {
+    "title": "Choose Your Task Preset",
+    "subtitle": "Pick a starting point that fits your goals. You can always customize tasks later.",
+    "stepTitle": "Style Selection",
+    "optionalAddons": "Optional Add-ons",
+    "totalDailyPoints": "Total daily points potential:",
+    "helpMeChoose": "Not sure which to pick? Help me choose",
+    "nextSetValues": "Next: Set Values",
+    "childRequired": "Child required",
+    "childRequiredDescription": "Please add a child first",
+    "saveFailed": "Save failed",
+    "presets": {
+      "starter": {
+        "name": "Starter",
+        "tagline": "A simple start with core habits"
+      },
+      "balanced": {
+        "name": "Balanced",
+        "tagline": "Well-rounded daily routines"
+      },
+      "learningFocus": {
+        "name": "Learning Focus",
+        "tagline": "Academic excellence prioritized"
+      }
+    },
+    "recommended": "Recommended",
+    "tasks": "{count} tasks",
+    "includes": "Includes",
+    "moreTasks": "{count} more tasks"
+  },
+  "modules": {
+    "title": "Add Optional Modules",
+    "subtitle": "Optional add-ons. You can change these later in Settings.",
+    "hygiene": {
+      "name": "Hygiene Routine",
+      "description": "Morning and evening hygiene habits"
+    },
+    "fitness": {
+      "name": "Fitness",
+      "description": "Physical exercise and outdoor activities"
+    },
+    "hobby": {
+      "name": "Hobby",
+      "description": "Music, art, and creative activities"
+    },
+    "tasksCount": "{count} tasks"
+  },
+  "familyValues": {
+    "title": "Set the Standard",
+    "subtitle": "Select the non-negotiable values for your household. These activities earn respect, not points.",
+    "stepTitle": "Values",
+    "whyNoPoints": "Why no points?",
+    "whyNoPointsDescription": "Reinforcing intrinsic motivation helps children understand that some behaviors are expected as part of being a family member, rather than distinct tasks to be \"paid\" for.",
+    "addCustomValue": "Add Custom Value",
+    "skipForNow": "Skip for Now",
+    "completeSelection": "Complete Selection",
+    "saveFailed": "Save failed",
+    "items": {
+      "gratitude": {
+        "title": "Express Gratitude",
+        "description": "Saying please and thank you without being reminded."
+      },
+      "greetings": {
+        "title": "Family Greetings",
+        "description": "Saying good morning and good night to everyone."
+      },
+      "honesty": {
+        "title": "Honesty",
+        "description": "Telling the truth, even when it is difficult."
+      },
+      "respect": {
+        "title": "Respect",
+        "description": "Listening when others are speaking."
+      },
+      "cleanSpaces": {
+        "title": "Clean Spaces",
+        "description": "Putting your own dishes in the sink after eating."
+      }
+    },
+    "values": {
+      "responsibility": "Responsibility",
+      "kindness": "Kindness",
+      "creativity": "Creativity",
+      "health": "Health",
+      "learning": "Learning",
+      "teamwork": "Teamwork"
+    },
+    "selectAtLeast": "Select at least 1 value",
+    "selected": "{count} selected"
+  },
+  "complete": {
+    "title": "Ready!",
+    "subtitle": "You're all set up! {childCount, plural, one {Your child's} other {Your children's}} first tasks are waiting. Let's start building those good habits together.",
+    "configSummary": "Configuration Summary",
+    "childProfile": "Child Profile",
+    "childAdded": "Child Added",
+    "childNameWithAge": "{name} (Age {age})",
+    "childrenNames": "{name} and {count, plural, one {# other} other {# others}}",
+    "dailyTasks": "Daily Tasks",
+    "tasksSet": "{count} Tasks Set",
+    "weeklyGoal": "Weekly Goal",
+    "pointsGoal": "{points} Points",
+    "startNow": "Start Now",
+    "adjustTasksRewards": "Adjust Tasks/Rewards",
+    "reassurance": "Don't worry, you can change these settings anytime from the settings menu.",
+    "summary": {
+      "children": "{count, plural, one {# child} other {# children}} added",
+      "tasks": "{count} tasks ready",
+      "style": "Using {style} preset"
+    },
+    "tips": {
+      "title": "Quick Tips",
+      "tip1": "Children can complete tasks from their dashboard",
+      "tip2": "You'll approve task completions in the Action Center",
+      "tip3": "Rewards can be redeemed in the Store"
+    },
+    "goToDashboard": "Go to Dashboard"
+  },
+  "progress": {
+    "step": "Step {current} of {total}"
+  }
+}

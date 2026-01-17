@@ -2,7 +2,11 @@ import { createClient } from '@/lib/supabase/server';
 import { getOrCreateUserProfile } from '@/lib/services/user';
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ locale: string }> }
+) {
+  const { locale } = await params;
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
 
@@ -12,7 +16,7 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error('Error exchanging code for session:', error);
-      return NextResponse.redirect(`${requestUrl.origin}/en-US/login?error=auth_failed`);
+      return NextResponse.redirect(`${requestUrl.origin}/${locale}/login?error=auth_failed`);
     }
 
     // Create family and user profile if they don't exist
@@ -28,7 +32,7 @@ export async function GET(request: Request) {
             .eq('family_id', userProfile.family_id);
 
           if (count && count > 0) {
-            return NextResponse.redirect(`${requestUrl.origin}/en-US/dashboard`);
+            return NextResponse.redirect(`${requestUrl.origin}/${locale}/dashboard`);
           }
         }
       } catch (err) {
@@ -39,5 +43,5 @@ export async function GET(request: Request) {
   }
 
   // URL to redirect to after sign in process completes
-  return NextResponse.redirect(`${requestUrl.origin}/en-US/onboarding/add-child`);
+  return NextResponse.redirect(`${requestUrl.origin}/${locale}/onboarding/add-child`);
 }

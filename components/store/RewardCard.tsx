@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import Image from 'next/image';
 import { Sparkle, Lock } from '@phosphor-icons/react';
 import { AppIcon } from '@/components/ui/AppIcon';
@@ -39,6 +40,7 @@ export default function RewardCard({
   screenBudget,
 }: RewardCardProps) {
   const router = useRouter();
+  const locale = useLocale();
   const [loading, setLoading] = useState(false);
 
   const canAfford = currentBalance >= reward.points_cost;
@@ -91,7 +93,7 @@ export default function RewardCard({
         description: `You now have ${result.newBalance} QP left.`,
       });
       router.refresh();
-      router.push('/en-US/child/tickets');
+      router.push(`/${locale}/child/tickets`);
     } catch (error: any) {
       console.error('Failed to purchase:', error);
       toast.error('Purchase failed', {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { randomBytes } from 'crypto';
+import { cookies } from 'next/headers';
 
 /**
  * POST /api/family/invite
@@ -115,7 +116,9 @@ export async function POST(request: NextRequest) {
 
     // Generate invite URL
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001';
-    const inviteUrl = `${baseUrl}/en-US/invite/${token}`;
+    const cookieStore = await cookies();
+    const locale = cookieStore.get('NEXT_LOCALE')?.value || 'en-US';
+    const inviteUrl = `${baseUrl}/${locale}/invite/${token}`;
 
     // TODO: Send email with invite link (implement email service later)
     // For now, just return the link

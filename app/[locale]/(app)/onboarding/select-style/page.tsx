@@ -8,10 +8,15 @@ import ModuleSelector from '@/components/onboarding/ModuleSelector';
 import { PresetKey, ModuleKey } from '@/lib/types/task';
 import { calculateDailyPoints } from '@/lib/utils/onboarding';
 import { toast } from 'sonner';
+import { useLocale, useTranslations } from 'next-intl';
 
 export default function SelectStylePage() {
   const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
+  const t = useTranslations('onboarding.selectStyle');
+  const tProgress = useTranslations('onboarding.progress');
+  const tCommon = useTranslations('common');
   const childId = searchParams.get('childId');
   const [selectedPreset, setSelectedPreset] = useState<PresetKey>('balanced');
   const [enabledModules, setEnabledModules] = useState<ModuleKey[]>([]);
@@ -43,10 +48,10 @@ export default function SelectStylePage() {
       }
 
       if (!firstChild) {
-        toast.error('Child required', {
-          description: 'Please add a child first',
+        toast.error(t('childRequired'), {
+          description: t('childRequiredDescription'),
         });
-        router.push('/en-US/onboarding/add-child');
+        router.push(`/${locale}/onboarding/add-child`);
         return;
       }
 
@@ -76,11 +81,11 @@ export default function SelectStylePage() {
 
       // Navigate to next step
       const firstChildId = firstChild.id;
-      router.push(`/en-US/onboarding/family-values?childId=${firstChildId}&preset=${selectedPreset}`);
+      router.push(`/${locale}/onboarding/family-values?childId=${firstChildId}&preset=${selectedPreset}`);
     } catch (error) {
       console.error('Failed to save style:', error);
-      toast.error('Save failed', {
-        description: 'Please try again.',
+      toast.error(t('saveFailed'), {
+        description: tCommon('errors.generic'),
       });
     } finally {
       setLoading(false);
@@ -95,22 +100,22 @@ export default function SelectStylePage() {
       {/* Progress Bar Section */}
       <div className="flex flex-col gap-3 p-4 mb-4">
         <div className="flex gap-6 justify-between">
-          <p className="text-text-main dark:text-white text-base font-medium leading-normal">Step 2 of 4</p>
+          <p className="text-text-main dark:text-white text-base font-medium leading-normal">{tProgress('step', { current: 2, total: 4 })}</p>
         </div>
         <div className="rounded bg-gray-200 dark:bg-gray-700">
           <div className="h-2 rounded bg-primary shadow-[0_0_10px_rgba(55,236,19,0.5)]" style={{ width: '50%' }} />
         </div>
-        <p className="text-text-muted dark:text-text-muted text-sm font-normal leading-normal">Style Selection</p>
+        <p className="text-text-muted dark:text-text-muted text-sm font-normal leading-normal">{t('stepTitle')}</p>
       </div>
 
       {/* Page Heading */}
       <div className="flex flex-wrap justify-between gap-3 px-4 pb-4">
         <div className="flex min-w-72 flex-col gap-3">
           <h1 className="text-text-main dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
-            Choose Your Task Preset
+            {t('title')}
           </h1>
           <p className="text-text-muted dark:text-text-muted text-base font-normal leading-normal max-w-2xl">
-            Pick a starting point that fits your goals. You can always customize tasks later.
+            {t('subtitle')}
           </p>
         </div>
       </div>
@@ -123,7 +128,7 @@ export default function SelectStylePage() {
       {/* Module Add-ons */}
       <div className="px-4 py-6">
         <div className="max-w-full">
-          <h3 className="text-text-main dark:text-white text-lg font-bold mb-4">Optional Add-ons</h3>
+          <h3 className="text-text-main dark:text-white text-lg font-bold mb-4">{t('optionalAddons')}</h3>
           <ModuleSelector enabledModules={enabledModules} onToggle={handleToggleModule} />
         </div>
       </div>
@@ -132,8 +137,8 @@ export default function SelectStylePage() {
       <div className="px-4 py-4">
         <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
           <div className="flex items-center justify-between">
-            <span className="text-text-muted dark:text-text-muted font-medium">Total daily points potential:</span>
-            <span className="text-2xl font-black text-primary">{totalDailyPoints} XP</span>
+            <span className="text-text-muted dark:text-text-muted font-medium">{t('totalDailyPoints')}</span>
+            <span className="text-2xl font-black text-primary">{totalDailyPoints} {tCommon('points.xp')}</span>
           </div>
         </div>
       </div>
@@ -143,7 +148,7 @@ export default function SelectStylePage() {
         <button className="w-full text-center group">
           <p className="text-text-muted dark:text-text-muted text-sm font-normal leading-normal underline decoration-dashed underline-offset-4 group-hover:text-primary transition-colors flex items-center justify-center gap-2">
             <HelpCircle className="h-4 w-4" />
-            Not sure which to pick? Help me choose
+            {t('helpMeChoose')}
           </p>
         </button>
       </div>
@@ -155,14 +160,14 @@ export default function SelectStylePage() {
           className="flex items-center gap-2 px-6 py-3 rounded-full text-text-muted dark:text-text-muted font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
-          Back
+          {tCommon('buttons.back')}
         </button>
         <button
           onClick={handleNext}
           disabled={loading}
           className="flex items-center gap-2 px-10 py-4 rounded-full bg-primary hover:bg-primary/90 text-black font-bold text-lg shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Saving...' : 'Next: Set Values'}
+          {loading ? tCommon('status.saving') : t('nextSetValues')}
           <ArrowRight className="h-5 w-5" />
         </button>
       </div>

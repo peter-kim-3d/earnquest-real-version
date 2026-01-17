@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Target, Trophy, Pencil, Trash, CheckCircle } from '@phosphor-icons/react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import GoalFormDialog from './GoalFormDialog';
 import { TierBadge, EffortBadge } from '@/components/ui/EffortBadge';
 import { Tier, estimateTimeToGoal } from '@/lib/utils/tiers';
@@ -34,6 +35,7 @@ interface GoalListProps {
 }
 
 export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: GoalListProps) {
+  const t = useTranslations('goals');
   const router = useRouter();
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -70,15 +72,15 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: 
         throw new Error('Failed to delete goal');
       }
 
-      toast.success('Goal Deleted', {
-        description: `"${deleteGoal.name}" has been removed.`,
+      toast.success(t('toast.deleted'), {
+        description: t('toast.deletedDescription', { name: deleteGoal.name }),
       });
 
       router.refresh();
     } catch (error) {
       console.error('Error deleting goal:', error);
-      toast.error('Delete Failed', {
-        description: 'Failed to delete goal. Please try again.',
+      toast.error(t('toast.deleteFailed'), {
+        description: t('toast.deleteFailedDescription'),
       });
     } finally {
       setIsDeleting(false);
@@ -97,14 +99,14 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: 
   // Group by child
   const groupedGoals = filteredGoals.reduce((acc, goal) => {
     const child = childrenList.find((c) => c.id === goal.child_id);
-    const childName = child?.name || 'Unknown';
+    const childName = child?.name || t('unknown');
     if (!acc[childName]) acc[childName] = [];
     acc[childName].push(goal);
     return acc;
   }, {} as Record<string, Goal[]>);
 
   const getChildName = (childId: string) => {
-    return childrenList.find((c) => c.id === childId)?.name || 'Unknown';
+    return childrenList.find((c) => c.id === childId)?.name || t('unknown');
   };
 
   return (
@@ -122,7 +124,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: 
             }`}
           >
             <Target size={16} weight="bold" />
-            All Goals
+            {t('filter.all')}
           </button>
           <button
             onClick={() => setFilter('active')}
@@ -133,7 +135,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: 
             }`}
           >
             <Target size={16} weight="fill" />
-            Active
+            {t('filter.active')}
           </button>
           <button
             onClick={() => setFilter('completed')}
@@ -144,7 +146,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: 
             }`}
           >
             <Trophy size={16} weight="fill" />
-            Completed
+            {t('filter.completed')}
           </button>
         </div>
 
@@ -155,7 +157,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: 
             onChange={(e) => setSelectedChild(e.target.value)}
             className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-medium"
           >
-            <option value="all">All Children</option>
+            <option value="all">{t('childFilter.all')}</option>
             {childrenList.map((child) => (
               <option key={child.id} value={child.id}>
                 {child.name}
@@ -170,7 +172,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: 
           className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all flex items-center gap-2"
         >
           <Plus size={18} weight="bold" />
-          New Goal
+          {t('newGoal')}
         </button>
       </div>
 
@@ -178,7 +180,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: 
       {Object.entries(groupedGoals).map(([childName, childGoals]) => (
         <div key={childName}>
           <h2 className="text-xl font-bold text-text-main dark:text-white mb-4 flex items-center gap-2">
-            <span>{childName}&apos;s Goals</span>
+            <span>{t('childGoals', { name: childName })}</span>
             <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
               ({childGoals.length})
             </span>
@@ -268,7 +270,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: 
                     {goal.is_completed ? (
                       <div className="flex items-center gap-2 text-sm text-yellow-700 dark:text-yellow-400">
                         <CheckCircle size={16} weight="fill" />
-                        <span className="font-medium">Completed!</span>
+                        <span className="font-medium">{t('completedStatus')}</span>
                       </div>
                     ) : (
                       <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -288,17 +290,17 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: 
         <div className="text-center py-12 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
           <Target size={48} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
           <p className="text-lg font-semibold text-text-muted dark:text-gray-400 mb-2">
-            {filter === 'completed' ? 'No completed goals yet' : 'No goals yet'}
+            {filter === 'completed' ? t('noCompletedGoals') : t('noGoals')}
           </p>
           <p className="text-sm text-text-muted dark:text-gray-500 mb-4">
-            Create a savings goal for your children to work toward!
+            {t('emptyDescription')}
           </p>
           <button
             onClick={handleNew}
             className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all inline-flex items-center gap-2"
           >
             <Plus size={18} weight="bold" />
-            Create First Goal
+            {t('createFirstButton')}
           </button>
         </div>
       )}
@@ -316,10 +318,10 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: 
         isOpen={!!deleteGoal}
         onClose={() => setDeleteGoal(null)}
         onConfirm={handleDelete}
-        title="Delete Goal?"
-        description={`Are you sure you want to delete "${deleteGoal?.name}"? This action cannot be undone. Any points deposited will remain in the child's balance.`}
-        confirmLabel={isDeleting ? 'Deleting...' : 'Delete'}
-        cancelLabel="Cancel"
+        title={t('confirm.deleteTitle')}
+        description={t('confirm.deleteDescription', { name: deleteGoal?.name || '' })}
+        confirmLabel={isDeleting ? t('confirm.deleting') : t('actions.delete')}
+        cancelLabel={t('confirm.cancel')}
       />
     </div>
   );

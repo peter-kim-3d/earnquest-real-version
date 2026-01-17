@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import ActionCenter from '@/components/parent/ActionCenter';
 import ChildCard from '@/components/parent/ChildCard';
 import ActivityFeed from '@/components/parent/ActivityFeed';
@@ -8,13 +9,19 @@ import DashboardStats from '@/components/dashboard/DashboardStats';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import TransactionHistory from '@/components/parent/TransactionHistory';
 
-export default async function ParentDashboardPage() {
+export default async function ParentDashboardPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations('parent.dashboard');
   const supabase = await createClient();
 
   // Get authenticated user
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
-    redirect('/en-US/login');
+    redirect(`/${locale}/login`);
   }
 
   // Get user's family
@@ -25,7 +32,7 @@ export default async function ParentDashboardPage() {
     .single() as { data: { family_id: string; full_name: string } | null };
 
   if (!userProfile?.family_id) {
-    redirect('/en-US/onboarding/add-child');
+    redirect(`/${locale}/onboarding/add-child`);
   }
 
   // Get children
@@ -116,10 +123,12 @@ export default async function ParentDashboardPage() {
       header={
         <div>
           <h1 className="text-3xl font-black text-text-main dark:text-white mb-2">
-            Welcome back{userProfile.full_name ? `, ${userProfile.full_name.split(' ')[0]}` : ''}! 👋
+            {userProfile.full_name
+              ? t('welcome', { name: userProfile.full_name.split(' ')[0] })
+              : t('welcomeNoName')}
           </h1>
           <p className="text-lg text-text-muted dark:text-gray-400">
-            The family has {children?.length || 0} {children?.length === 1 ? 'child' : 'children'} on their quest journey
+            {t('familyStatus', { count: children?.length || 0 })}
           </p>
         </div>
       }
@@ -151,7 +160,7 @@ export default async function ParentDashboardPage() {
       childrenList={
         <div>
           <h2 className="text-xl font-bold text-text-main dark:text-white mb-4">
-            Your Children
+            {t('yourChildren')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4">
             {children?.map((child) => (

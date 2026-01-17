@@ -3,6 +3,8 @@
 import { ReactNode } from 'react';
 import BetaBadge from '@/components/BetaBadge';
 import { Sword } from '@phosphor-icons/react';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { ModeToggle } from '@/components/ModeToggle';
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
@@ -39,7 +41,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* Right Panel: Form */}
-      <div className="flex w-full lg:w-1/2 flex-col justify-center px-6 py-12 lg:px-20 xl:px-32 bg-background-light dark:bg-background-dark">
+      <div className="relative flex w-full lg:w-1/2 flex-col justify-center px-6 py-12 lg:px-20 xl:px-32 bg-background-light dark:bg-background-dark">
         {/* Mobile Logo Header */}
         <div className="flex lg:hidden items-center justify-between mb-8">
           <div className="flex items-center gap-2 text-text-main dark:text-white">
@@ -47,6 +49,16 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             <h2 className="text-xl font-bold tracking-tight">EarnQuest</h2>
             <BetaBadge />
           </div>
+          <div className="flex items-center gap-1">
+            <LanguageSwitcher />
+            <ModeToggle />
+          </div>
+        </div>
+
+        {/* Desktop Language/Theme Switcher */}
+        <div className="hidden lg:flex items-center gap-1 absolute top-6 right-6">
+          <LanguageSwitcher />
+          <ModeToggle />
         </div>
 
         {/* Children (form content) */}

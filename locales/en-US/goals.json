@@ -1,0 +1,78 @@
+{
+  "pageTitle": "Goals Management",
+  "pageSubtitle": "Create savings goals for your children to work toward",
+  "stats": {
+    "activeGoals": "Active Goals",
+    "completed": "Completed",
+    "totalSaved": "Total Saved"
+  },
+  "newGoal": "New Goal",
+  "noGoals": "No goals yet",
+  "noCompletedGoals": "No completed goals yet",
+  "createFirst": "Click \"New Goal\" above to create your first savings goal!",
+  "createFirstButton": "Create First Goal",
+  "emptyDescription": "Create a savings goal for your children to work toward!",
+  "filter": {
+    "all": "All Goals",
+    "active": "Active",
+    "completed": "Completed"
+  },
+  "childFilter": {
+    "all": "All Children"
+  },
+  "childGoals": "{name}'s Goals",
+  "completedStatus": "Completed!",
+  "unknown": "Unknown",
+  "form": {
+    "name": "Goal Name",
+    "namePlaceholder": "e.g., New Bike",
+    "nameRequired": "Goal name is required",
+    "description": "Description",
+    "descriptionPlaceholder": "Optional details about the goal",
+    "targetPoints": "Target Points",
+    "targetPointsHelp": "Total points needed to reach the goal",
+    "child": "Child",
+    "childHelp": "Which child is saving for this goal",
+    "image": "Image",
+    "chooseImage": "Choose Image",
+    "uploadCustom": "Upload Custom"
+  },
+  "actions": {
+    "create": "Create Goal",
+    "creating": "Creating...",
+    "save": "Save Goal",
+    "saving": "Saving...",
+    "update": "Update Goal",
+    "delete": "Delete Goal",
+    "deposit": "Deposit",
+    "withdraw": "Withdraw",
+    "complete": "Mark Complete"
+  },
+  "confirm": {
+    "deleteTitle": "Delete Goal?",
+    "deleteDescription": "Are you sure you want to delete \"{name}\"? This action cannot be undone. Any points deposited will remain in the child's balance.",
+    "completeTitle": "Complete Goal?",
+    "completeDescription": "Mark this goal as complete? Points will be returned to the child.",
+    "cancel": "Cancel",
+    "deleting": "Deleting..."
+  },
+  "toast": {
+    "created": "Goal created successfully",
+    "updated": "Goal updated successfully",
+    "deleted": "Goal Deleted",
+    "deletedDescription": "\"{name}\" has been removed.",
+    "deleteFailed": "Delete Failed",
+    "deleteFailedDescription": "Failed to delete goal. Please try again.",
+    "deposited": "Points deposited successfully",
+    "withdrawn": "Points withdrawn successfully",
+    "completed": "Goal completed!",
+    "error": "Failed to save goal. Please try again."
+  },
+  "card": {
+    "progress": "Progress",
+    "saved": "saved",
+    "remaining": "remaining",
+    "weeksToGo": "~{weeks} weeks to go",
+    "almostThere": "Almost there!"
+  }
+}

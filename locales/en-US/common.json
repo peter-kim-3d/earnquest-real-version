@@ -3,47 +3,139 @@
     "name": "EarnQuest",
     "tagline": "Growing habits, shining rewards"
   },
+  "landing": {
+    "parentCard": {
+      "title": "I'm a Parent",
+      "description": "Set up tasks, approve completions, and manage rewards for your family",
+      "cta": "Get Started"
+    },
+    "kidCard": {
+      "title": "I'm a Kid",
+      "description": "Complete your quests and earn rewards by building great habits",
+      "cta": "Enter Family Code"
+    },
+    "alreadyHaveAccount": "Already have an account?",
+    "signIn": "Sign in"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "tasks": "Tasks",
     "rewards": "Rewards",
     "store": "Store",
+    "goals": "Goals",
     "badges": "Badges",
     "settings": "Settings",
-    "logout": "Logout"
+    "profile": "Profile",
+    "logout": "Log out",
+    "switchToParent": "Switch to Parent View",
+    "viewAsChild": "View as Child",
+    "children": "Children",
+    "kindness": "Kindness",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "signOut": "Sign Out",
+    "logoutTitle": "Log Out?",
+    "logoutDescription": "Are you sure you want to log out?"
   },
-  "auth": {
-    "login": "Log in",
-    "signup": "Sign up",
-    "loginWithGoogle": "Continue with Google",
-    "loginWithApple": "Continue with Apple",
-    "email": "Email",
-    "password": "Password",
-    "forgotPassword": "Forgot password?",
-    "noAccount": "Don't have an account?",
-    "hasAccount": "Already have an account?",
-    "createAccount": "Create account"
-  },
-  "common": {
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success",
+  "buttons": {
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
+    "create": "Create",
+    "add": "Add",
+    "confirm": "Confirm",
     "close": "Close",
     "next": "Next",
     "back": "Back",
     "finish": "Finish",
+    "continue": "Continue",
     "getStarted": "Get Started",
-    "learnMore": "Learn More"
+    "learnMore": "Learn More",
+    "viewAll": "View All",
+    "seeMore": "See More",
+    "done": "Done",
+    "submit": "Submit",
+    "update": "Update",
+    "remove": "Remove",
+    "approve": "Approve",
+    "reject": "Reject",
+    "retry": "Retry"
+  },
+  "status": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "error": "Error",
+    "success": "Success!",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "completed": "Completed",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+    "anytime": "Anytime",
+    "afterSchool": "After School",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly"
   },
   "points": {
     "balance": "Balance",
     "earned": "Earned",
     "spent": "Spent",
     "total": "Total",
-    "qp": "QP"
+    "qp": "QP",
+    "xp": "XP",
+    "perDay": "{points} XP/day"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "notFound": "Not found",
+    "unauthorized": "You are not authorized to perform this action",
+    "networkError": "Network error. Please check your connection.",
+    "requiredField": "This field is required"
+  },
+  "confirm": {
+    "title": "Are you sure?",
+    "deleteTitle": "Delete Confirmation",
+    "description": "This action cannot be undone.",
+    "yes": "Yes",
+    "no": "No",
+    "yesDelete": "Yes, Delete",
+    "noKeep": "No, Keep It"
+  },
+  "empty": {
+    "noData": "No data available",
+    "noResults": "No results found",
+    "noItems": "No items yet"
+  },
+  "form": {
+    "optional": "Optional",
+    "required": "Required",
+    "name": "Name",
+    "description": "Description",
+    "email": "Email",
+    "password": "Password",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "accessibility": {
+    "skipToContent": "Skip to main content",
+    "beta": "BETA"
   }
 }

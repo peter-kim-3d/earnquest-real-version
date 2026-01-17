@@ -4,13 +4,18 @@ import { cookies } from 'next/headers';
 import { Star, Trophy, Gift, LogOut } from 'lucide-react';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
 
-export default async function ChildProfilePage() {
+export default async function ChildProfilePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   // Check for child session cookie
   const cookieStore = await cookies();
   const childSessionCookie = cookieStore.get('child_session');
 
   if (!childSessionCookie) {
-    redirect('/en-US/child-login');
+    redirect(`/${locale}/child-login`);
   }
 
   // Parse child session
@@ -18,12 +23,12 @@ export default async function ChildProfilePage() {
   try {
     childSession = JSON.parse(childSessionCookie.value);
   } catch (error) {
-    redirect('/en-US/child-login');
+    redirect(`/${locale}/child-login`);
   }
 
   const { childId, familyId } = childSession;
   if (!childId || !familyId) {
-    redirect('/en-US/child-login');
+    redirect(`/${locale}/child-login`);
   }
 
   // Get child data
@@ -36,7 +41,7 @@ export default async function ChildProfilePage() {
     .single();
 
   if (!childData) {
-    redirect('/en-US/child-login');
+    redirect(`/${locale}/child-login`);
   }
 
   // Get family name

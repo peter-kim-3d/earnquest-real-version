@@ -1,0 +1,129 @@
+{
+  "title": "설정",
+  "subtitle": "계정과 환경설정을 관리하세요",
+  "sections": {
+    "profile": "프로필",
+    "children": "아이들",
+    "family": "가족",
+    "notifications": "알림",
+    "appearance": "화면",
+    "language": "언어",
+    "security": "보안",
+    "about": "정보"
+  },
+  "profile": {
+    "title": "프로필 설정",
+    "name": "이름",
+    "email": "이메일",
+    "avatar": "프로필 사진",
+    "changeAvatar": "사진 변경",
+    "removeAvatar": "사진 제거",
+    "save": "변경사항 저장"
+  },
+  "children": {
+    "title": "아이 관리",
+    "subtitle": "가족에서 아이를 추가, 수정, 제거하세요",
+    "addChild": "아이 추가",
+    "editChild": "아이 수정",
+    "noChildren": "아직 추가된 아이가 없습니다",
+    "addFirst": "\"아이 추가\"를 클릭해서 시작하세요",
+    "name": "이름",
+    "ageGroup": "연령대",
+    "pin": "PIN 코드",
+    "setPin": "PIN 설정",
+    "changePin": "PIN 변경",
+    "removePin": "PIN 제거",
+    "pinInfo": "PIN은 공유 기기에서 아이 로그인에 사용됩니다",
+    "delete": "아이 제거",
+    "deleteConfirm": "{name}을(를) 제거하시겠습니까? 모든 데이터가 삭제됩니다.",
+    "avatar": "아바타",
+    "viewAsChild": "아이 화면 보기",
+    "questPoints": "퀘스트 포인트",
+    "memberSince": "{date}에 가입",
+    "ageGroups": {
+      "4-6": "4-6세",
+      "7-9": "7-9세",
+      "10-12": "10-12세",
+      "13+": "13세 이상"
+    },
+    "ageGroupLabels": {
+      "5-7": "미니 어너 (5-7세)",
+      "8-11": "프로 어너 (8-11세)",
+      "12-14": "틴 어너 (12-14세)"
+    }
+  },
+  "family": {
+    "title": "가족 설정",
+    "familyName": "가족 이름",
+    "inviteParent": "다른 부모 초대",
+    "inviteLink": "초대 링크",
+    "copyLink": "링크 복사",
+    "linkCopied": "링크가 복사되었습니다!",
+    "members": "가족 구성원",
+    "role": "역할",
+    "parent": "부모",
+    "child": "아이",
+    "remove": "제거",
+    "leave": "가족 나가기"
+  },
+  "notifications": {
+    "title": "알림 설정",
+    "push": "푸시 알림",
+    "email": "이메일 알림",
+    "taskCompleted": "할 일 완료",
+    "taskCompletedDesc": "아이가 할 일을 완료하면 알림을 받습니다",
+    "rewardPurchased": "보상 구매",
+    "rewardPurchasedDesc": "아이가 보상을 구매하면 알림을 받습니다",
+    "weeklyReport": "주간 리포트",
+    "weeklyReportDesc": "가족 활동 주간 요약을 받습니다"
+  },
+  "appearance": {
+    "title": "화면 설정",
+    "theme": "테마",
+    "light": "라이트",
+    "dark": "다크",
+    "system": "시스템"
+  },
+  "language": {
+    "title": "언어",
+    "current": "현재 언어",
+    "select": "언어 선택",
+    "english": "English",
+    "korean": "한국어"
+  },
+  "security": {
+    "title": "보안",
+    "changePassword": "비밀번호 변경",
+    "currentPassword": "현재 비밀번호",
+    "newPassword": "새 비밀번호",
+    "confirmPassword": "새 비밀번호 확인",
+    "twoFactor": "2단계 인증",
+    "twoFactorDesc": "추가 보안 계층을 추가합니다",
+    "sessions": "활성 세션",
+    "logoutAll": "모든 기기에서 로그아웃"
+  },
+  "about": {
+    "title": "EarnQuest 정보",
+    "version": "버전",
+    "termsOfService": "서비스 약관",
+    "privacyPolicy": "개인정보 처리방침",
+    "help": "도움말 및 지원",
+    "feedback": "피드백 보내기",
+    "rateApp": "앱 평가하기"
+  },
+  "danger": {
+    "title": "위험 구역",
+    "deleteAccount": "계정 삭제",
+    "deleteAccountDesc": "계정과 모든 관련 데이터를 영구적으로 삭제합니다",
+    "deleteConfirm": "이 작업은 취소할 수 없습니다. 모든 데이터가 영구적으로 삭제됩니다."
+  },
+  "toast": {
+    "saved": "설정이 저장되었습니다",
+    "error": "설정 저장에 실패했습니다",
+    "pinSet": "PIN 코드가 설정되었습니다",
+    "pinChanged": "PIN 코드가 변경되었습니다",
+    "pinRemoved": "PIN 코드가 제거되었습니다",
+    "avatarUpdated": "아바타가 업데이트되었습니다",
+    "profileUpdated": "프로필이 업데이트되었습니다"
+  }
+}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Scroll, CaretDown, ArrowUp, ArrowDown, Target, Gift, Repeat, Question } from '@phosphor-icons/react';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface Transaction {
   id: string;
@@ -30,6 +31,8 @@ export default function TransactionHistory({
   childName,
   limit = 50,
 }: TransactionHistoryProps) {
+  const t = useTranslations('parent.transactions');
+  const locale = useLocale();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +57,7 @@ export default function TransactionHistory({
       setTransactions(data.transactions || []);
     } catch (err) {
       console.error('Error fetching transactions:', err);
-      setError('Failed to load transaction history');
+      setError(t('loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -89,17 +92,17 @@ export default function TransactionHistory({
     yesterday.setDate(yesterday.getDate() - 1);
     const txDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
-    if (txDate.getTime() === today.getTime()) return 'Today';
-    if (txDate.getTime() === yesterday.getTime()) return 'Yesterday';
+    if (txDate.getTime() === today.getTime()) return t('today');
+    if (txDate.getTime() === yesterday.getTime()) return t('yesterday');
 
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(locale, {
       month: 'short',
       day: 'numeric',
     });
   };
 
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('en-US', {
+    return new Date(dateString).toLocaleTimeString(locale, {
       hour: 'numeric',
       minute: '2-digit',
     });
@@ -122,7 +125,7 @@ export default function TransactionHistory({
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center gap-2 mb-4">
           <Scroll size={20} className="text-primary" />
-          <h3 className="font-bold text-gray-900 dark:text-white">Point History</h3>
+          <h3 className="font-bold text-gray-900 dark:text-white">{t('title')}</h3>
         </div>
         <div className="animate-pulse space-y-3">
           {[1, 2, 3].map((i) => (
@@ -138,7 +141,7 @@ export default function TransactionHistory({
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center gap-2 mb-4">
           <Scroll size={20} className="text-primary" />
-          <h3 className="font-bold text-gray-900 dark:text-white">Point History</h3>
+          <h3 className="font-bold text-gray-900 dark:text-white">{t('title')}</h3>
         </div>
         <p className="text-red-500 text-sm">{error}</p>
       </div>
@@ -152,12 +155,12 @@ export default function TransactionHistory({
         <div className="flex items-center gap-2">
           <Scroll size={20} className="text-primary" />
           <h3 className="font-bold text-gray-900 dark:text-white">
-            Point History {childName && `— ${childName}`}
+            {childName ? t('titleWithChild', { name: childName }) : t('title')}
           </h3>
         </div>
         {!childId && (
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            All children
+            {t('allChildren')}
           </span>
         )}
       </div>
@@ -167,7 +170,7 @@ export default function TransactionHistory({
         {transactions.length === 0 ? (
           <div className="p-8 text-center text-gray-500 dark:text-gray-400">
             <Gift size={40} className="mx-auto mb-2 opacity-50" />
-            <p>No transactions yet</p>
+            <p>{t('noTransactions')}</p>
           </div>
         ) : (
           visibleGroups.map(([date, txs]) => (
@@ -209,7 +212,7 @@ export default function TransactionHistory({
                       {tx.amount > 0 ? '+' : ''}{tx.amount} XP
                     </p>
                     <p className="text-xs text-gray-400 dark:text-gray-500">
-                      Bal: {tx.balance_after}
+                      {t('balanceShort')} {tx.balance_after}
                     </p>
                   </div>
                 </div>
@@ -226,7 +229,7 @@ export default function TransactionHistory({
           className="w-full px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium text-primary hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-t border-gray-100 dark:border-gray-700"
         >
           <CaretDown size={16} />
-          Show More
+          {t('showMore')}
         </button>
       )}
     </div>

@@ -10,7 +10,12 @@ import { getUser } from '@/lib/services/user';
 import { CollapsibleSection } from '@/components/ui/collapsible-section';
 
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const supabase = await createClient();
 
   // Check authentication
@@ -19,7 +24,7 @@ export default async function SettingsPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/en-US/login');
+    redirect(`/${locale}/login`);
   }
 
   // Get user profile and family info
@@ -31,7 +36,7 @@ export default async function SettingsPage() {
   } | null;
 
   if (!userProfile || !userProfile.family_id) {
-    redirect('/en-US/onboarding/add-child');
+    redirect(`/${locale}/onboarding/add-child`);
   }
 
   // Get family members count
@@ -73,7 +78,7 @@ export default async function SettingsPage() {
           <div className="space-y-4">
             {/* Children Settings */}
             <Link
-              href="/en-US/settings/children"
+              href={`/${locale}/settings/children`}
               className="block p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all"
             >
               <div className="flex items-center justify-between">

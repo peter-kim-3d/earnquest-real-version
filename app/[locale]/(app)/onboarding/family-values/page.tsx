@@ -5,12 +5,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowRight, Plus, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppIcon } from '@/components/ui/AppIcon';
+import { useLocale, useTranslations } from 'next-intl';
 
 type FamilyValue = {
   id: string;
   icon: string;
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
   checked: boolean;
 };
 
@@ -18,7 +19,11 @@ type FamilyValue = {
 
 export default function FamilyValuesPage() {
   const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
+  const t = useTranslations('onboarding.familyValues');
+  const tProgress = useTranslations('onboarding.progress');
+  const tCommon = useTranslations('common');
   const childId = searchParams.get('childId');
   const style = searchParams.get('style');
 
@@ -27,36 +32,36 @@ export default function FamilyValuesPage() {
     {
       id: 'gratitude',
       icon: 'handshake',
-      title: 'Express Gratitude',
-      description: 'Saying please and thank you without being reminded.',
+      titleKey: 'items.gratitude.title',
+      descriptionKey: 'items.gratitude.description',
       checked: true,
     },
     {
       id: 'greetings',
       icon: 'wb_sunny',
-      title: 'Family Greetings',
-      description: 'Saying good morning and good night to everyone.',
+      titleKey: 'items.greetings.title',
+      descriptionKey: 'items.greetings.description',
       checked: true,
     },
     {
       id: 'honesty',
       icon: 'verified',
-      title: 'Honesty',
-      description: 'Telling the truth, even when it is difficult.',
+      titleKey: 'items.honesty.title',
+      descriptionKey: 'items.honesty.description',
       checked: false,
     },
     {
       id: 'respect',
       icon: 'record_voice_over',
-      title: 'Respect',
-      description: 'Listening when others are speaking.',
+      titleKey: 'items.respect.title',
+      descriptionKey: 'items.respect.description',
       checked: false,
     },
     {
       id: 'clean_spaces',
       icon: 'cleaning_services',
-      title: 'Clean Spaces',
-      description: 'Putting your own dishes in the sink after eating.',
+      titleKey: 'items.cleanSpaces.title',
+      descriptionKey: 'items.cleanSpaces.description',
       checked: true,
     },
   ]);
@@ -70,20 +75,20 @@ export default function FamilyValuesPage() {
   };
 
   const handleSkip = () => {
-    router.push('/en-US/onboarding/complete');
+    router.push(`/${locale}/onboarding/complete`);
   };
 
   const handleComplete = async () => {
     try {
       setLoading(true);
 
-      // Get selected values
+      // Get selected values with translated titles and descriptions
       const selectedValues = values
         .filter((v) => v.checked)
         .map((v) => ({
           value_id: v.id,
-          title: v.title,
-          description: v.description,
+          title: t(v.titleKey),
+          description: t(v.descriptionKey),
           icon: v.icon,
         }));
 
@@ -105,11 +110,11 @@ export default function FamilyValuesPage() {
       console.log('Saved values:', result);
 
       // Navigate to next step
-      router.push('/en-US/onboarding/complete');
+      router.push(`/${locale}/onboarding/complete`);
     } catch (error) {
       console.error('Failed to save values:', error);
-      toast.error('Save failed', {
-        description: 'Please try again.',
+      toast.error(t('saveFailed'), {
+        description: tCommon('errors.generic'),
       });
     } finally {
       setLoading(false);
@@ -122,10 +127,10 @@ export default function FamilyValuesPage() {
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold text-text-muted dark:text-text-muted uppercase tracking-wider">
-            Step 3 of 4
+            {tProgress('step', { current: 3, total: 4 })}
           </p>
           <p className="text-sm font-medium text-text-main dark:text-white">
-            Values
+            {t('stepTitle')}
           </p>
         </div>
         <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
@@ -136,11 +141,10 @@ export default function FamilyValuesPage() {
       {/* PageHeading */}
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-black leading-tight tracking-tight md:text-5xl text-text-main dark:text-white">
-          Set the Standard
+          {t('title')}
         </h1>
         <p className="max-w-2xl text-lg font-normal leading-relaxed text-text-muted dark:text-text-muted">
-          Select the non-negotiable values for your household. These activities
-          earn respect, not points.
+          {t('subtitle')}
         </p>
 
         {/* Psychology Pro Tip */}
@@ -148,12 +152,10 @@ export default function FamilyValuesPage() {
           <Lightbulb className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
           <div>
             <p className="text-sm font-bold text-blue-900 dark:text-blue-100">
-              Why no points?
+              {t('whyNoPoints')}
             </p>
             <p className="text-sm text-blue-700 dark:text-blue-300">
-              Reinforcing intrinsic motivation helps children understand that
-              some behaviors are expected as part of being a family member,
-              rather than distinct tasks to be &quot;paid&quot; for.
+              {t('whyNoPointsDescription')}
             </p>
           </div>
         </div>
@@ -184,10 +186,10 @@ export default function FamilyValuesPage() {
             </div>
             <div>
               <h3 className="mb-1 text-lg font-bold text-text-main dark:text-white">
-                {value.title}
+                {t(value.titleKey)}
               </h3>
               <p className="text-sm text-text-muted dark:text-text-muted">
-                {value.description}
+                {t(value.descriptionKey)}
               </p>
             </div>
           </label>
@@ -198,7 +200,7 @@ export default function FamilyValuesPage() {
           <div className="flex size-12 items-center justify-center rounded-full bg-background-light dark:bg-background-dark">
             <Plus className="h-6 w-6" />
           </div>
-          <span className="font-medium">Add Custom Value</span>
+          <span className="font-medium">{t('addCustomValue')}</span>
         </button>
       </div>
 
@@ -208,14 +210,14 @@ export default function FamilyValuesPage() {
           onClick={handleSkip}
           className="w-full rounded-xl px-6 py-3 text-base font-bold text-text-muted dark:text-text-muted hover:bg-gray-100 dark:hover:bg-gray-800 sm:w-auto transition-colors"
         >
-          Skip for Now
+          {t('skipForNow')}
         </button>
         <button
           onClick={handleComplete}
           disabled={loading}
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-10 py-3 text-base font-bold text-black shadow-lg shadow-primary/25 hover:bg-primary/90 hover:shadow-primary/40 focus:ring-4 focus:ring-primary/30 sm:w-auto transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span>{loading ? 'Saving...' : 'Complete Selection'}</span>
+          <span>{loading ? tCommon('status.saving') : t('completeSelection')}</span>
           <ArrowRight className="h-5 w-5" />
         </button>
       </div>

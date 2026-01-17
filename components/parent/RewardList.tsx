@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Plus, Sparkle, Lock, Pause } from '@phosphor-icons/react';
+import { useTranslations } from 'next-intl';
 import RewardCard from './RewardCard';
 import RewardFormDialog from './RewardFormDialog';
 
@@ -25,6 +26,7 @@ interface RewardListProps {
 }
 
 export default function RewardList({ rewards, rewardPurchases }: RewardListProps) {
+  const t = useTranslations('rewards');
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
@@ -59,11 +61,11 @@ export default function RewardList({ rewards, rewardPurchases }: RewardListProps
   }, {} as Record<string, Reward[]>);
 
   const categoryLabels: Record<string, string> = {
-    screen: '📺 Screen Time',
-    autonomy: '🔓 Power Ups',
-    experience: '🎉 Fun Stuff',
-    savings: '💰 Savings',
-    other: '🎁 Other',
+    screen: t('categoryLabels.screen'),
+    autonomy: t('categoryLabels.autonomy'),
+    experience: t('categoryLabels.experience'),
+    savings: t('categoryLabels.savings'),
+    other: t('categoryLabels.other'),
   };
 
   return (
@@ -79,7 +81,7 @@ export default function RewardList({ rewards, rewardPurchases }: RewardListProps
               }`}
           >
             <Sparkle size={16} weight="bold" />
-            All Rewards
+            {t('filter.all')}
           </button>
           <button
             onClick={() => setFilter('active')}
@@ -89,7 +91,7 @@ export default function RewardList({ rewards, rewardPurchases }: RewardListProps
               }`}
           >
             <Sparkle size={16} weight="fill" />
-            Active
+            {t('filter.active')}
           </button>
           <button
             onClick={() => setFilter('inactive')}
@@ -99,7 +101,7 @@ export default function RewardList({ rewards, rewardPurchases }: RewardListProps
               }`}
           >
             <Pause size={16} weight="bold" />
-            Inactive
+            {t('filter.inactive')}
           </button>
         </div>
 
@@ -109,7 +111,7 @@ export default function RewardList({ rewards, rewardPurchases }: RewardListProps
           className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all flex items-center gap-2"
         >
           <Plus size={18} weight="bold" />
-          New Reward
+          {t('newReward')}
         </button>
       </div>
 
