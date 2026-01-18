@@ -14,7 +14,8 @@
     "migrate:auth": "tsx scripts/apply-auth-migrations.ts",
     "test-goals": "tsx scripts/test-goals.ts",
     "test-screen-time": "tsx scripts/test-screen-time.ts",
-    "test-auto-refund": "tsx scripts/test-auto-refund.ts"
+    "test-auto-refund": "tsx scripts/test-auto-refund.ts",
+    "upload-reward-image": "tsx scripts/upload-reward-image.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

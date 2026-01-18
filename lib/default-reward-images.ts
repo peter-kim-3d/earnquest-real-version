@@ -26,6 +26,7 @@ export const DEFAULT_REWARD_IMAGES: DefaultRewardImage[] = [
   { id: 'new_clothes', name: 'New Clothes', category: 'shopping', url: `${SUPABASE_STORAGE_URL}/new_clothes.png` },
   { id: 'new_shoes', name: 'New Shoes', category: 'shopping', url: `${SUPABASE_STORAGE_URL}/new_shoes.png` },
   { id: 'new_backpack', name: 'Backpack', category: 'shopping', url: `${SUPABASE_STORAGE_URL}/new_backpack.png` },
+  { id: 'gift_card', name: 'Gift Card', category: 'shopping', url: `${SUPABASE_STORAGE_URL}/gift_card.png` },
 
   // Experiences
   { id: 'bike_ride', name: 'Bike Ride', category: 'experience', url: `${SUPABASE_STORAGE_URL}/bike_ride.png` },
@@ -34,11 +35,13 @@ export const DEFAULT_REWARD_IMAGES: DefaultRewardImage[] = [
   { id: 'camping_trip', name: 'Camping', category: 'experience', url: `${SUPABASE_STORAGE_URL}/camping_trip.png` },
   { id: 'park_visit', name: 'Park', category: 'experience', url: `${SUPABASE_STORAGE_URL}/park_visit.png` },
   { id: 'event_ticket', name: 'Event Ticket', category: 'experience', url: `${SUPABASE_STORAGE_URL}/event_ticket.png` },
+  { id: 'family_movie', name: 'Family Movie', category: 'experience', url: `${SUPABASE_STORAGE_URL}/movie_night.png` },
 
   // Savings
   { id: 'piggy_bank', name: 'Piggy Bank', category: 'savings', url: `${SUPABASE_STORAGE_URL}/piggy_bank.png` },
   { id: 'wallet_money', name: 'Wallet', category: 'savings', url: `${SUPABASE_STORAGE_URL}/wallet_money.png` },
   { id: 'coin_jar', name: 'Coin Jar', category: 'savings', url: `${SUPABASE_STORAGE_URL}/coin_jar.png` },
+  { id: 'save_to_bank', name: 'Save to Bank', category: 'savings', url: `${SUPABASE_STORAGE_URL}/piggy_bank.png` },
 
   // General
   { id: 'gift_reward', name: 'Gift', category: 'general', url: `${SUPABASE_STORAGE_URL}/gift_reward.png` },
