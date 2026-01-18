@@ -58,6 +58,9 @@ export type MonthlyMode = 'any_day' | 'specific_day' | 'first_day' | 'last_day';
  * Allows for future expansion without schema changes
  */
 export interface TaskMetadata {
+  /** Custom color for task card (hex or CSS color) */
+  color?: string | null;
+
   /** Subcategory for more granular classification */
   subcategory?: string;
 
