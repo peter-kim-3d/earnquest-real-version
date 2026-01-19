@@ -8,6 +8,7 @@ import PendingTicketsSection from '@/components/dashboard/PendingTicketsSection'
 import DashboardStats from '@/components/dashboard/DashboardStats';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import TransactionHistory from '@/components/parent/TransactionHistory';
+import { getAuthUserWithProfile } from '@/lib/supabase/cached-queries';
 
 export default async function ParentDashboardPage({
   params,
@@ -18,18 +19,11 @@ export default async function ParentDashboardPage({
   const t = await getTranslations('parent.dashboard');
   const supabase = await createClient();
 
-  // Get authenticated user
-  const { data: { user } } = await supabase.auth.getUser();
+  // Use cached queries - deduplicated with layout
+  const { user, profile: userProfile } = await getAuthUserWithProfile();
   if (!user) {
     redirect(`/${locale}/login`);
   }
-
-  // Get user's family
-  const { data: userProfile } = await supabase
-    .from('users')
-    .select('family_id, full_name')
-    .eq('id', user.id)
-    .single() as { data: { family_id: string; full_name: string } | null };
 
   if (!userProfile?.family_id) {
     redirect(`/${locale}/onboarding/add-child`);

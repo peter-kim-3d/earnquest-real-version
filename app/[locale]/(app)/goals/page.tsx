@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import GoalList from '@/components/parent/GoalList';
+import { getAuthUserWithProfile } from '@/lib/supabase/cached-queries';
 
 export default async function GoalsManagementPage({
   params,
@@ -13,18 +14,11 @@ export default async function GoalsManagementPage({
   const t = await getTranslations('goals');
   const supabase = await createClient();
 
-  // Get authenticated user
-  const { data: { user } } = await supabase.auth.getUser();
+  // Use cached queries - deduplicated with layout
+  const { user, profile: userProfile } = await getAuthUserWithProfile();
   if (!user) {
     redirect(`/${locale}/login`);
   }
-
-  // Get user's family
-  const { data: userProfile } = await supabase
-    .from('users')
-    .select('family_id')
-    .eq('id', user.id)
-    .single();
 
   if (!userProfile?.family_id) {
     redirect(`/${locale}/onboarding/add-child`);

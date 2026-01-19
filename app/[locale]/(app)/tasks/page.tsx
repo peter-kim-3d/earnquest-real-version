@@ -2,8 +2,8 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import TaskList from '@/components/parent/TaskList';
-import TaskCard from '@/components/tasks/TaskCard';
 import { Checks, CheckCircle, TrendUp, ListChecks } from '@/components/ui/ClientIcons';
+import { getAuthUserWithProfile } from '@/lib/supabase/cached-queries';
 
 type Task = {
   id: string;
@@ -32,45 +32,45 @@ export default async function TaskManagementPage({
   const t = await getTranslations('tasks');
   const supabase = await createClient();
 
-  // Get authenticated user
-  const { data: { user } } = await supabase.auth.getUser();
+  // Use cached queries - deduplicated with layout
+  const { user, profile: userProfile } = await getAuthUserWithProfile();
   if (!user) {
     redirect(`/${locale}/login`);
   }
-
-  // Get user's family
-  const { data: userProfile } = await supabase
-    .from('users')
-    .select('family_id, full_name')
-    .eq('id', user.id)
-    .single() as { data: { family_id: string; full_name: string } | null };
 
   if (!userProfile?.family_id) {
     redirect(`/${locale}/onboarding/add-child`);
   }
 
-  // Get all tasks for this family (exclude deleted)
-  const { data: tasks } = await supabase
-    .from('tasks')
-    .select('*')
-    .eq('family_id', userProfile.family_id)
-    .is('deleted_at', null)
-    .order('category', { ascending: true })
-    .order('name', { ascending: true }) as { data: Task[] | null };
+  // Parallelize all queries that depend on family_id
+  const [tasksResult, childrenResult, completionStatsResult] = await Promise.all([
+    // Get all tasks for this family (exclude deleted)
+    supabase
+      .from('tasks')
+      .select('*')
+      .eq('family_id', userProfile.family_id)
+      .is('deleted_at', null)
+      .order('category', { ascending: true })
+      .order('name', { ascending: true }),
 
-  // Get children for assignee lookup
-  const { data: children } = await supabase
-    .from('children')
-    .select('id, name, avatar_url')
-    .eq('family_id', userProfile.family_id) as { data: any[] | null };
+    // Get children for assignee lookup
+    supabase
+      .from('children')
+      .select('id, name, avatar_url')
+      .eq('family_id', userProfile.family_id),
 
-  // Get task completion stats (including pending)
-  const { data: completionStats } = await supabase
-    .from('task_completions')
-    .select('task_id, status')
-    .eq('family_id', userProfile.family_id)
-    .in('status', ['approved', 'auto_approved', 'pending_approval'])
-    .gte('completed_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()) as { data: { task_id: string; status: string }[] | null };
+    // Get task completion stats (including pending)
+    supabase
+      .from('task_completions')
+      .select('task_id, status')
+      .eq('family_id', userProfile.family_id)
+      .in('status', ['approved', 'auto_approved', 'pending_approval'])
+      .gte('completed_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+  ]);
+
+  const tasks = tasksResult.data as Task[] | null;
+  const children = childrenResult.data as any[] | null;
+  const completionStats = completionStatsResult.data as { task_id: string; status: string }[] | null;
 
   // Calculate completion count per task (approved/auto_approved)
   const taskCompletions = new Map<string, number>();

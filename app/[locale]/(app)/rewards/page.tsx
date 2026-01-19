@@ -1,10 +1,10 @@
-import { Gift, Plus, ShoppingCart } from '@phosphor-icons/react/dist/ssr';
-import { getUser } from '@/lib/services/user';
+import { Gift } from '@phosphor-icons/react/dist/ssr';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import RewardList from '@/components/parent/RewardList';
 import { CheckCircle, Ticket, Package } from '@/components/ui/ClientIcons';
+import { getAuthUserWithProfile } from '@/lib/supabase/cached-queries';
 
 export default async function RewardManagementPage({
   params,
@@ -15,43 +15,37 @@ export default async function RewardManagementPage({
   const t = await getTranslations('rewards');
   const supabase = await createClient();
 
-  // Get authenticated user
-  const { data: { user } } = await supabase.auth.getUser();
+  // Use cached queries - deduplicated with layout
+  const { user, profile: userProfile } = await getAuthUserWithProfile();
   if (!user) {
     redirect(`/${locale}/login`);
   }
 
-
-
-  // ...
-
-  // Get user's family
-  const userProfile = await getUser(user.id) as { family_id: string } | null;
-
-  if (!userProfile) {
+  if (!userProfile?.family_id) {
     redirect(`/${locale}/onboarding/add-child`);
   }
 
-  // Get all rewards for this family (exclude deleted)
-  const { data: rewardsData } = await supabase
-    .from('rewards')
-    .select('*')
-    .eq('family_id', userProfile.family_id)
-    .is('deleted_at', null)
-    .order('category', { ascending: true })
-    .order('name', { ascending: true });
+  // Parallelize all queries that depend on family_id
+  const [rewardsResult, purchaseStatsResult] = await Promise.all([
+    // Get all rewards for this family (exclude deleted)
+    supabase
+      .from('rewards')
+      .select('*')
+      .eq('family_id', userProfile.family_id)
+      .is('deleted_at', null)
+      .order('category', { ascending: true })
+      .order('name', { ascending: true }),
 
-  // Explicitly type rewards to avoid 'never'
-  const rewards = (rewardsData || []) as any[];
+    // Get reward purchase stats
+    supabase
+      .from('reward_purchases')
+      .select('reward_id, status')
+      .eq('family_id', userProfile.family_id)
+      .gte('purchased_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+  ]);
 
-  // Get reward purchase stats
-  const { data: purchaseStatsData } = await supabase
-    .from('reward_purchases')
-    .select('reward_id, status')
-    .eq('family_id', userProfile.family_id)
-    .gte('purchased_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
-
-  const purchaseStats = (purchaseStatsData || []) as { reward_id: string; status: string }[];
+  const rewards = (rewardsResult.data || []) as any[];
+  const purchaseStats = (purchaseStatsResult.data || []) as { reward_id: string; status: string }[];
 
   // Calculate purchase count per reward
   const rewardPurchases = new Map<string, number>();

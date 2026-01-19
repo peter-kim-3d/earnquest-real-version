@@ -1,8 +1,8 @@
-import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import ParentNav from '@/components/parent/ParentNav';
 import SkipToContent from '@/components/SkipToContent';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import { getAuthUserWithProfile } from '@/lib/supabase/cached-queries';
 
 export default async function AppLayout({
   children,
@@ -12,21 +12,13 @@ export default async function AppLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const supabase = await createClient();
 
-  // Check if user is authenticated
-  const { data: { user } } = await supabase.auth.getUser();
+  // Use cached query - will be deduplicated with child pages
+  const { user, profile: userProfile } = await getAuthUserWithProfile();
 
   if (!user) {
     redirect(`/${locale}/login`);
   }
-
-  // Get user's profile
-  const { data: userProfile } = await supabase
-    .from('users')
-    .select('full_name, avatar_url')
-    .eq('id', user.id)
-    .single() as { data: { full_name: string | null; avatar_url: string | null } | null };
 
   return (
     <>
