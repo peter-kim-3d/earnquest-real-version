@@ -1,10 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { Plus, Sparkle, Lock, Pause } from '@phosphor-icons/react';
+import { useState, useMemo, useCallback } from 'react';
+import { Plus, Sparkle, Pause } from '@phosphor-icons/react';
 import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 import RewardCard from './RewardCard';
-import RewardFormDialog from './RewardFormDialog';
+
+// Dynamic import for heavy dialog component
+const RewardFormDialog = dynamic(() => import('./RewardFormDialog'), {
+  ssr: false,
+});
 
 type Reward = {
   id: string;
@@ -31,34 +36,34 @@ export default function RewardList({ rewards, rewardPurchases }: RewardListProps
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
 
-  const handleNew = () => {
+  const handleNew = useCallback(() => {
     setSelectedReward(null);
     setIsDialogOpen(true);
-  };
+  }, []);
 
-  const handleEdit = (reward: Reward) => {
+  const handleEdit = useCallback((reward: Reward) => {
     setSelectedReward(reward);
     setIsDialogOpen(true);
-  };
+  }, []);
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = useCallback(() => {
     setSelectedReward(null);
     setIsDialogOpen(false);
-  };
+  }, []);
 
-  const filteredRewards = rewards.filter((reward) => {
+  const filteredRewards = useMemo(() => rewards.filter((reward) => {
     if (filter === 'active') return reward.is_active;
     if (filter === 'inactive') return !reward.is_active;
     return true;
-  });
+  }), [rewards, filter]);
 
-  // Group rewards by category
-  const groupedRewards = filteredRewards.reduce((acc, reward) => {
+  // Group rewards by category (memoized)
+  const groupedRewards = useMemo(() => filteredRewards.reduce((acc, reward) => {
     const category = reward.category || 'other';
     if (!acc[category]) acc[category] = [];
     acc[category].push(reward);
     return acc;
-  }, {} as Record<string, Reward[]>);
+  }, {} as Record<string, Reward[]>), [filteredRewards]);
 
   const categoryLabels: Record<string, string> = {
     screen: t('categoryLabels.screen'),

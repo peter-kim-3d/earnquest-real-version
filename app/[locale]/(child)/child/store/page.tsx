@@ -48,52 +48,65 @@ export default async function StorePage({
     redirect(`/${locale}/onboarding/add-child`);
   }
 
-  // Get all active rewards
-  const { data: rewards } = await supabase
-    .from('rewards')
-    .select('*')
-    .eq('family_id', userProfile.family_id)
-    .eq('is_active', true)
-    .order('category', { ascending: true })
-    .order('points_cost', { ascending: true });
-
-  // Get screen time budget
+  // Calculate date ranges for queries
   const today = new Date();
   const dayOfWeek = today.getDay();
   const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
   const weekStart = new Date(today.setDate(diff));
   weekStart.setHours(0, 0, 0, 0);
   const weekStartDate = weekStart.toISOString().split('T')[0];
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
 
-  const { data: screenBudgetData } = await supabase
-    .from('screen_time_budgets')
-    .select('*')
-    .eq('child_id', child.id)
-    .eq('week_start_date', weekStartDate)
-    .maybeSingle();
+  // Parallelize all queries
+  const [
+    rewardsResult,
+    screenBudgetResult,
+    screenUsageResult,
+    todayUsageResult,
+  ] = await Promise.all([
+    // Get all active rewards
+    supabase
+      .from('rewards')
+      .select('*')
+      .eq('family_id', userProfile.family_id)
+      .eq('is_active', true)
+      .order('category', { ascending: true })
+      .order('points_cost', { ascending: true }),
 
-  // Fallback to legacy screen usage if no budget exists
-  const { data: screenUsage } = await supabase
-    .from('screen_usage_log')
-    .select('minutes_used')
-    .eq('child_id', child.id)
-    .gte('created_at', weekStart.toISOString());
+    // Get screen time budget
+    supabase
+      .from('screen_time_budgets')
+      .select('*')
+      .eq('child_id', child.id)
+      .eq('week_start_date', weekStartDate)
+      .maybeSingle(),
+
+    // Get weekly screen usage (fallback for legacy)
+    supabase
+      .from('screen_usage_log')
+      .select('minutes_used')
+      .eq('child_id', child.id)
+      .gte('created_at', weekStart.toISOString()),
+
+    // Get today's usage for daily limit
+    supabase
+      .from('screen_usage_log')
+      .select('minutes_used')
+      .eq('child_id', child.id)
+      .gte('created_at', todayStart.toISOString()),
+  ]);
+
+  const rewards = rewardsResult.data;
+  const screenBudgetData = screenBudgetResult.data;
+  const screenUsage = screenUsageResult.data;
+  const todayUsage = todayUsageResult.data;
 
   const totalScreenMinutes = screenBudgetData?.used_minutes ||
     screenUsage?.reduce((sum, log) => sum + log.minutes_used, 0) || 0;
   const screenBudget = screenBudgetData
     ? (screenBudgetData.base_minutes + screenBudgetData.bonus_minutes)
     : (child.settings?.screenBudgetWeeklyMinutes || 300);
-
-  // Get today's usage for daily limit
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const { data: todayUsage } = await supabase
-    .from('screen_usage_log')
-    .select('minutes_used')
-    .eq('child_id', child.id)
-    .gte('created_at', todayStart.toISOString());
-
   const usedTodayMinutes = todayUsage?.reduce((sum, log) => sum + log.minutes_used, 0) || 0;
 
   // Filter rewards by category

@@ -1,10 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Plus, CheckSquare, Pause, Archive } from '@phosphor-icons/react';
 import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 import TaskCard from './TaskCard';
-import TaskFormDialog from './TaskFormDialog';
+
+// Dynamic import for heavy dialog component
+const TaskFormDialog = dynamic(() => import('./TaskFormDialog'), {
+  ssr: false,
+});
 
 type Task = {
   id: string;
@@ -46,12 +51,12 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
   const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
-  const handleNew = () => {
+  const handleNew = useCallback(() => {
     setSelectedTask(null);
     setIsDialogOpen(true);
-  };
+  }, []);
 
-  const filteredTasks = tasks.filter((task) => {
+  const filteredTasks = useMemo(() => tasks.filter((task) => {
     if (filter === 'archived') {
       return task.archived_at !== null;
     } else {
@@ -60,42 +65,46 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
       if (filter === 'inactive') return !task.is_active;
       return true;
     }
-  });
+  }), [tasks, filter]);
 
-  const handleEdit = (task: Task) => {
+  const handleEdit = useCallback((task: Task) => {
     if (isSelectionMode) return; // Disable edit in selection mode
     setSelectedTask(task);
     setIsDialogOpen(true);
-  };
+  }, [isSelectionMode]);
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = useCallback(() => {
     setSelectedTask(null);
     setIsDialogOpen(false);
-  };
+  }, []);
 
   // Selection Handlers
-  const toggleSelectionMode = () => {
-    setIsSelectionMode(!isSelectionMode);
+  const toggleSelectionMode = useCallback(() => {
+    setIsSelectionMode(prev => !prev);
     setSelectedTaskIds(new Set()); // Clear selection when toggling
-  };
+  }, []);
 
-  const toggleTaskSelection = (taskId: string) => {
-    const newSelected = new Set(selectedTaskIds);
-    if (newSelected.has(taskId)) {
-      newSelected.delete(taskId);
-    } else {
-      newSelected.add(taskId);
-    }
-    setSelectedTaskIds(newSelected);
-  };
+  const toggleTaskSelection = useCallback((taskId: string) => {
+    setSelectedTaskIds(prev => {
+      const newSelected = new Set(prev);
+      if (newSelected.has(taskId)) {
+        newSelected.delete(taskId);
+      } else {
+        newSelected.add(taskId);
+      }
+      return newSelected;
+    });
+  }, []);
 
-  const selectAll = () => {
-    if (selectedTaskIds.size === filteredTasks.length) {
-      setSelectedTaskIds(new Set());
-    } else {
-      setSelectedTaskIds(new Set(filteredTasks.map(t => t.id)));
-    }
-  };
+  const selectAll = useCallback(() => {
+    setSelectedTaskIds(prev => {
+      if (prev.size === filteredTasks.length) {
+        return new Set();
+      } else {
+        return new Set(filteredTasks.map(t => t.id));
+      }
+    });
+  }, [filteredTasks]);
 
   // Bulk Actions
   const handleBulkArchive = async (archive: boolean) => {
@@ -146,13 +155,13 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
     }
   };
 
-  // Group tasks by category
-  const groupedTasks = filteredTasks.reduce((acc, task) => {
+  // Group tasks by category (memoized)
+  const groupedTasks = useMemo(() => filteredTasks.reduce((acc, task) => {
     const category = task.category || 'other';
     if (!acc[category]) acc[category] = [];
     acc[category].push(task);
     return acc;
-  }, {} as Record<string, Task[]>);
+  }, {} as Record<string, Task[]>), [filteredTasks]);
 
   const categoryLabels: Record<string, string> = {
     hygiene: t('categoryLabels.hygiene'),

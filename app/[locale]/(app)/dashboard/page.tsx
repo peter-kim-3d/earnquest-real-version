@@ -35,79 +35,94 @@ export default async function ParentDashboardPage({
     redirect(`/${locale}/onboarding/add-child`);
   }
 
-  // Get children
-  const { data: children } = await supabase
-    .from('children')
-    .select('id, name, age_group, points_balance, avatar_url, pin_code, settings')
-    .eq('family_id', userProfile.family_id)
-    .order('created_at', { ascending: true }) as { data: any[] | null };
+  // Parallelize all queries that depend on family_id
+  const [
+    childrenResult,
+    pendingCompletionsResult,
+    recentCompletionsResult,
+    activeTasksResult,
+    overridesResult,
+    pendingTicketsResult,
+    allActiveTicketsResult,
+  ] = await Promise.all([
+    // Get children
+    supabase
+      .from('children')
+      .select('id, name, age_group, points_balance, avatar_url, pin_code, settings')
+      .eq('family_id', userProfile.family_id)
+      .order('created_at', { ascending: true }),
 
-  // Get pending task completions for approval
-  const { data: pendingCompletions } = await supabase
-    .from('task_completions')
-    .select(`
-      *,
-      tasks(*),
-      children(*)
-    `)
-    .eq('family_id', userProfile.family_id)
-    .eq('status', 'pending')
-    .order('requested_at', { ascending: true }) as { data: any[] | null };
+    // Get pending task completions for approval
+    supabase
+      .from('task_completions')
+      .select(`
+        *,
+        tasks(*),
+        children(*)
+      `)
+      .eq('family_id', userProfile.family_id)
+      .eq('status', 'pending')
+      .order('requested_at', { ascending: true }),
 
-  // Get recent activity
-  const { data: recentCompletions } = await supabase
-    .from('task_completions')
-    .select(`
-      *,
-      tasks(name),
-      children(name)
-    `)
-    .eq('family_id', userProfile.family_id)
-    .in('status', ['approved', 'auto_approved'])
-    .order('completed_at', { ascending: false })
-    .eq('family_id', userProfile.family_id)
-    .in('status', ['approved', 'auto_approved'])
-    .order('completed_at', { ascending: false })
-    .limit(10) as { data: any[] | null };
+    // Get recent activity (fixed duplicate filters)
+    supabase
+      .from('task_completions')
+      .select(`
+        *,
+        tasks(name),
+        children(name)
+      `)
+      .eq('family_id', userProfile.family_id)
+      .in('status', ['approved', 'auto_approved'])
+      .order('completed_at', { ascending: false })
+      .limit(10),
 
-  // Get active tasks for child cards
-  const { data: activeTasks } = await supabase
-    .from('tasks')
-    .select('*')
-    .eq('family_id', userProfile.family_id)
-    .eq('is_active', true)
-    .is('deleted_at', null) as { data: any[] | null };
+    // Get active tasks for child cards
+    supabase
+      .from('tasks')
+      .select('*')
+      .eq('family_id', userProfile.family_id)
+      .eq('is_active', true)
+      .is('deleted_at', null),
 
-  // Get task overrides
-  const { data: overrides } = await supabase
-    .from('child_task_overrides')
-    .select('task_id, child_id, is_enabled')
-    .eq('is_enabled', false) as { data: any[] | null };
+    // Get task overrides
+    supabase
+      .from('child_task_overrides')
+      .select('task_id, child_id, is_enabled')
+      .eq('is_enabled', false),
 
-  // Get pending ticket use requests
-  const { data: pendingTickets } = await supabase
-    .from('reward_purchases')
-    .select(`
-      *,
-      reward:rewards(id, name, description, category, icon, image_url, screen_minutes),
-      children(name, avatar_url)
-    `)
-    .eq('family_id', userProfile.family_id)
-    .eq('status', 'use_requested')
-    .order('purchased_at', { ascending: true }) as { data: any[] | null };
+    // Get pending ticket use requests
+    supabase
+      .from('reward_purchases')
+      .select(`
+        *,
+        reward:rewards(id, name, description, category, icon, image_url, screen_minutes),
+        children(name, avatar_url)
+      `)
+      .eq('family_id', userProfile.family_id)
+      .eq('status', 'use_requested')
+      .order('purchased_at', { ascending: true }),
 
-  // Get active non-screen tickets (item/experience) that need fulfillment
-  // We'll get all active tickets and filter them
-  const { data: allActiveTickets } = await supabase
-    .from('reward_purchases')
-    .select(`
-      *,
-      reward:rewards(id, name, description, category, icon, image_url, screen_minutes),
-      children(name, avatar_url)
-    `)
-    .eq('family_id', userProfile.family_id)
-    .eq('status', 'active')
-    .order('purchased_at', { ascending: true }) as { data: any[] | null };
+    // Get active non-screen tickets (item/experience) that need fulfillment
+    supabase
+      .from('reward_purchases')
+      .select(`
+        *,
+        reward:rewards(id, name, description, category, icon, image_url, screen_minutes),
+        children(name, avatar_url)
+      `)
+      .eq('family_id', userProfile.family_id)
+      .eq('status', 'active')
+      .order('purchased_at', { ascending: true }),
+  ]);
+
+  const children = childrenResult.data as any[] | null;
+  const pendingCompletions = pendingCompletionsResult.data as any[] | null;
+  const recentCompletions = recentCompletionsResult.data as any[] | null;
+  const activeTasks = activeTasksResult.data as any[] | null;
+  const overrides = overridesResult.data as any[] | null;
+  const pendingTickets = pendingTicketsResult.data as any[] | null;
+  const allActiveTickets = allActiveTicketsResult.data as any[] | null;
 
   // Filter for non-screen rewards (item/experience) that need parent fulfillment
   const activeTickets = (allActiveTickets || []).filter((ticket: any) => {

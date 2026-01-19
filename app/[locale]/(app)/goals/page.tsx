@@ -30,44 +30,50 @@ export default async function GoalsManagementPage({
     redirect(`/${locale}/onboarding/add-child`);
   }
 
-  // Get children
-  const { data: childrenData } = await supabase
-    .from('children')
-    .select('id, name')
-    .eq('family_id', userProfile.family_id)
-    .is('deleted_at', null)
-    .order('created_at', { ascending: true });
+  // Calculate date for weekly earnings query
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
 
-  const children = (childrenData || []) as { id: string; name: string }[];
+  // Parallelize all queries that depend on family_id
+  const [
+    childrenResult,
+    goalsResult,
+    weeklyTransactionsResult,
+  ] = await Promise.all([
+    // Get children
+    supabase
+      .from('children')
+      .select('id, name')
+      .eq('family_id', userProfile.family_id)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: true }),
 
-  // Get all goals for this family
-  const { data: goalsData } = await supabase
-    .from('goals')
-    .select('*')
-    .eq('family_id', userProfile.family_id)
-    .is('deleted_at', null)
-    .order('is_completed', { ascending: true })
-    .order('created_at', { ascending: false });
+    // Get all goals for this family
+    supabase
+      .from('goals')
+      .select('*')
+      .eq('family_id', userProfile.family_id)
+      .is('deleted_at', null)
+      .order('is_completed', { ascending: true })
+      .order('created_at', { ascending: false }),
 
-  const goals = (goalsData || []) as any[];
+    // Get weekly earnings (last 7 days)
+    supabase
+      .from('point_transactions')
+      .select('amount')
+      .eq('family_id', userProfile.family_id)
+      .eq('type', 'earn')
+      .gte('created_at', weekAgo.toISOString()),
+  ]);
+
+  const children = (childrenResult.data || []) as { id: string; name: string }[];
+  const goals = (goalsResult.data || []) as any[];
+  const weeklyEarnings = weeklyTransactionsResult.data?.reduce((sum, tx) => sum + tx.amount, 0) || 350;
 
   // Calculate stats
   const activeGoals = goals.filter((g) => !g.is_completed);
   const completedGoals = goals.filter((g) => g.is_completed);
   const totalDeposited = goals.reduce((sum, g) => sum + (g.current_points || 0), 0);
-
-  // Calculate average weekly earnings (last 7 days)
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
-
-  const { data: weeklyTransactions } = await supabase
-    .from('point_transactions')
-    .select('amount')
-    .eq('family_id', userProfile.family_id)
-    .eq('type', 'earn')
-    .gte('created_at', weekAgo.toISOString());
-
-  const weeklyEarnings = weeklyTransactions?.reduce((sum, tx) => sum + tx.amount, 0) || 350;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">

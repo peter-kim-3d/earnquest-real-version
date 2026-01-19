@@ -33,39 +33,49 @@ export default async function ChildGoalsPage({
     redirect(`/${locale}/child-login`);
   }
 
-  // Get the specific child from session
-  const { data: child } = await supabase
-    .from('children')
-    .select('*')
-    .eq('id', childId)
-    .is('deleted_at', null)
-    .single();
+  // Calculate date for weekly earnings query
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
 
+  // Parallelize all queries that depend on childId
+  const [
+    childResult,
+    goalsResult,
+    weeklyTransactionsResult,
+  ] = await Promise.all([
+    // Get the specific child from session
+    supabase
+      .from('children')
+      .select('*')
+      .eq('id', childId)
+      .is('deleted_at', null)
+      .single(),
+
+    // Get goals for this child
+    supabase
+      .from('goals')
+      .select('*')
+      .eq('child_id', childId)
+      .is('deleted_at', null)
+      .order('is_completed', { ascending: true })
+      .order('created_at', { ascending: false }),
+
+    // Calculate weekly earnings (last 7 days)
+    supabase
+      .from('point_transactions')
+      .select('amount')
+      .eq('child_id', childId)
+      .eq('type', 'earn')
+      .gte('created_at', weekAgo.toISOString()),
+  ]);
+
+  const child = childResult.data;
   if (!child) {
     redirect(`/${locale}/child-login`);
   }
 
-  // Get goals for this child
-  const { data: goals } = await supabase
-    .from('goals')
-    .select('*')
-    .eq('child_id', child.id)
-    .is('deleted_at', null)
-    .order('is_completed', { ascending: true })
-    .order('created_at', { ascending: false });
-
-  // Calculate weekly earnings (last 7 days)
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
-
-  const { data: weeklyTransactions } = await supabase
-    .from('point_transactions')
-    .select('amount')
-    .eq('child_id', child.id)
-    .eq('type', 'earn')
-    .gte('created_at', weekAgo.toISOString());
-
-  const weeklyEarnings = weeklyTransactions?.reduce((sum, tx) => sum + tx.amount, 0) || 350;
+  const goals = goalsResult.data;
+  const weeklyEarnings = weeklyTransactionsResult.data?.reduce((sum, tx) => sum + tx.amount, 0) || 350;
 
   return (
     <div className="space-y-6">
