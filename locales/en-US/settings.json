@@ -199,6 +199,13 @@
     "referenceNote": "This rate is used as a guide when creating new rewards or goals. Changing this rate will NOT automatically update existing rewards or goals - you'll need to manually adjust them if desired.",
     "current": "Current",
     "exampleTitle": "Example conversions:",
+    "options": {
+      "10": "Lower effort per dollar",
+      "20": "Low effort",
+      "50": "Medium effort",
+      "100": "Recommended",
+      "200": "High effort per dollar"
+    },
     "confirm": {
       "title": "Change Exchange Rate?",
       "description": "This will change how points are converted to dollar values in your parent dashboard.",

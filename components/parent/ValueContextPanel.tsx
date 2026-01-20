@@ -18,6 +18,7 @@ interface ValueContextPanelProps {
   existingRewards?: ExistingReward[];
   taskPointValues?: { daily: number; special: number };
   exchangeRate?: ExchangeRate;
+  locale?: string;
 }
 
 /**
@@ -37,6 +38,7 @@ export default function ValueContextPanel({
   existingRewards = [],
   taskPointValues = { daily: 50, special: 150 },
   exchangeRate = DEFAULT_EXCHANGE_RATE,
+  locale = 'en-US',
 }: ValueContextPanelProps) {
   const tier = getTierForPoints(pointsCost);
   const tierLabel = getTierLabel(tier);
@@ -104,8 +106,11 @@ export default function ValueContextPanel({
 
   // Dollar value context (parent-only)
   const dollarValue = useMemo(() => {
-    return formatPointsAsDollars(pointsCost, exchangeRate);
-  }, [pointsCost, exchangeRate]);
+    return formatPointsAsDollars(pointsCost, exchangeRate, locale);
+  }, [pointsCost, exchangeRate, locale]);
+
+  // Currency unit for display
+  const currencyUnit = locale.startsWith('ko') ? '₩1,000' : '$1';
 
   if (pointsCost <= 0) {
     return null;
@@ -128,7 +133,7 @@ export default function ValueContextPanel({
             Real value: {dollarValue}
           </span>
           <span className="text-green-600 dark:text-green-400 text-xs">
-            ($1 = {exchangeRate} XP)
+            ({currencyUnit} = {exchangeRate} XP)
           </span>
         </div>
 

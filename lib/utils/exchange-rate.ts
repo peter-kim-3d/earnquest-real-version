@@ -17,15 +17,28 @@ export type ExchangeRate = (typeof VALID_EXCHANGE_RATES)[number];
 export const DEFAULT_EXCHANGE_RATE: ExchangeRate = 100;
 
 /**
- * Exchange rate options with labels for settings UI
+ * Exchange rate option values
  */
 export const EXCHANGE_RATE_OPTIONS = [
-  { value: 10, label: '$1 = 10 XP', description: 'Lower effort per dollar' },
-  { value: 20, label: '$1 = 20 XP', description: 'Low effort' },
-  { value: 50, label: '$1 = 50 XP', description: 'Medium effort' },
-  { value: 100, label: '$1 = 100 XP', description: 'Recommended' },
-  { value: 200, label: '$1 = 200 XP', description: 'High effort per dollar' },
+  { value: 10 as ExchangeRate },
+  { value: 20 as ExchangeRate },
+  { value: 50 as ExchangeRate },
+  { value: 100 as ExchangeRate },
+  { value: 200 as ExchangeRate },
 ] as const;
+
+/**
+ * Get locale-specific currency label for exchange rate
+ * @param rate - Exchange rate value
+ * @param locale - Locale string (e.g., 'en-US', 'ko-KR')
+ * @returns Label string (e.g., "$1 = 10 XP" or "₩1,000 = 10 XP")
+ */
+export function getExchangeRateLabel(rate: ExchangeRate, locale: string = 'en-US'): string {
+  if (locale.startsWith('ko')) {
+    return `₩1,000 = ${rate} XP`;
+  }
+  return `$1 = ${rate} XP`;
+}
 
 /**
  * Calculate points from dollar amount
@@ -48,24 +61,36 @@ export function calculateDollarValue(points: number, rate: ExchangeRate = DEFAUL
 }
 
 /**
- * Format points as dollar string
+ * Format points as currency string (locale-aware)
  * @param points - Point amount
- * @param rate - Exchange rate ($1 = X points)
+ * @param rate - Exchange rate ($1 or ₩1000 = X points)
  * @param locale - Locale for formatting (default: en-US)
- * @returns Formatted dollar string (e.g., "$5.00")
+ * @returns Formatted currency string (e.g., "$5.00" or "₩5,000")
  */
 export function formatPointsAsDollars(
   points: number,
   rate: ExchangeRate = DEFAULT_EXCHANGE_RATE,
   locale: string = 'en-US'
 ): string {
-  const dollars = calculateDollarValue(points, rate);
+  const value = calculateDollarValue(points, rate);
+
+  if (locale.startsWith('ko')) {
+    // For Korean: ₩1,000 = X points, so multiply by 1000
+    const won = value * 1000;
+    return new Intl.NumberFormat('ko-KR', {
+      style: 'currency',
+      currency: 'KRW',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(won);
+  }
+
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(dollars);
+  }).format(value);
 }
 
 /**

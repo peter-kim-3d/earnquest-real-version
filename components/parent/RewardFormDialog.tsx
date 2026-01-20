@@ -22,7 +22,9 @@ import {
   dollarsToCents,
   ExchangeRate,
   DEFAULT_EXCHANGE_RATE,
+  getExchangeRateLabel,
 } from '@/lib/utils/exchange-rate';
+import { useLocale } from 'next-intl';
 
 type Reward = {
   id: string;
@@ -49,6 +51,7 @@ interface RewardFormDialogProps {
 export default function RewardFormDialog({ reward, isOpen, onClose, existingRewards = [], exchangeRate = DEFAULT_EXCHANGE_RATE }: RewardFormDialogProps) {
   const router = useRouter();
   const t = useTranslations('rewards');
+  const locale = useLocale();
   const [loading, setLoading] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -104,12 +107,14 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
     }
   }, [reward]);
 
-  // Handle dollar value change - auto-calculate points
+  // Handle dollar/won value change - auto-calculate points
   const handleDollarValueChange = (value: string) => {
     setFormData(prev => ({ ...prev, dollarValue: value }));
     if (value && !isNaN(parseFloat(value))) {
-      const dollars = parseFloat(value);
-      const points = calculatePointsFromDollars(dollars, exchangeRate);
+      const inputValue = parseFloat(value);
+      // For Korean locale, input is in won, divide by 1000 to get dollar equivalent
+      const dollarEquivalent = locale.startsWith('ko') ? inputValue / 1000 : inputValue;
+      const points = calculatePointsFromDollars(dollarEquivalent, exchangeRate);
       setFormData(prev => ({ ...prev, dollarValue: value, points_cost: points }));
     }
   };
@@ -393,21 +398,23 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
               <span className="text-xs text-gray-500">({t('form.parentOnly')})</span>
             </Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                {locale.startsWith('ko') ? '₩' : '$'}
+              </span>
               <Input
                 id="dollarValue"
                 name="dollarValue"
                 type="number"
                 value={formData.dollarValue}
                 onChange={(e) => handleDollarValueChange(e.target.value)}
-                placeholder="5.00"
-                step="0.01"
+                placeholder={locale.startsWith('ko') ? '5000' : '5.00'}
+                step={locale.startsWith('ko') ? '1000' : '0.01'}
                 min="0"
                 className="pl-7"
               />
             </div>
             <p className="text-xs text-gray-500">
-              {t('form.dollarValueHelp', { rate: exchangeRate })}
+              {getExchangeRateLabel(exchangeRate, locale)}
             </p>
           </div>
 
@@ -433,6 +440,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
               pointsCost={formData.points_cost}
               existingRewards={existingRewards.filter(r => r.name !== formData.name)}
               exchangeRate={exchangeRate}
+              locale={locale}
             />
           )}
 

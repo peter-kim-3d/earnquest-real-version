@@ -18,8 +18,9 @@ import {
   EXCHANGE_RATE_OPTIONS,
   ExchangeRate,
   formatPointsAsDollars,
+  getExchangeRateLabel,
 } from '@/lib/utils/exchange-rate';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface ExchangeRateSettingsProps {
   currentRate: ExchangeRate;
@@ -28,6 +29,7 @@ interface ExchangeRateSettingsProps {
 export default function ExchangeRateSettings({ currentRate }: ExchangeRateSettingsProps) {
   const router = useRouter();
   const t = useTranslations('settings.exchangeRate');
+  const locale = useLocale();
   const [selectedRate, setSelectedRate] = useState<ExchangeRate>(currentRate);
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -110,8 +112,8 @@ export default function ExchangeRateSettings({ currentRate }: ExchangeRateSettin
                 }`}
               >
                 <div className="text-left">
-                  <span className="font-semibold">{option.label}</span>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{option.description}</p>
+                  <span className="font-semibold">{getExchangeRateLabel(option.value, locale)}</span>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t(`options.${option.value}`)}</p>
                 </div>
                 {selectedRate === option.value && (
                   <span className="text-primary font-semibold">{t('current')}</span>
@@ -127,13 +129,13 @@ export default function ExchangeRateSettings({ currentRate }: ExchangeRateSettin
             </p>
             <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
               <p>
-                500 XP = {formatPointsAsDollars(500, selectedRate)}
+                500 XP = {formatPointsAsDollars(500, selectedRate, locale)}
               </p>
               <p>
-                1000 XP = {formatPointsAsDollars(1000, selectedRate)}
+                1000 XP = {formatPointsAsDollars(1000, selectedRate, locale)}
               </p>
               <p>
-                2000 XP = {formatPointsAsDollars(2000, selectedRate)}
+                2000 XP = {formatPointsAsDollars(2000, selectedRate, locale)}
               </p>
             </div>
           </div>
@@ -158,11 +160,11 @@ export default function ExchangeRateSettings({ currentRate }: ExchangeRateSettin
               <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <p className="text-sm">
                   <span className="text-gray-500">{t('confirm.from')}</span>{' '}
-                  <span className="font-semibold">$1 = {currentRate} XP</span>
+                  <span className="font-semibold">{getExchangeRateLabel(currentRate, locale)}</span>
                 </p>
                 <p className="text-sm">
                   <span className="text-gray-500">{t('confirm.to')}</span>{' '}
-                  <span className="font-semibold text-primary">$1 = {pendingRate} XP</span>
+                  <span className="font-semibold text-primary">{getExchangeRateLabel(pendingRate, locale)}</span>
                 </p>
               </div>
             )}
