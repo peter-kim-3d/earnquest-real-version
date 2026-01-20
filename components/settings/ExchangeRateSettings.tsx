@@ -91,6 +91,12 @@ export default function ExchangeRateSettings({ currentRate }: ExchangeRateSettin
             <p className="text-sm text-blue-700 dark:text-blue-300">{t('info')}</p>
           </div>
 
+          {/* Reference note - important guidance */}
+          <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+            <WarningCircle size={20} className="text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+            <p className="text-sm text-amber-700 dark:text-amber-300">{t('referenceNote')}</p>
+          </div>
+
           {/* Rate selection */}
           <div className="grid gap-2">
             {EXCHANGE_RATE_OPTIONS.map((option) => (

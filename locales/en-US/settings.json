@@ -196,6 +196,7 @@
     "title": "Point Exchange Rate",
     "description": "Set how many points equal $1 for your reference",
     "info": "This is for your reference only. Children don't see dollar values.",
+    "referenceNote": "This rate is used as a guide when creating new rewards or goals. Changing this rate will NOT automatically update existing rewards or goals - you'll need to manually adjust them if desired.",
     "current": "Current",
     "exampleTitle": "Example conversions:",
     "confirm": {
