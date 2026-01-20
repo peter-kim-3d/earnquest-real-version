@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Sparkle, Lock } from '@phosphor-icons/react';
+import { Sparkle, Lock } from '@phosphor-icons/react/dist/ssr';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';
 import { EffortBadge, TierBadge } from '@/components/ui/EffortBadge';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PiggyBank, Target, Sparkle } from '@phosphor-icons/react';
+import { PiggyBank, Target, Sparkle } from '@phosphor-icons/react/dist/ssr';
 import {
   Dialog,
   DialogContent,

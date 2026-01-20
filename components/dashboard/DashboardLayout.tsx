@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Gear, Eye, EyeSlash } from '@phosphor-icons/react';
+import { Gear, Eye, EyeSlash } from '@phosphor-icons/react/dist/ssr';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {

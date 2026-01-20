@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Plus, CheckSquare, Pause, Archive } from '@phosphor-icons/react';
+import { Plus, CheckSquare, Pause, Archive } from '@phosphor-icons/react/dist/ssr';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import TaskCard from './TaskCard';

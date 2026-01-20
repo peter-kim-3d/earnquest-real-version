@@ -54,13 +54,21 @@ export default function ChildLoginPage() {
     setError('');
 
     try {
-      // Validate code
-      const validateRes = await fetch('/api/family/validate-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
-      });
+      // Run both requests in parallel to avoid waterfall
+      const [validateRes, childrenRes] = await Promise.all([
+        fetch('/api/family/validate-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code }),
+        }),
+        fetch('/api/children/by-family-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ familyCode: code }),
+        }),
+      ]);
 
+      // Check validation result first
       if (!validateRes.ok) {
         const data = await validateRes.json();
         if (data.error === 'INVALID_CODE') {
@@ -72,13 +80,7 @@ export default function ChildLoginPage() {
         return;
       }
 
-      // Get children for this family
-      const childrenRes = await fetch('/api/children/by-family-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ familyCode: code }),
-      });
-
+      // Check children fetch result
       if (!childrenRes.ok) {
         setError(t('errors.loadFailed'));
         setLoading(false);

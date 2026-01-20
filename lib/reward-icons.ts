@@ -27,8 +27,8 @@ import {
   PiggyBank,
   Wallet,
   HandCoins,
-  IconProps,
-} from '@phosphor-icons/react';
+} from '@phosphor-icons/react/dist/ssr';
+import type { IconProps } from '@phosphor-icons/react';
 
 export interface RewardIcon {
   id: string;

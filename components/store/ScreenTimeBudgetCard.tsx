@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { DeviceTabletSpeaker, Play, Pause, Timer } from '@phosphor-icons/react';
+import { DeviceTabletSpeaker, Play, Pause, Timer } from '@phosphor-icons/react/dist/ssr';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 

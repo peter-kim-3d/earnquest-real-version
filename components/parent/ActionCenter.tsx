@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bell, CheckSquare, Square, CheckCircle } from '@phosphor-icons/react';
+import { Bell, CheckSquare, Square, CheckCircle } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';

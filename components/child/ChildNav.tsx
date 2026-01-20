@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Trophy, Gift, Medal, Ticket, List, X, User, SignOut, CaretDown, Star, Eye, Target } from '@phosphor-icons/react';
+import { Trophy, Gift, Medal, Ticket, List, X, User, SignOut, CaretDown, Star, Eye, Target } from '@phosphor-icons/react/dist/ssr';
 import BetaBadge from '@/components/BetaBadge';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
 import {

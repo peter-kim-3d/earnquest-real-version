@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Fire, TrendUp, Trash, Plus, Checks, Eye } from '@phosphor-icons/react';
+import { Fire, TrendUp, Trash, Plus, Checks, Eye } from '@phosphor-icons/react/dist/ssr';
 import { AppIcon } from '@/components/ui/AppIcon';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';

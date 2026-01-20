@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Plus, Sparkle, Pause } from '@phosphor-icons/react';
+import { Plus, Sparkle, Pause } from '@phosphor-icons/react/dist/ssr';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import RewardCard from './RewardCard';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Scroll, CaretDown, ArrowUp, ArrowDown, Target, Gift, Repeat, Question } from '@phosphor-icons/react';
+import { Scroll, CaretDown, ArrowUp, ArrowDown, Target, Gift, Repeat, Question } from '@phosphor-icons/react/dist/ssr';
 import { useTranslations, useLocale } from 'next-intl';
 
 interface Transaction {

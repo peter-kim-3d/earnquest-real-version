@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Target, Trophy, Sparkle } from '@phosphor-icons/react';
+import { Target, Trophy, Sparkle } from '@phosphor-icons/react/dist/ssr';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import GoalCard from '@/components/goals/GoalCard';

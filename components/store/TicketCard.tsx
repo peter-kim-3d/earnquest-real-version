@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Check, Clock, X, Sparkle, Gift } from '@phosphor-icons/react';
+import { Check, Clock, X, Sparkle, Gift } from '@phosphor-icons/react/dist/ssr';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';
 import { useLocale, useTranslations } from 'next-intl';

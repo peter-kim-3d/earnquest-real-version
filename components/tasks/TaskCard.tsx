@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Sparkle, Timer, ListChecks, Checks } from '@phosphor-icons/react';
+import { Sparkle, Timer, ListChecks, Checks } from '@phosphor-icons/react/dist/ssr';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';

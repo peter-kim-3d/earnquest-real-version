@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Target, Trophy, Pencil, Trash, CheckCircle } from '@phosphor-icons/react';
+import { Plus, Target, Trophy, Pencil, Trash, CheckCircle } from '@phosphor-icons/react/dist/ssr';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import GoalFormDialog from './GoalFormDialog';

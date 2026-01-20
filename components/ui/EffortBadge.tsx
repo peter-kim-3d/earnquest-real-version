@@ -1,6 +1,6 @@
 'use client';
 
-import { Star } from '@phosphor-icons/react';
+import { Star } from '@phosphor-icons/react/dist/ssr';
 import { Tier, getTierStars, getTierLabel, getNatureIcon } from '@/lib/utils/tiers';
 
 interface EffortBadgeProps {

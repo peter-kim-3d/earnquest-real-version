@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Target } from '@phosphor-icons/react';
+import { Target } from '@phosphor-icons/react/dist/ssr';
 import { getTierForPoints, getTierLabel, TIER_RANGES, Tier } from '@/lib/utils/tiers';
 import { EffortBadge, TierBadge } from '@/components/ui/EffortBadge';
 import { useTranslations } from 'next-intl';

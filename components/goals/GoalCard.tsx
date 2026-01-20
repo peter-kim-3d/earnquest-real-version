@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Target, Trophy, ArrowRight, PiggyBank } from '@phosphor-icons/react';
+import { Target, Trophy, ArrowRight, PiggyBank } from '@phosphor-icons/react/dist/ssr';
 import { TierBadge, EffortBadge } from '@/components/ui/EffortBadge';
 import { Button } from '@/components/ui/button';
 import { Tier, estimateTimeToGoal } from '@/lib/utils/tiers';

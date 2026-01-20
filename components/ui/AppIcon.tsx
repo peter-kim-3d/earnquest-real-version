@@ -27,7 +27,6 @@ import {
     MusicNotes,
     PaintBrush,
     Sparkle,
-    IconProps,
     // Additional icons for migration
     TrendUp,
     GridFour,
@@ -40,7 +39,8 @@ import {
     Microphone,
     Smiley,
     CheckCircle,
-} from '@phosphor-icons/react';
+} from '@phosphor-icons/react/dist/ssr';
+import type { IconProps } from '@phosphor-icons/react';
 
 const ICON_MAP: Record<string, React.ComponentType<IconProps>> = {
     // Chores / Household

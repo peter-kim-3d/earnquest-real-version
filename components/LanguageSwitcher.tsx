@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { Globe } from '@phosphor-icons/react';
+import { Globe } from '@phosphor-icons/react/dist/ssr';
 import {
     DropdownMenu,
     DropdownMenuContent,

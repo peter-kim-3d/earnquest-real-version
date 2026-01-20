@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, Bell, Package, Ticket } from '@phosphor-icons/react';
+import { Check, Bell, Package, Ticket } from '@phosphor-icons/react/dist/ssr';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import TicketCard from '@/components/store/TicketCard';

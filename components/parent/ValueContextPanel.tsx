@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Info, TrendUp, Scales, ChartBar, CheckCircle } from '@phosphor-icons/react';
+import { Info, TrendUp, Scales, ChartBar, CheckCircle } from '@phosphor-icons/react/dist/ssr';
 import { getTierForPoints, getTierLabel, TIER_RANGES } from '@/lib/utils/tiers';
 
 interface ExistingReward {

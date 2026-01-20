@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { PencilSimple, Trash, DotsThreeVertical, Archive, ArrowCounterClockwise, Users, Checks } from '@phosphor-icons/react';
+import { PencilSimple, Trash, DotsThreeVertical, Archive, ArrowCounterClockwise, Users, Checks } from '@phosphor-icons/react/dist/ssr';
 import { ALL_AVATARS } from '@/lib/avatars';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';

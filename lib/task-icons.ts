@@ -27,8 +27,8 @@ import {
   Sparkle,
   Gift,
   Pizza,
-  IconProps,
-} from '@phosphor-icons/react';
+} from '@phosphor-icons/react/dist/ssr';
+import type { IconProps } from '@phosphor-icons/react';
 
 export interface TaskIcon {
   id: string;

@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { CaretDown, CaretRight } from '@/components/ui/ClientIcons';
 import { cn } from '@/lib/utils';
-import { Icon as IconType } from '@phosphor-icons/react';
+import type { Icon as IconType } from '@phosphor-icons/react';
 
 interface CollapsibleSectionProps {
     title: string;
