@@ -37,7 +37,9 @@ export async function POST(request: Request) {
       screen_minutes,
       weekly_limit,
       icon,
+      image_url,
       is_active,
+      real_value_cents,
     } = body;
 
     // Validate required fields
@@ -60,7 +62,9 @@ export async function POST(request: Request) {
         screen_minutes: screen_minutes || null,
         weekly_limit: weekly_limit || null,
         icon: icon || 'redeem',
+        image_url: image_url || null,
         is_active: is_active !== undefined ? is_active : true,
+        real_value_cents: real_value_cents || null,
       })
       .select()
       .single();

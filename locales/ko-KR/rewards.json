@@ -43,7 +43,10 @@
     "weeklyLimitHelp": "주당 최대 구매 횟수 (선택)",
     "weeklyLimitPlaceholder": "예: 2",
     "isActive": "활성화",
-    "isActiveHelp": "비활성화된 보상은 스토어에 보이지 않습니다"
+    "isActiveHelp": "비활성화된 보상은 스토어에 보이지 않습니다",
+    "dollarValue": "달러 가치",
+    "parentOnly": "부모 전용",
+    "dollarValueHelp": "설정한 환율 기준: $1 = {rate} XP"
   },
   "dialog": {
     "editTitle": "보상 수정",

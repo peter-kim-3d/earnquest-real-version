@@ -43,7 +43,10 @@
     "weeklyLimitHelp": "Optional - max purchases per week",
     "weeklyLimitPlaceholder": "e.g., 2",
     "isActive": "Active",
-    "isActiveHelp": "Inactive rewards won't appear in store"
+    "isActiveHelp": "Inactive rewards won't appear in store",
+    "dollarValue": "Dollar Value",
+    "parentOnly": "Parent Only",
+    "dollarValueHelp": "Based on your exchange rate: $1 = {rate} XP"
   },
   "dialog": {
     "editTitle": "Edit Reward",

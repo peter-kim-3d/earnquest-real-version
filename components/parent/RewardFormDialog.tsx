@@ -17,6 +17,12 @@ import RewardIconPicker from '@/components/rewards/RewardIconPicker';
 import DefaultRewardImagePicker from '@/components/rewards/DefaultRewardImagePicker';
 import TaskImageUpload from '@/components/tasks/TaskImageUpload';
 import { getRewardIconById } from '@/lib/reward-icons';
+import {
+  calculatePointsFromDollars,
+  dollarsToCents,
+  ExchangeRate,
+  DEFAULT_EXCHANGE_RATE,
+} from '@/lib/utils/exchange-rate';
 
 type Reward = {
   id: string;
@@ -29,6 +35,7 @@ type Reward = {
   is_active: boolean;
   icon: string | null;
   image_url: string | null;
+  real_value_cents?: number | null;
 };
 
 interface RewardFormDialogProps {
@@ -36,9 +43,10 @@ interface RewardFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
   existingRewards?: Array<{ name: string; points_cost: number }>;
+  exchangeRate?: ExchangeRate;
 }
 
-export default function RewardFormDialog({ reward, isOpen, onClose, existingRewards = [] }: RewardFormDialogProps) {
+export default function RewardFormDialog({ reward, isOpen, onClose, existingRewards = [], exchangeRate = DEFAULT_EXCHANGE_RATE }: RewardFormDialogProps) {
   const router = useRouter();
   const t = useTranslations('rewards');
   const [loading, setLoading] = useState(false);
@@ -57,6 +65,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
     image_url: null as string | null,
     is_active: true,
     color: '', // Custom color
+    dollarValue: '', // For $ input (optional)
   });
 
   // Update form when reward changes
@@ -73,6 +82,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
         image_url: reward.image_url || null,
         is_active: reward.is_active,
         color: (reward as any).settings?.color || '',
+        dollarValue: reward.real_value_cents ? (reward.real_value_cents / 100).toString() : '',
       });
       setImageMode(reward.image_url ? 'image' : 'icon');
     } else {
@@ -88,10 +98,21 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
         image_url: null,
         is_active: true,
         color: '',
+        dollarValue: '',
       });
       setImageMode('icon');
     }
   }, [reward]);
+
+  // Handle dollar value change - auto-calculate points
+  const handleDollarValueChange = (value: string) => {
+    setFormData(prev => ({ ...prev, dollarValue: value }));
+    if (value && !isNaN(parseFloat(value))) {
+      const dollars = parseFloat(value);
+      const points = calculatePointsFromDollars(dollars, exchangeRate);
+      setFormData(prev => ({ ...prev, dollarValue: value, points_cost: points }));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,15 +128,21 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
       const url = reward ? '/api/rewards/update' : '/api/rewards/create';
       const method = reward ? 'PATCH' : 'POST';
 
-      // Extract color from formData - it goes into settings, not as a direct column
-      const { color, ...dataWithoutColor } = formData;
+      // Extract color and dollarValue from formData
+      const { color, dollarValue, ...dataWithoutExtras } = formData;
+
+      // Calculate real value in cents if dollar value provided
+      const realValueCents = dollarValue
+        ? dollarsToCents(parseFloat(dollarValue))
+        : undefined;
 
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...(reward && { rewardId: reward.id }),
-          ...dataWithoutColor,
+          ...dataWithoutExtras,
+          real_value_cents: realValueCents,
           settings: {
             ...(reward as any)?.settings,
             ...(color ? { color } : {}),
@@ -359,6 +386,31 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
             </div>
           </div>
 
+          {/* Dollar Value (Parent Reference) */}
+          <div className="space-y-2">
+            <Label htmlFor="dollarValue" className="flex items-center gap-2">
+              {t('form.dollarValue')}
+              <span className="text-xs text-gray-500">({t('form.parentOnly')})</span>
+            </Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <Input
+                id="dollarValue"
+                name="dollarValue"
+                type="number"
+                value={formData.dollarValue}
+                onChange={(e) => handleDollarValueChange(e.target.value)}
+                placeholder="5.00"
+                step="0.01"
+                min="0"
+                className="pl-7"
+              />
+            </div>
+            <p className="text-xs text-gray-500">
+              {t('form.dollarValueHelp', { rate: exchangeRate })}
+            </p>
+          </div>
+
           {/* Points Cost */}
           <div className="space-y-2">
             <Label htmlFor="points_cost">{t('form.costLabel')}</Label>
@@ -367,7 +419,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
               name="pointsCost"
               type="number"
               value={formData.points_cost}
-              onChange={(e) => setFormData({ ...formData, points_cost: parseInt(e.target.value) || 0 })}
+              onChange={(e) => setFormData({ ...formData, points_cost: parseInt(e.target.value) || 0, dollarValue: '' })}
               min={10}
               max={5000}
               step={10}
