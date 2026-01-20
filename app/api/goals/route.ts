@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { childId, name, description, targetPoints, icon } = body;
+    const { childId, name, description, targetPoints, icon, realValueCents, milestoneBonuses } = body;
 
     // Validate required fields
     if (!childId || !name || !targetPoints) {
@@ -129,6 +129,21 @@ export async function POST(request: NextRequest) {
     // Calculate tier
     const tier = getTierForPoints(targetPoints);
 
+    // Validate milestone bonuses if provided
+    let validatedMilestones: Record<string, number> | null = null;
+    if (milestoneBonuses && typeof milestoneBonuses === 'object') {
+      const tempMilestones: Record<string, number> = {};
+      for (const key of ['25', '50', '75']) {
+        const value = milestoneBonuses[key];
+        if (typeof value === 'number' && value > 0) {
+          tempMilestones[key] = value;
+        }
+      }
+      if (Object.keys(tempMilestones).length > 0) {
+        validatedMilestones = tempMilestones;
+      }
+    }
+
     // Create goal
     const { data: goal, error } = await supabase
       .from('goals')
@@ -143,6 +158,9 @@ export async function POST(request: NextRequest) {
         tier,
         original_target: targetPoints,
         is_completed: false,
+        real_value_cents: typeof realValueCents === 'number' ? realValueCents : null,
+        milestone_bonuses: validatedMilestones,
+        milestones_completed: [],
       })
       .select()
       .single();

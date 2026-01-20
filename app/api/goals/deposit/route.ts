@@ -85,6 +85,8 @@ export async function POST(request: NextRequest) {
       goal_progress?: number;
       goal_target?: number;
       is_completed?: boolean;
+      milestone_reached?: number | null;
+      milestone_bonus?: number;
     };
 
     if (!depositResult.success) {
@@ -100,6 +102,8 @@ export async function POST(request: NextRequest) {
       goalProgress: depositResult.goal_progress,
       goalTarget: depositResult.goal_target,
       isCompleted: depositResult.is_completed,
+      milestoneReached: depositResult.milestone_reached ?? null,
+      milestoneBonus: depositResult.milestone_bonus ?? 0,
     });
   } catch (error) {
     console.error('Goal deposit error:', error);

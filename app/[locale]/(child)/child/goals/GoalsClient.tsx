@@ -48,7 +48,7 @@ export default function GoalsClient({
   const activeGoals = goals.filter((g) => !g.is_completed);
   const completedGoals = goals.filter((g) => g.is_completed);
 
-  const handleDeposit = async (goalId: string, amount: number) => {
+  const handleDeposit = async (goalId: string, amount: number): Promise<{ milestoneReached?: number; milestoneBonus?: number }> => {
     try {
       const response = await fetch('/api/goals/deposit', {
         method: 'POST',
@@ -75,17 +75,26 @@ export default function GoalsClient({
           description: t('toast.goalAchievedDescription'),
           icon: '🎉',
         });
-      } else {
+      } else if (!result.milestoneReached) {
+        // Only show regular deposit toast if no milestone was reached
+        // Milestone celebration will be shown via MilestoneModal
         toast.success(t('toast.pointsDeposited'), {
           description: t('toast.pointsDepositedDescription', { amount }),
         });
       }
 
       router.refresh();
-    } catch (error: any) {
+
+      // Return milestone info for the GoalCard to show MilestoneModal
+      return {
+        milestoneReached: result.milestoneReached,
+        milestoneBonus: result.milestoneBonus,
+      };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Deposit failed:', error);
       toast.error(t('toast.depositFailed'), {
-        description: error.message || t('toast.depositFailedDescription'),
+        description: errorMessage || t('toast.depositFailedDescription'),
       });
       throw error;
     }

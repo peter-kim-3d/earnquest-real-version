@@ -192,6 +192,27 @@
     "disabling": "Disabling...",
     "disablePin": "Disable PIN"
   },
+  "exchangeRate": {
+    "title": "Point Exchange Rate",
+    "description": "Set how many points equal $1 for your reference",
+    "info": "This is for your reference only. Children don't see dollar values.",
+    "current": "Current",
+    "exampleTitle": "Example conversions:",
+    "confirm": {
+      "title": "Change Exchange Rate?",
+      "description": "This will change how points are converted to dollar values in your parent dashboard.",
+      "warning": "This change only affects how you see values. It doesn't change your children's points or goals.",
+      "from": "From:",
+      "to": "To:",
+      "cancel": "Cancel",
+      "updating": "Updating...",
+      "confirm": "Change Rate"
+    },
+    "toast": {
+      "updated": "Exchange rate updated",
+      "updateFailed": "Failed to update exchange rate"
+    }
+  },
   "deviceConnection": {
     "copyCode": "Copy code",
     "instructions": {

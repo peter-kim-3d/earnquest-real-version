@@ -33,6 +33,9 @@
     "nameRequired": "Goal name is required",
     "description": "Description",
     "descriptionPlaceholder": "Optional details about the goal",
+    "dollarValue": "Dollar Value",
+    "dollarValueHelp": "$1 = {rate} XP at your exchange rate",
+    "parentOnly": "Parent only",
     "targetPoints": "Target Points",
     "targetPointsHelp": "Total points needed to reach the goal",
     "child": "Child",
@@ -51,6 +54,13 @@
       "large": "A bigger goal - requires patience and dedication",
       "xl": "An ambitious goal - a major milestone to work toward!"
     },
+    "milestoneBonuses": "Milestone Bonuses",
+    "enableMilestones": "Enable",
+    "milestoneHelp": "Award bonus XP when child reaches these milestones",
+    "useSuggested": "Use Suggested",
+    "totalBonus": "Total Bonus",
+    "childNeeds": "Child needs to save",
+    "estimatedTime": "Estimated time",
     "howGoalsWork": "How Goals Work",
     "howGoalsWorkDescription": "Your child can deposit points toward this goal from their dashboard. Once they reach the target, the goal is marked complete and they can redeem it!",
     "cancel": "Cancel",
@@ -138,5 +148,12 @@
       "depositFailed": "Deposit Failed",
       "depositFailedDescription": "Please try again."
     }
+  },
+  "milestone": {
+    "title": "{percentage}% Milestone Reached!",
+    "reachedFor": "You've made amazing progress on {goalName}!",
+    "bonusEarned": "Bonus Earned!",
+    "keepGoing": "Keep saving to reach the next milestone!",
+    "awesome": "Awesome!"
   }
 }

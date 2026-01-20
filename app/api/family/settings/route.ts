@@ -7,6 +7,7 @@ interface FamilySettings {
   autoApprovalHours?: number;
   screenBudgetWeeklyMinutes?: number;
   requireChildPin?: boolean;
+  pointExchangeRate?: number;
 }
 
 // GET - Get family settings
@@ -38,10 +39,10 @@ export async function GET() {
       );
     }
 
-    // Get family settings
+    // Get family settings and exchange rate
     const { data: family, error: familyError } = await supabase
       .from('families')
-      .select('settings')
+      .select('settings, point_exchange_rate')
       .eq('id', userProfile.family_id)
       .single();
 
@@ -60,6 +61,7 @@ export async function GET() {
       autoApprovalHours: 24,
       screenBudgetWeeklyMinutes: 300,
       requireChildPin: true,
+      pointExchangeRate: family?.point_exchange_rate ?? 100,
       ...family?.settings,
     };
 
@@ -131,7 +133,14 @@ export async function PATCH(request: NextRequest) {
       updates.screenBudgetWeeklyMinutes = body.screenBudgetWeeklyMinutes;
     }
 
-    if (Object.keys(updates).length === 0) {
+    // Handle exchange rate update (stored in separate column)
+    const validExchangeRates = [10, 20, 50, 100, 200];
+    let exchangeRateUpdate: number | undefined;
+    if (typeof body.pointExchangeRate === 'number' && validExchangeRates.includes(body.pointExchangeRate)) {
+      exchangeRateUpdate = body.pointExchangeRate;
+    }
+
+    if (Object.keys(updates).length === 0 && exchangeRateUpdate === undefined) {
       return NextResponse.json(
         { error: 'No valid settings to update' },
         { status: 400 }
@@ -141,7 +150,7 @@ export async function PATCH(request: NextRequest) {
     // Get current settings
     const { data: currentFamily } = await supabase
       .from('families')
-      .select('settings')
+      .select('settings, point_exchange_rate')
       .eq('id', userProfile.family_id)
       .single();
 
@@ -151,10 +160,18 @@ export async function PATCH(request: NextRequest) {
       ...updates,
     };
 
+    // Build update object
+    const familyUpdate: { settings: object; point_exchange_rate?: number } = {
+      settings: newSettings,
+    };
+    if (exchangeRateUpdate !== undefined) {
+      familyUpdate.point_exchange_rate = exchangeRateUpdate;
+    }
+
     // Update family settings
     const { error: updateError } = await supabase
       .from('families')
-      .update({ settings: newSettings })
+      .update(familyUpdate)
       .eq('id', userProfile.family_id);
 
     if (updateError) {
@@ -167,7 +184,10 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      settings: newSettings,
+      settings: {
+        ...newSettings,
+        pointExchangeRate: exchangeRateUpdate ?? currentFamily?.point_exchange_rate ?? 100,
+      },
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';

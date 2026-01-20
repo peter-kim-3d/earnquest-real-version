@@ -1,17 +1,34 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Target } from '@phosphor-icons/react/dist/ssr';
+import { Target, Info, Sparkle } from '@phosphor-icons/react/dist/ssr';
 import { getTierForPoints, getTierLabel, TIER_RANGES, Tier } from '@/lib/utils/tiers';
 import { EffortBadge, TierBadge } from '@/components/ui/EffortBadge';
 import { useTranslations } from 'next-intl';
+import {
+  calculatePointsFromDollars,
+  calculateDollarValue,
+  formatCentsAsDollars,
+  dollarsToCents,
+  calculateTimeEstimate,
+  ExchangeRate,
+  DEFAULT_EXCHANGE_RATE,
+} from '@/lib/utils/exchange-rate';
+import {
+  calculateTotalMilestoneBonus,
+  calculateNetPointsNeeded,
+  getSuggestedMilestoneBonuses,
+  MILESTONE_PERCENTAGES,
+} from '@/lib/utils/milestones';
+import { MilestoneBonuses } from '@/lib/types/goal';
 
 interface Child {
   id: string;
@@ -27,6 +44,8 @@ interface Goal {
   current_points: number;
   tier: Tier;
   is_completed: boolean;
+  real_value_cents?: number | null;
+  milestone_bonuses?: MilestoneBonuses | null;
 }
 
 interface GoalFormDialogProps {
@@ -34,9 +53,10 @@ interface GoalFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
   childrenList: Child[];
+  exchangeRate?: ExchangeRate;
 }
 
-export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: GoalFormDialogProps) {
+export default function GoalFormDialog({ goal, isOpen, onClose, childrenList, exchangeRate = DEFAULT_EXCHANGE_RATE }: GoalFormDialogProps) {
   const router = useRouter();
   const t = useTranslations('goals');
   const [loading, setLoading] = useState(false);
@@ -45,8 +65,23 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
     childId: '',
     name: '',
     description: '',
-    targetPoints: 500,
+    targetPoints: 1000,
+    dollarValue: '', // For $ input (optional)
   });
+
+  // Milestone bonuses state
+  const [enableMilestones, setEnableMilestones] = useState(false);
+  const [milestoneValues, setMilestoneValues] = useState<MilestoneBonuses>({
+    25: 0,
+    50: 0,
+    75: 0,
+  });
+
+  // Calculate suggested bonuses when target changes
+  const suggestedBonuses = useMemo(
+    () => getSuggestedMilestoneBonuses(formData.targetPoints),
+    [formData.targetPoints]
+  );
 
   // Update form when goal changes
   useEffect(() => {
@@ -56,15 +91,31 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
         name: goal.name,
         description: goal.description || '',
         targetPoints: goal.target_points,
+        dollarValue: goal.real_value_cents ? (goal.real_value_cents / 100).toString() : '',
       });
+      // Load existing milestones
+      if (goal.milestone_bonuses && Object.keys(goal.milestone_bonuses).length > 0) {
+        setEnableMilestones(true);
+        setMilestoneValues({
+          25: goal.milestone_bonuses[25] || 0,
+          50: goal.milestone_bonuses[50] || 0,
+          75: goal.milestone_bonuses[75] || 0,
+        });
+      } else {
+        setEnableMilestones(false);
+        setMilestoneValues({ 25: 0, 50: 0, 75: 0 });
+      }
     } else {
       // Reset form for new goal
       setFormData({
         childId: childrenList.length === 1 ? childrenList[0].id : '',
         name: '',
         description: '',
-        targetPoints: 500,
+        targetPoints: 1000,
+        dollarValue: '',
       });
+      setEnableMilestones(false);
+      setMilestoneValues({ 25: 0, 50: 0, 75: 0 });
     }
     setHasSubmitted(false);
   }, [goal, childrenList, isOpen]);
@@ -79,6 +130,23 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
 
     setLoading(true);
 
+    // Prepare milestone bonuses
+    const m25 = milestoneValues[25] ?? 0;
+    const m50 = milestoneValues[50] ?? 0;
+    const m75 = milestoneValues[75] ?? 0;
+    const milestoneBonuses: MilestoneBonuses | undefined = enableMilestones
+      ? {
+          ...(m25 > 0 ? { 25: m25 } : {}),
+          ...(m50 > 0 ? { 50: m50 } : {}),
+          ...(m75 > 0 ? { 75: m75 } : {}),
+        }
+      : undefined;
+
+    // Calculate real value in cents if dollar value provided
+    const realValueCents = formData.dollarValue
+      ? dollarsToCents(parseFloat(formData.dollarValue))
+      : undefined;
+
     try {
       if (goal) {
         // Update existing goal
@@ -91,6 +159,8 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
             description: formData.description || null,
             targetPoints: formData.targetPoints,
             reason: 'Updated by parent',
+            realValueCents,
+            milestoneBonuses,
           }),
         });
 
@@ -112,6 +182,8 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
             name: formData.name,
             description: formData.description || null,
             targetPoints: formData.targetPoints,
+            realValueCents,
+            milestoneBonuses,
           }),
         });
 
@@ -130,25 +202,48 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
 
       router.refresh();
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Error saving goal:', error);
       toast.error(t('toast.saveFailed'), {
-        description: error.message || t('toast.error'),
+        description: errorMessage || t('toast.error'),
       });
     } finally {
       setLoading(false);
     }
   };
 
+  // Handle dollar value change - auto-calculate points
+  const handleDollarValueChange = (value: string) => {
+    setFormData(prev => ({ ...prev, dollarValue: value }));
+    if (value && !isNaN(parseFloat(value))) {
+      const dollars = parseFloat(value);
+      const points = calculatePointsFromDollars(dollars, exchangeRate);
+      setFormData(prev => ({ ...prev, dollarValue: value, targetPoints: points }));
+    }
+  };
+
+  // Apply suggested milestone bonuses
+  const applySuggestedBonuses = () => {
+    setMilestoneValues(suggestedBonuses);
+  };
+
+  // Calculate total bonus and net points needed
+  const totalBonus = enableMilestones ? calculateTotalMilestoneBonus(milestoneValues) : 0;
+  const netPointsNeeded = enableMilestones
+    ? calculateNetPointsNeeded(formData.targetPoints, milestoneValues)
+    : formData.targetPoints;
+  const timeEstimate = calculateTimeEstimate(formData.targetPoints, 0, 220);
+
   const tier = getTierForPoints(formData.targetPoints);
   const tierLabel = getTierLabel(tier);
 
-  // Preset target amounts
+  // Preset target amounts (doubled for v2)
   const presets = [
-    { label: t('form.presets.small', { points: 100 }), value: 100, tier: 'small' as Tier },
-    { label: t('form.presets.medium', { points: 250 }), value: 250, tier: 'medium' as Tier },
-    { label: t('form.presets.large', { points: 500 }), value: 500, tier: 'large' as Tier },
-    { label: t('form.presets.xl', { points: 1000 }), value: 1000, tier: 'xl' as Tier },
+    { label: t('form.presets.small', { points: 200 }), value: 200, tier: 'small' as Tier },
+    { label: t('form.presets.medium', { points: 500 }), value: 500, tier: 'medium' as Tier },
+    { label: t('form.presets.large', { points: 1000 }), value: 1000, tier: 'large' as Tier },
+    { label: t('form.presets.xl', { points: 2000 }), value: 2000, tier: 'xl' as Tier },
   ];
 
   return (
@@ -219,6 +314,31 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
             />
           </div>
 
+          {/* Dollar Value (Parent Reference) */}
+          <div className="space-y-2">
+            <Label htmlFor="dollarValue" className="flex items-center gap-2">
+              {t('form.dollarValue')}
+              <span className="text-xs text-gray-500">({t('form.parentOnly')})</span>
+            </Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <Input
+                id="dollarValue"
+                name="dollarValue"
+                type="number"
+                value={formData.dollarValue}
+                onChange={(e) => handleDollarValueChange(e.target.value)}
+                placeholder="10.00"
+                step="0.01"
+                min="0"
+                className="pl-7"
+              />
+            </div>
+            <p className="text-xs text-gray-500">
+              {t('form.dollarValueHelp', { rate: exchangeRate })}
+            </p>
+          </div>
+
           {/* Target Points */}
           <div className="space-y-2">
             <Label htmlFor="targetPoints">{t('form.targetPoints')} *</Label>
@@ -228,8 +348,8 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
               type="number"
               value={formData.targetPoints}
               onChange={(e) => setFormData({ ...formData, targetPoints: parseInt(e.target.value) || 0 })}
-              min={50}
-              max={5000}
+              min={100}
+              max={10000}
               step={10}
               required
             />
@@ -259,10 +379,91 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
             </div>
           </div>
 
-          {/* Tier Preview */}
+          {/* Milestone Bonuses */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="flex items-center gap-2">
+                <Sparkle size={16} className="text-yellow-500" />
+                {t('form.milestoneBonuses')}
+              </Label>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="enableMilestones"
+                  checked={enableMilestones}
+                  onCheckedChange={(checked: boolean | 'indeterminate') => setEnableMilestones(!!checked)}
+                />
+                <label htmlFor="enableMilestones" className="text-sm cursor-pointer">
+                  {t('form.enableMilestones')}
+                </label>
+              </div>
+            </div>
+
+            {enableMilestones && (
+              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-yellow-700 dark:text-yellow-300">
+                    {t('form.milestoneHelp')}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={applySuggestedBonuses}
+                    className="text-xs"
+                  >
+                    {t('form.useSuggested')}
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                  {MILESTONE_PERCENTAGES.map((pct) => (
+                    <div key={pct} className="space-y-1">
+                      <label className="text-xs font-medium">{pct}%</label>
+                      <Input
+                        type="number"
+                        value={milestoneValues[pct] || ''}
+                        onChange={(e) =>
+                          setMilestoneValues((prev) => ({
+                            ...prev,
+                            [pct]: parseInt(e.target.value) || 0,
+                          }))
+                        }
+                        placeholder={`${suggestedBonuses[pct]} XP`}
+                        min={0}
+                        className="text-sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {totalBonus > 0 && (
+                  <div className="pt-2 border-t border-yellow-200 dark:border-yellow-800">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-yellow-700 dark:text-yellow-300">
+                        {t('form.totalBonus')}:
+                      </span>
+                      <span className="font-semibold text-yellow-800 dark:text-yellow-200">
+                        +{totalBonus} XP
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-yellow-700 dark:text-yellow-300">
+                        {t('form.childNeeds')}:
+                      </span>
+                      <span className="font-semibold text-yellow-800 dark:text-yellow-200">
+                        {netPointsNeeded.toLocaleString()} XP
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Tier Preview & Time Estimate */}
           {formData.targetPoints > 0 && (
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-3">
+              <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">{t('form.goalTier')}</span>
                 <div className="flex items-center gap-2">
                   <TierBadge tier={tier} />
@@ -272,17 +473,28 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {t(`form.tierDescriptions.${tier}`)}
               </p>
+              <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">{t('form.estimatedTime')}:</span>
+                  <span className="font-medium">{timeEstimate}</span>
+                </div>
+              </div>
             </div>
           )}
 
           {/* Info Box */}
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-sm">
-            <p className="font-semibold text-blue-800 dark:text-blue-200 mb-1">
-              {t('form.howGoalsWork')}
-            </p>
-            <p className="text-blue-700 dark:text-blue-300 leading-relaxed">
-              {t('form.howGoalsWorkDescription')}
-            </p>
+            <div className="flex items-start gap-2">
+              <Info size={18} className="text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-semibold text-blue-800 dark:text-blue-200 mb-1">
+                  {t('form.howGoalsWork')}
+                </p>
+                <p className="text-blue-700 dark:text-blue-300 leading-relaxed">
+                  {t('form.howGoalsWorkDescription')}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Action Buttons */}

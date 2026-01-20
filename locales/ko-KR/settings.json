@@ -192,6 +192,27 @@
     "disabling": "비활성화 중...",
     "disablePin": "PIN 비활성화"
   },
+  "exchangeRate": {
+    "title": "포인트 환율",
+    "description": "참고용으로 $1이 몇 포인트인지 설정하세요",
+    "info": "이것은 부모님 참고용입니다. 아이들은 달러 값을 볼 수 없어요.",
+    "current": "현재",
+    "exampleTitle": "예시 환산:",
+    "confirm": {
+      "title": "환율을 변경할까요?",
+      "description": "부모 대시보드에서 포인트를 달러 값으로 환산하는 방식이 변경됩니다.",
+      "warning": "이 변경은 보이는 값에만 영향을 미쳐요. 아이들의 포인트나 목표는 변경되지 않아요.",
+      "from": "변경 전:",
+      "to": "변경 후:",
+      "cancel": "취소",
+      "updating": "업데이트 중...",
+      "confirm": "변경하기"
+    },
+    "toast": {
+      "updated": "환율이 업데이트되었습니다",
+      "updateFailed": "환율 업데이트에 실패했습니다"
+    }
+  },
   "deviceConnection": {
     "copyCode": "코드 복사",
     "instructions": {

@@ -1,11 +1,14 @@
 /**
- * Tier System Utilities (V1.1)
+ * Tier System Utilities (V2.0)
  *
  * Defines effort tiers for rewards and goals
- * Small: 50-100 points (easy)
- * Medium: 100-200 points (moderate)
- * Large: 200-500 points (significant)
- * XL: 500+ points (major)
+ * Small: 100-200 points (easy)
+ * Medium: 200-400 points (moderate)
+ * Large: 400-1000 points (significant)
+ * XL: 1000+ points (major)
+ *
+ * Note: Points doubled from v1.1 to v2.0
+ * Expected daily earnings: ~200-240 pts
  */
 
 export type Tier = 'small' | 'medium' | 'large' | 'xl';
@@ -16,10 +19,10 @@ export interface TierRange {
 }
 
 export const TIER_RANGES: Record<Tier, TierRange> = {
-  small: { min: 50, max: 100 },
-  medium: { min: 100, max: 200 },
-  large: { min: 200, max: 500 },
-  xl: { min: 500, max: 1500 },
+  small: { min: 100, max: 200 },
+  medium: { min: 200, max: 400 },
+  large: { min: 400, max: 1000 },
+  xl: { min: 1000, max: 3000 },
 };
 
 export const TIER_LABELS: Record<Tier, string> = {
@@ -46,12 +49,12 @@ export const TIER_NATURE_ICONS: Record<Tier, string> = {
 };
 
 /**
- * Calculate tier based on point cost
+ * Calculate tier based on point cost (v2.0 doubled values)
  */
 export function getTierForPoints(points: number): Tier {
-  if (points <= 100) return 'small';
-  if (points <= 200) return 'medium';
-  if (points <= 500) return 'large';
+  if (points <= 200) return 'small';
+  if (points <= 400) return 'medium';
+  if (points <= 1000) return 'large';
   return 'xl';
 }
 
@@ -134,12 +137,12 @@ export function getPriceWarning(
 }
 
 /**
- * Calculate effort equivalents for parent context
+ * Calculate effort equivalents for parent context (v2.0 doubled values)
  */
 export function calculateEffortEquivalents(
   points: number,
-  averageDailyTaskPoints: number = 50,
-  averageSpecialTaskPoints: number = 100
+  averageDailyTaskPoints: number = 100,
+  averageSpecialTaskPoints: number = 200
 ): {
   dailyRoutines: string;
   specialMissions: string;

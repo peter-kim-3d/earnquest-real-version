@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Target, Trophy, ArrowRight, PiggyBank } from '@phosphor-icons/react/dist/ssr';
+import { Target, Trophy, ArrowRight, PiggyBank, CheckCircle, Circle } from '@phosphor-icons/react/dist/ssr';
 import { TierBadge, EffortBadge } from '@/components/ui/EffortBadge';
 import { Button } from '@/components/ui/button';
 import { Tier, estimateTimeToGoal } from '@/lib/utils/tiers';
+import { MilestoneBonuses } from '@/lib/types/goal';
+import { getAllMilestones, getProgressToNextMilestone, hasMilestones } from '@/lib/utils/milestones';
 import DepositModal from './DepositModal';
+import MilestoneModal from './MilestoneModal';
 
 interface Goal {
   id: string;
@@ -17,6 +20,8 @@ interface Goal {
   tier: Tier;
   is_completed: boolean;
   completed_at?: string;
+  milestone_bonuses?: MilestoneBonuses | null;
+  milestones_completed?: number[] | null;
   change_log?: Array<{
     action: string;
     reason: string;
@@ -30,7 +35,7 @@ interface GoalCardProps {
   childId: string;
   availableBalance: number;
   weeklyEarnings?: number;
-  onDeposit?: (goalId: string, amount: number) => Promise<void>;
+  onDeposit?: (goalId: string, amount: number) => Promise<{ milestoneReached?: number; milestoneBonus?: number }>;
   onRefresh?: () => void;
 }
 
@@ -38,12 +43,17 @@ export default function GoalCard({
   goal,
   childId,
   availableBalance,
-  weeklyEarnings = 350,
+  weeklyEarnings = 440, // Updated for v2 (doubled from 220)
   onDeposit,
   onRefresh,
 }: GoalCardProps) {
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isDepositing, setIsDepositing] = useState(false);
+  const [milestoneModal, setMilestoneModal] = useState<{
+    isOpen: boolean;
+    percentage: number;
+    bonus: number;
+  }>({ isOpen: false, percentage: 0, bonus: 0 });
 
   const progress = Math.min(
     (goal.current_points / goal.target_points) * 100,
@@ -56,13 +66,38 @@ export default function GoalCard({
     weeklyEarnings
   );
 
+  // Milestone info
+  const hasGoalMilestones = hasMilestones(goal.milestone_bonuses ?? null);
+  const allMilestones = getAllMilestones(
+    goal.target_points,
+    goal.current_points,
+    goal.milestone_bonuses ?? null,
+    goal.milestones_completed || []
+  );
+  const nextMilestoneProgress = getProgressToNextMilestone(
+    goal.current_points,
+    goal.target_points,
+    goal.milestone_bonuses ?? null,
+    goal.milestones_completed || []
+  );
+
   const handleDeposit = async (amount: number) => {
     if (!onDeposit) return;
 
     setIsDepositing(true);
     try {
-      await onDeposit(goal.id, amount);
+      const result = await onDeposit(goal.id, amount);
       setIsDepositOpen(false);
+
+      // Check if milestone was reached
+      if (result?.milestoneReached && result?.milestoneBonus) {
+        setMilestoneModal({
+          isOpen: true,
+          percentage: result.milestoneReached,
+          bonus: result.milestoneBonus,
+        });
+      }
+
       onRefresh?.();
     } catch (error) {
       console.error('Deposit error:', error);
@@ -159,6 +194,38 @@ export default function GoalCard({
               {timeEstimate}
             </p>
           )}
+
+          {/* Milestone indicators */}
+          {hasGoalMilestones && allMilestones.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+              <div className="flex items-center justify-between gap-2">
+                {allMilestones.map((milestone) => (
+                  <div
+                    key={milestone.percentage}
+                    className={`flex items-center gap-1 text-xs ${
+                      milestone.isCompleted
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-gray-400 dark:text-gray-500'
+                    }`}
+                  >
+                    {milestone.isCompleted ? (
+                      <CheckCircle size={14} weight="fill" />
+                    ) : (
+                      <Circle size={14} />
+                    )}
+                    <span>{milestone.percentage}%</span>
+                  </div>
+                ))}
+              </div>
+              {nextMilestoneProgress && !goal.is_completed && (
+                <p className="text-xs text-primary mt-1">
+                  {nextMilestoneProgress.pointsToMilestone.toLocaleString()} XP to{' '}
+                  {nextMilestoneProgress.milestone.percentage}% bonus (+
+                  {nextMilestoneProgress.milestone.bonusPoints} XP)
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Actions */}
@@ -213,6 +280,15 @@ export default function GoalCard({
         targetPoints={goal.target_points}
         availableBalance={availableBalance}
         isLoading={isDepositing}
+      />
+
+      {/* Milestone Achievement Modal */}
+      <MilestoneModal
+        isOpen={milestoneModal.isOpen}
+        onClose={() => setMilestoneModal({ ...milestoneModal, isOpen: false })}
+        milestonePercentage={milestoneModal.percentage}
+        bonusPoints={milestoneModal.bonus}
+        goalName={goal.name}
       />
 
       <style jsx>{`
