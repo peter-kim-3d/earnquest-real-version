@@ -59,7 +59,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: 'household',
+    category: 'life',
     points: 50,
     frequency: 'daily',
     approval_type: 'parent',
@@ -113,7 +113,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
         setFormData({
           name: '',
           description: '',
-          category: 'household',
+          category: 'life',
           points: 50,
           frequency: 'daily',
           approval_type: 'parent',
@@ -289,7 +289,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
   // v2 categories
   const categories = [
     { value: 'learning', label: t('categoryLabels.learning'), icon: 'school' },
-    { value: 'household', label: t('categoryLabels.chores'), icon: 'home_work' },
+    { value: 'life', label: t('categoryLabels.life'), icon: 'home_work' },
     { value: 'health', label: t('categoryLabels.health'), icon: 'fitness_center' },
   ];
 
