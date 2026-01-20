@@ -752,7 +752,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
             </div>
           )}
 
-          {/* Auto-Assign (for daily/weekly/monthly tasks) */}
+          {/* Auto-Assign - Hidden for now as frequency already handles this
           {['daily', 'weekly', 'monthly'].includes(formData.frequency) && (
             <div className="space-y-2 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
               <div className="flex items-start gap-3">
@@ -774,6 +774,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
               </div>
             </div>
           )}
+          */}
 
           {/* Weekly Task Options */}
           {formData.frequency === 'weekly' && (
