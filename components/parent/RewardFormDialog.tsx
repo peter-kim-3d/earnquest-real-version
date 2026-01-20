@@ -432,6 +432,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
             <ValueContextPanel
               pointsCost={formData.points_cost}
               existingRewards={existingRewards.filter(r => r.name !== formData.name)}
+              exchangeRate={exchangeRate}
             />
           )}
 

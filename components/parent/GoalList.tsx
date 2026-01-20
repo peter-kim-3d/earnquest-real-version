@@ -9,6 +9,7 @@ import GoalFormDialog from './GoalFormDialog';
 import { TierBadge, EffortBadge } from '@/components/ui/EffortBadge';
 import { Tier, estimateTimeToGoal } from '@/lib/utils/tiers';
 import ConfirmDialog from '@/components/ui/confirm-dialog';
+import { ExchangeRate, DEFAULT_EXCHANGE_RATE } from '@/lib/utils/exchange-rate';
 
 interface Child {
   id: string;
@@ -32,9 +33,10 @@ interface GoalListProps {
   goals: Goal[];
   childrenList: Child[];
   weeklyEarnings?: number;
+  exchangeRate?: ExchangeRate;
 }
 
-export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: GoalListProps) {
+export default function GoalList({ goals, childrenList, weeklyEarnings = 350, exchangeRate = DEFAULT_EXCHANGE_RATE }: GoalListProps) {
   const t = useTranslations('goals');
   const router = useRouter();
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
@@ -311,6 +313,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350 }: 
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
         childrenList={childrenList}
+        exchangeRate={exchangeRate}
       />
 
       {/* Delete Confirmation */}

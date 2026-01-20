@@ -4,11 +4,13 @@ import { getTranslations } from 'next-intl/server';
 import InviteCoParent from '@/components/settings/InviteCoParent';
 import DeviceConnection from '@/components/settings/DeviceConnection';
 import ChildPinToggle from '@/components/settings/ChildPinToggle';
+import ExchangeRateSettings from '@/components/settings/ExchangeRateSettings';
 import BetaBadge from '@/components/BetaBadge';
 import Link from 'next/link';
-import { Users, Envelope as Mail, CaretRight, Shield, User, Smartphone, Lock } from '@/components/ui/ClientIcons';
+import { Users, Envelope as Mail, CaretRight, Shield, User, Smartphone, Lock, CurrencyDollar } from '@/components/ui/ClientIcons';
 import { getUser } from '@/lib/services/user';
 import { CollapsibleSection } from '@/components/ui/collapsible-section';
+import { DEFAULT_EXCHANGE_RATE, ExchangeRate } from '@/lib/utils/exchange-rate';
 
 
 export default async function SettingsPage({
@@ -47,16 +49,24 @@ export default async function SettingsPage({
     .select('*', { count: 'exact', head: true })
     .eq('family_id', userProfile.family_id);
 
-  // Get pending invitations
-  const { data: pendingInvitesData } = await supabase
-    .from('family_invitations')
-    .select('id, invited_email, created_at, expires_at')
-    .eq('family_id', userProfile.family_id)
-    .eq('status', 'pending')
-    .gt('expires_at', new Date().toISOString())
-    .order('created_at', { ascending: false });
+  // Get pending invitations and family settings in parallel
+  const [pendingInvitesResult, familyResult] = await Promise.all([
+    supabase
+      .from('family_invitations')
+      .select('id, invited_email, created_at, expires_at')
+      .eq('family_id', userProfile.family_id)
+      .eq('status', 'pending')
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('families')
+      .select('point_exchange_rate')
+      .eq('id', userProfile.family_id)
+      .single(),
+  ]);
 
-  const pendingInvites = (pendingInvitesData as unknown as { id: string; invited_email: string; created_at: string; expires_at: string }[]) || [];
+  const pendingInvites = (pendingInvitesResult.data as unknown as { id: string; invited_email: string; created_at: string; expires_at: string }[]) || [];
+  const exchangeRate = (familyResult.data?.point_exchange_rate || DEFAULT_EXCHANGE_RATE) as ExchangeRate;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -114,6 +124,16 @@ export default async function SettingsPage({
               icon={Lock}
             >
               <ChildPinToggle />
+            </CollapsibleSection>
+
+            {/* Exchange Rate Settings */}
+            <CollapsibleSection
+              id="exchange-rate"
+              title={t('exchangeRate.title')}
+              description={t('exchangeRate.description')}
+              icon={CurrencyDollar}
+            >
+              <ExchangeRateSettings currentRate={exchangeRate} />
             </CollapsibleSection>
 
             {/* Co-Parent Invite */}

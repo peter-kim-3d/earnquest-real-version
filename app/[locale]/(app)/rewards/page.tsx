@@ -5,6 +5,7 @@ import { getTranslations } from 'next-intl/server';
 import RewardList from '@/components/parent/RewardList';
 import { CheckCircle, Ticket, Package } from '@/components/ui/ClientIcons';
 import { getAuthUserWithProfile } from '@/lib/supabase/cached-queries';
+import { DEFAULT_EXCHANGE_RATE, ExchangeRate } from '@/lib/utils/exchange-rate';
 
 export default async function RewardManagementPage({
   params,
@@ -26,7 +27,7 @@ export default async function RewardManagementPage({
   }
 
   // Parallelize all queries that depend on family_id
-  const [rewardsResult, purchaseStatsResult] = await Promise.all([
+  const [rewardsResult, purchaseStatsResult, familyResult] = await Promise.all([
     // Get all rewards for this family (exclude deleted)
     supabase
       .from('rewards')
@@ -42,10 +43,18 @@ export default async function RewardManagementPage({
       .select('reward_id, status')
       .eq('family_id', userProfile.family_id)
       .gte('purchased_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+
+    // Get family settings for exchange rate
+    supabase
+      .from('families')
+      .select('point_exchange_rate')
+      .eq('id', userProfile.family_id)
+      .single(),
   ]);
 
   const rewards = (rewardsResult.data || []) as any[];
   const purchaseStats = (purchaseStatsResult.data || []) as { reward_id: string; status: string }[];
+  const exchangeRate = (familyResult.data?.point_exchange_rate || DEFAULT_EXCHANGE_RATE) as ExchangeRate;
 
   // Calculate purchase count per reward
   const rewardPurchases = new Map<string, number>();
@@ -112,7 +121,7 @@ export default async function RewardManagementPage({
       </div>
 
       {/* Reward List */}
-      <RewardList rewards={rewards || []} rewardPurchases={rewardPurchases} />
+      <RewardList rewards={rewards || []} rewardPurchases={rewardPurchases} exchangeRate={exchangeRate} />
 
       {/* Empty State */}
       {rewards?.length === 0 && (

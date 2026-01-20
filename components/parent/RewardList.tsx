@@ -5,6 +5,7 @@ import { Plus, Sparkle, Pause } from '@phosphor-icons/react/dist/ssr';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import RewardCard from './RewardCard';
+import { ExchangeRate, DEFAULT_EXCHANGE_RATE } from '@/lib/utils/exchange-rate';
 
 // Dynamic import for heavy dialog component
 const RewardFormDialog = dynamic(() => import('./RewardFormDialog'), {
@@ -28,9 +29,10 @@ type Reward = {
 interface RewardListProps {
   rewards: Reward[];
   rewardPurchases: Map<string, number>;
+  exchangeRate?: ExchangeRate;
 }
 
-export default function RewardList({ rewards, rewardPurchases }: RewardListProps) {
+export default function RewardList({ rewards, rewardPurchases, exchangeRate = DEFAULT_EXCHANGE_RATE }: RewardListProps) {
   const t = useTranslations('rewards');
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -146,6 +148,7 @@ export default function RewardList({ rewards, rewardPurchases }: RewardListProps
         reward={selectedReward}
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
+        exchangeRate={exchangeRate}
       />
     </div >
   );

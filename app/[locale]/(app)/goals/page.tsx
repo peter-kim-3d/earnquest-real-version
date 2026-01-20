@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import GoalList from '@/components/parent/GoalList';
 import { getAuthUserWithProfile } from '@/lib/supabase/cached-queries';
+import { DEFAULT_EXCHANGE_RATE, ExchangeRate } from '@/lib/utils/exchange-rate';
 
 export default async function GoalsManagementPage({
   params,
@@ -33,6 +34,7 @@ export default async function GoalsManagementPage({
     childrenResult,
     goalsResult,
     weeklyTransactionsResult,
+    familyResult,
   ] = await Promise.all([
     // Get children
     supabase
@@ -58,11 +60,19 @@ export default async function GoalsManagementPage({
       .eq('family_id', userProfile.family_id)
       .eq('type', 'earn')
       .gte('created_at', weekAgo.toISOString()),
+
+    // Get family settings for exchange rate
+    supabase
+      .from('families')
+      .select('point_exchange_rate')
+      .eq('id', userProfile.family_id)
+      .single(),
   ]);
 
   const children = (childrenResult.data || []) as { id: string; name: string }[];
   const goals = (goalsResult.data || []) as any[];
   const weeklyEarnings = weeklyTransactionsResult.data?.reduce((sum, tx) => sum + tx.amount, 0) || 350;
+  const exchangeRate = (familyResult.data?.point_exchange_rate || DEFAULT_EXCHANGE_RATE) as ExchangeRate;
 
   // Calculate stats
   const activeGoals = goals.filter((g) => !g.is_completed);
@@ -131,6 +141,7 @@ export default async function GoalsManagementPage({
         goals={goals}
         childrenList={children}
         weeklyEarnings={weeklyEarnings}
+        exchangeRate={exchangeRate}
       />
     </div>
   );

@@ -47,6 +47,7 @@ export {
     // Money & Points
     PiggyBank,
     CreditCard,
+    CurrencyDollar,
 
     // Settings & Admin
     Gear,

@@ -1,8 +1,9 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Info, TrendUp, Scales, ChartBar, CheckCircle } from '@phosphor-icons/react/dist/ssr';
+import { Info, TrendUp, Scales, ChartBar, CheckCircle, CurrencyDollar } from '@phosphor-icons/react/dist/ssr';
 import { getTierForPoints, getTierLabel, TIER_RANGES } from '@/lib/utils/tiers';
+import { formatPointsAsDollars, ExchangeRate, DEFAULT_EXCHANGE_RATE } from '@/lib/utils/exchange-rate';
 
 interface ExistingReward {
   name: string;
@@ -16,6 +17,7 @@ interface ValueContextPanelProps {
   availableBalance?: number;
   existingRewards?: ExistingReward[];
   taskPointValues?: { daily: number; special: number };
+  exchangeRate?: ExchangeRate;
 }
 
 /**
@@ -34,6 +36,7 @@ export default function ValueContextPanel({
   availableBalance,
   existingRewards = [],
   taskPointValues = { daily: 50, special: 150 },
+  exchangeRate = DEFAULT_EXCHANGE_RATE,
 }: ValueContextPanelProps) {
   const tier = getTierForPoints(pointsCost);
   const tierLabel = getTierLabel(tier);
@@ -99,6 +102,11 @@ export default function ValueContextPanel({
     };
   }, [pointsCost, tierRange, tierLabel, tier]);
 
+  // Dollar value context (parent-only)
+  const dollarValue = useMemo(() => {
+    return formatPointsAsDollars(pointsCost, exchangeRate);
+  }, [pointsCost, exchangeRate]);
+
   if (pointsCost <= 0) {
     return null;
   }
@@ -113,6 +121,17 @@ export default function ValueContextPanel({
       </div>
 
       <div className="space-y-4 text-sm">
+        {/* Dollar Value */}
+        <div className="flex items-center gap-2 px-3 py-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+          <CurrencyDollar size={18} weight="bold" className="text-green-700 dark:text-green-400" />
+          <span className="text-green-800 dark:text-green-300 font-semibold">
+            Real value: {dollarValue}
+          </span>
+          <span className="text-green-600 dark:text-green-400 text-xs">
+            ($1 = {exchangeRate} XP)
+          </span>
+        </div>
+
         {/* Effort Equivalent */}
         <div>
           <div className="flex items-center gap-1.5 text-amber-700 dark:text-amber-300 font-medium mb-1">
