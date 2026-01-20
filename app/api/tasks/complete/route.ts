@@ -94,11 +94,96 @@ export async function POST(request: Request) {
           { status: 400 }
         );
       }
-    } else {
-      // For all tasks without instance: check if already completed today
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    }
 
+    // For all tasks: check for existing completions today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Check for fix_requested completion first (re-submission case)
+    const { data: fixRequestedCompletion } = await supabase
+      .from('task_completions')
+      .select('*')
+      .eq('task_id', taskId)
+      .eq('child_id', childId)
+      .gte('requested_at', today.toISOString())
+      .eq('status', 'fix_requested')
+      .single();
+
+    // If there's a fix_requested completion, update it instead of creating new
+    if (fixRequestedCompletion) {
+      // Determine new status based on approval_type
+      let newStatus = 'pending';
+      let pointsAwarded = null;
+      let approvedAt = null;
+      let completedAt = null;
+
+      if (
+        task.approval_type === 'auto' ||
+        task.approval_type === 'timer' ||
+        task.approval_type === 'checklist'
+      ) {
+        newStatus = 'auto_approved';
+        pointsAwarded = task.points;
+        approvedAt = new Date().toISOString();
+        completedAt = new Date().toISOString();
+      }
+
+      // Update the existing completion
+      const { data: updatedCompletion, error: updateError } = await supabase
+        .from('task_completions')
+        .update({
+          status: newStatus,
+          timer_completed: evidence?.timerCompleted || false,
+          checklist_state: evidence?.checklistState || null,
+          fix_request: null, // Clear the fix request
+          fix_request_count: (fixRequestedCompletion.fix_request_count || 0) + 1,
+          requested_at: new Date().toISOString(),
+          approved_at: approvedAt,
+          completed_at: completedAt,
+          points_awarded: pointsAwarded,
+          proof_image_url: evidence?.photos?.[0] || null,
+          note: evidence?.note || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', fixRequestedCompletion.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error('Error updating fix_requested completion:', updateError);
+        return NextResponse.json(
+          { error: 'Failed to resubmit task', details: updateError.message },
+          { status: 500 }
+        );
+      }
+
+      // If auto-approved, add points
+      if (newStatus === 'auto_approved') {
+        const { error: pointsError } = await supabase.rpc('add_points', {
+          p_child_id: childId,
+          p_amount: task.points,
+          p_type: 'task_completion',
+          p_reference_type: 'task_completion',
+          p_reference_id: updatedCompletion.id,
+          p_description: `${task.name} completed (resubmit)`,
+        });
+
+        if (pointsError) {
+          console.error('Error adding points:', pointsError);
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        completion: updatedCompletion,
+        autoApproved: newStatus === 'auto_approved',
+        resubmitted: true,
+      });
+    }
+
+    // Check for already completed/pending today (not fix_requested)
+    if (!task.auto_assign || !instanceId) {
       const { data: existingCompletion } = await supabase
         .from('task_completions')
         .select('*')
