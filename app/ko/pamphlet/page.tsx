@@ -36,24 +36,14 @@ export default function PamphletPageKo() {
             {/* Hero Image */}
             <div className="relative">
               <div className="relative bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
-                {/* 실제 이미지로 교체 필요 */}
-                <div className="w-full aspect-square bg-gradient-to-br from-white/20 to-white/5 rounded-2xl flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <div className="text-6xl mb-4">👨‍👩‍👧‍👦</div>
-                    <p className="text-white/80 text-sm">가족 성장 일러스트</p>
-                    <p className="text-white/60 text-xs mt-2">이미지 추가: /public/images/family-growth.png</p>
-                  </div>
-                </div>
-                {/* 이미지 준비되면 주석 해제:
                 <Image
-                  src="/images/family-growth.png"
+                  src="/images/pamphlet/gemini/hero-family-celebration-by-gemini.png"
                   alt="EarnQuest로 성취를 축하하는 행복한 가족"
                   width={600}
                   height={600}
                   className="w-full h-auto rounded-2xl"
                   priority
                 />
-                */}
               </div>
             </div>
           </div>
@@ -92,38 +82,13 @@ export default function PamphletPageKo() {
           {/* Journey Infographic */}
           <div className="mb-16 flex justify-center">
             <div className="relative max-w-4xl w-full">
-              {/* 실제 이미지로 교체 필요 */}
-              <div className="w-full bg-gradient-to-r from-[#f6f8f6] to-white rounded-2xl p-12 border-2 border-[#2bb800]/20">
-                <div className="text-center mb-8">
-                  <p className="text-[#688961] text-sm">여정 인포그래픽 플레이스홀더</p>
-                  <p className="text-[#688961]/60 text-xs">이미지 추가: /public/images/journey-infographic.png</p>
-                </div>
-                <div className="flex items-center justify-around">
-                  <div className="text-center">
-                    <div className="text-5xl mb-2">✅</div>
-                    <p className="font-bold text-[#121811]">태스크 완료</p>
-                  </div>
-                  <div className="text-4xl text-[#2bb800]">→</div>
-                  <div className="text-center">
-                    <div className="text-5xl mb-2">⭐</div>
-                    <p className="font-bold text-[#121811]">포인트 획득</p>
-                  </div>
-                  <div className="text-4xl text-[#2bb800]">→</div>
-                  <div className="text-center">
-                    <div className="text-5xl mb-2">🎁</div>
-                    <p className="font-bold text-[#121811]">보상 교환</p>
-                  </div>
-                </div>
-              </div>
-              {/* 이미지 준비되면 주석 해제:
               <Image
-                src="/images/journey-infographic.png"
+                src="/images/pamphlet/gemini/journey-infographic.png-by-gemini.png"
                 alt="여정: 태스크 → 포인트 → 보상"
                 width={1200}
                 height={600}
-                className="w-full h-auto"
+                className="w-full h-auto rounded-2xl"
               />
-              */}
             </div>
           </div>
 

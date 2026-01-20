@@ -36,24 +36,14 @@ export default function PamphletPage() {
             {/* Hero Image */}
             <div className="relative">
               <div className="relative bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
-                {/* Replace with actual image path when available */}
-                <div className="w-full aspect-square bg-gradient-to-br from-white/20 to-white/5 rounded-2xl flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <div className="text-6xl mb-4">👨‍👩‍👧‍👦</div>
-                    <p className="text-white/80 text-sm">Family Growth Illustration</p>
-                    <p className="text-white/60 text-xs mt-2">Add image: /public/images/family-growth.png</p>
-                  </div>
-                </div>
-                {/* Uncomment when image is available:
                 <Image
-                  src="/images/family-growth.png"
+                  src="/images/pamphlet/gemini/hero-family-celebration-by-gemini.png"
                   alt="Happy family celebrating achievements with EarnQuest"
                   width={600}
                   height={600}
                   className="w-full h-auto rounded-2xl"
                   priority
                 />
-                */}
               </div>
             </div>
           </div>
@@ -92,38 +82,13 @@ export default function PamphletPage() {
           {/* Journey Infographic */}
           <div className="mb-16 flex justify-center">
             <div className="relative max-w-4xl w-full">
-              {/* Replace with actual image when available */}
-              <div className="w-full bg-gradient-to-r from-[#f6f8f6] to-white rounded-2xl p-12 border-2 border-[#2bb800]/20">
-                <div className="text-center mb-8">
-                  <p className="text-[#688961] text-sm">Journey Infographic Placeholder</p>
-                  <p className="text-[#688961]/60 text-xs">Add image: /public/images/journey-infographic.png</p>
-                </div>
-                <div className="flex items-center justify-around">
-                  <div className="text-center">
-                    <div className="text-5xl mb-2">✅</div>
-                    <p className="font-bold text-[#121811]">Complete Tasks</p>
-                  </div>
-                  <div className="text-4xl text-[#2bb800]">→</div>
-                  <div className="text-center">
-                    <div className="text-5xl mb-2">⭐</div>
-                    <p className="font-bold text-[#121811]">Earn Points</p>
-                  </div>
-                  <div className="text-4xl text-[#2bb800]">→</div>
-                  <div className="text-center">
-                    <div className="text-5xl mb-2">🎁</div>
-                    <p className="font-bold text-[#121811]">Redeem Rewards</p>
-                  </div>
-                </div>
-              </div>
-              {/* Uncomment when image is available:
               <Image
-                src="/images/journey-infographic.png"
+                src="/images/pamphlet/gemini/journey-infographic.png-by-gemini.png"
                 alt="Your Journey: Tasks → Points → Rewards"
                 width={1200}
                 height={600}
-                className="w-full h-auto"
+                className="w-full h-auto rounded-2xl"
               />
-              */}
             </div>
           </div>
 
