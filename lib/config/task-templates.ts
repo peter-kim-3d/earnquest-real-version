@@ -1,9 +1,9 @@
 /**
- * Task Templates Configuration (v2.1)
+ * Task Templates Configuration (v2.2)
  *
- * 19 task templates organized by time context:
+ * 18 task templates organized by time context:
  * - morning (3): wake_on_time, make_bed, brush_morning
- * - after_school (5): shoes_tidy, backpack, lunchbox_sink, check_planner, wash_hands
+ * - after_school (4): backpack_shoes, lunchbox_sink, check_planner, wash_hands
  * - evening (3): prep_tomorrow, brush_evening, shower
  * - anytime (8): homework, reading, writing, clean_desk, exercise, outdoor, instrument, art
  */
@@ -73,35 +73,22 @@ export const TASK_TEMPLATES: TaskTemplateConfig[] = [
   },
 
   // ============================================================================
-  // After School Tasks (5)
+  // After School Tasks (4)
   // ============================================================================
   {
-    templateKey: 'shoes_tidy',
-    name: 'Tidy Shoes',
-    nameKo: '신발 정리하기',
-    description: 'Put shoes in the right place when coming home',
-    descriptionKo: '집에 오면 신발을 제자리에 놓기',
-    category: 'life',
-    timeContext: 'after_school',
-    points: 5,
-    icon: '👟',
-    frequency: 'daily',
-    approvalType: 'auto',
-  },
-  {
-    templateKey: 'backpack',
-    name: 'Unpack Backpack',
-    nameKo: '가방 정리하기',
-    description: 'Empty backpack and organize contents',
-    descriptionKo: '가방을 비우고 내용물 정리하기',
+    templateKey: 'backpack_shoes',
+    name: 'Put Away Backpack & Shoes',
+    nameKo: '가방과 신발 정리하기',
+    description: 'Put your backpack and shoes in their place when you get home',
+    descriptionKo: '집에 오면 가방과 신발을 제자리에 놓기',
     category: 'life',
     timeContext: 'after_school',
     points: 15,
     icon: '🎒',
     frequency: 'daily',
     approvalType: 'checklist',
-    checklist: ['Take out lunchbox', 'Remove papers/homework', 'Check for notes from teacher'],
-    checklistKo: ['도시락 꺼내기', '종이/숙제 꺼내기', '선생님 알림장 확인하기'],
+    checklist: ['Put away backpack', 'Tidy shoes'],
+    checklistKo: ['가방 정리하기', '신발 정리하기'],
   },
   {
     templateKey: 'lunchbox_sink',

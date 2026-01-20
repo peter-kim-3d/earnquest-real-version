@@ -1,9 +1,9 @@
 /**
- * Onboarding Presets Configuration (v2.1)
+ * Onboarding Presets Configuration (v2.2)
  *
  * 3 presets:
  * - starter (5 tasks): Minimal starter set
- * - balanced (9 tasks): Recommended for most families
+ * - balanced (8 tasks): Recommended for most families
  * - learning_focus (6 tasks): Academic emphasis
  */
 
@@ -41,7 +41,7 @@ export const PRESETS: Record<PresetKey, PresetConfig> = {
     icon: '🌱',
     color: '#00B894',
     recommended: false,
-    taskKeys: ['wake_on_time', 'make_bed', 'backpack', 'homework', 'clean_desk'],
+    taskKeys: ['wake_on_time', 'make_bed', 'backpack_shoes', 'homework', 'clean_desk'],
     expectedDailyPoints: {
       min: 65,
       max: 80,
@@ -54,16 +54,15 @@ export const PRESETS: Record<PresetKey, PresetConfig> = {
     tagline: 'Well-rounded routine',
     taglineKo: '균형 잡힌 루틴',
     description:
-      '9 tasks covering morning, after-school, and anytime activities. The recommended choice for most families.',
-    descriptionKo: '아침, 방과 후, 언제든지 활동을 포함하는 9개의 태스크. 대부분의 가족에게 추천하는 선택입니다.',
+      '8 tasks covering morning, after-school, and anytime activities. The recommended choice for most families.',
+    descriptionKo: '아침, 방과 후, 언제든지 활동을 포함하는 8개의 태스크. 대부분의 가족에게 추천하는 선택입니다.',
     icon: '⭐',
     color: '#6C5CE7',
     recommended: true,
     taskKeys: [
       'wake_on_time',
       'make_bed',
-      'shoes_tidy',
-      'backpack',
+      'backpack_shoes',
       'lunchbox_sink',
       'prep_tomorrow',
       'homework',

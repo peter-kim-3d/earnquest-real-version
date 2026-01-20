@@ -427,7 +427,7 @@ export interface BatchApproveResponse {
  * Auto-approval whitelist
  * Only these template keys are allowed to use auto approval
  */
-export const AUTO_APPROVAL_WHITELIST = ['backpack', 'get_dressed', 'set_alarm'] as const;
+export const AUTO_APPROVAL_WHITELIST = ['get_dressed', 'set_alarm'] as const;
 
 /**
  * Category display information
