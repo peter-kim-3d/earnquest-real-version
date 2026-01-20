@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Scroll, CaretDown, ArrowUp, ArrowDown, Target, Gift, Repeat, Question } from '@phosphor-icons/react/dist/ssr';
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -108,13 +108,15 @@ export default function TransactionHistory({
     });
   };
 
-  // Group transactions by date
-  const groupedTransactions = transactions.reduce((groups, tx) => {
-    const date = formatDate(tx.created_at);
-    if (!groups[date]) groups[date] = [];
-    groups[date].push(tx);
-    return groups;
-  }, {} as Record<string, Transaction[]>);
+  // Group transactions by date (memoized for performance)
+  const groupedTransactions = useMemo(() => {
+    return transactions.reduce((groups, tx) => {
+      const date = formatDate(tx.created_at);
+      if (!groups[date]) groups[date] = [];
+      groups[date].push(tx);
+      return groups;
+    }, {} as Record<string, Transaction[]>);
+  }, [transactions, locale]);
 
   const visibleGroups = showAll
     ? Object.entries(groupedTransactions)

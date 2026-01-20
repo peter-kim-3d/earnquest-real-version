@@ -1,8 +1,7 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 /* eslint-disable react/no-unescaped-entities */
-'use client';
 
-import { Sparkles, Target, Heart, TrendingUp, Users, Shield, Zap, Award, Star, CheckCircle } from 'lucide-react';
+import { Sparkle, Target, Heart, TrendUp, Users, Shield, Lightning, Medal, Star, CheckCircle } from '@phosphor-icons/react/dist/ssr';
 import Image from 'next/image';
 
 export default function PamphletPage() {
@@ -16,7 +15,7 @@ export default function PamphletPage() {
             <div className="text-center md:text-left">
               <div className="inline-block mb-6">
                 <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                  <Star className="w-12 h-12" fill="currentColor" />
+                  <Star size={48} weight="fill" />
                 </div>
               </div>
               <h1 className="font-display text-6xl md:text-7xl font-bold mb-6 tracking-tight">
@@ -190,7 +189,7 @@ function FeatureCard({ icon: Icon, title, description, color }: any) {
   return (
     <div className="bg-white rounded-2xl p-8 shadow-card hover:shadow-card-hover transition-all duration-300 group">
       <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-        <Icon className="w-8 h-8 text-white" />
+        <Icon size={32} className="text-white" />
       </div>
       <h3 className="font-display text-2xl font-bold text-[#121811] mb-4">
         {title}
@@ -225,7 +224,7 @@ function BenefitItem({ icon: Icon, title, description }: any) {
     <div className="flex gap-5">
       <div className="flex-shrink-0">
         <div className="w-12 h-12 rounded-xl bg-[#2bb800]/10 flex items-center justify-center">
-          <Icon className="w-7 h-7 text-[#2bb800]" />
+          <Icon size={28} className="text-[#2bb800]" />
         </div>
       </div>
       <div>
@@ -249,7 +248,7 @@ const features = [
     color: "from-[#2bb800] to-[#229900]"
   },
   {
-    icon: Sparkles,
+    icon: Sparkle,
     title: "Motivating Rewards",
     description: "Screen time, experiences, and privileges that kids actually want. Turn motivation into meaningful rewards.",
     color: "from-[#0ea5e9] to-[#0284c7]"
@@ -261,7 +260,7 @@ const features = [
     color: "from-[#f49d25] to-[#dc8b1e]"
   },
   {
-    icon: TrendingUp,
+    icon: TrendUp,
     title: "Trust Levels",
     description: "Gradually increase autonomy as your child proves responsibility. Watch them grow more independent over time.",
     color: "from-[#8b5cf6] to-[#7c3aed]"
@@ -297,12 +296,12 @@ const steps = [
 
 const benefits = [
   {
-    icon: Zap,
+    icon: Lightning,
     title: "Instant Motivation",
     description: "Turn \"I don't want to\" into \"I can't wait to!\" with gamified progress tracking and visual rewards."
   },
   {
-    icon: Award,
+    icon: Medal,
     title: "Build Real Skills",
     description: "Responsibility, time management, and delayed gratification - habits that last a lifetime."
   },

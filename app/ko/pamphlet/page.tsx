@@ -1,8 +1,7 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 /* eslint-disable react/no-unescaped-entities */
-'use client';
 
-import { Sparkles, Target, Heart, TrendingUp, Users, Shield, Zap, Award, Star } from 'lucide-react';
+import { Sparkle, Target, Heart, TrendUp, Users, Shield, Lightning, Medal, Star } from '@phosphor-icons/react/dist/ssr';
 import Image from 'next/image';
 
 export default function PamphletPageKo() {
@@ -16,7 +15,7 @@ export default function PamphletPageKo() {
             <div className="text-center md:text-left">
               <div className="inline-block mb-6">
                 <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                  <Star className="w-12 h-12" fill="currentColor" />
+                  <Star size={48} weight="fill" />
                 </div>
               </div>
               <h1 className="font-display text-6xl md:text-7xl font-bold mb-6 tracking-tight">
@@ -190,7 +189,7 @@ function FeatureCard({ icon: Icon, title, description, color }: any) {
   return (
     <div className="bg-white rounded-2xl p-8 shadow-card hover:shadow-card-hover transition-all duration-300 group">
       <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-        <Icon className="w-8 h-8 text-white" />
+        <Icon size={32} className="text-white" />
       </div>
       <h3 className="font-display text-2xl font-bold text-[#121811] mb-4">
         {title}
@@ -225,7 +224,7 @@ function BenefitItem({ icon: Icon, title, description }: any) {
     <div className="flex gap-5">
       <div className="flex-shrink-0">
         <div className="w-12 h-12 rounded-xl bg-[#2bb800]/10 flex items-center justify-center">
-          <Icon className="w-7 h-7 text-[#2bb800]" />
+          <Icon size={28} className="text-[#2bb800]" />
         </div>
       </div>
       <div>
@@ -249,7 +248,7 @@ const features = [
     color: "from-[#2bb800] to-[#229900]"
   },
   {
-    icon: Sparkles,
+    icon: Sparkle,
     title: "동기부여되는 보상",
     description: "아이들이 진짜 원하는 스크린타임, 경험, 특권. 동기부여를 의미 있는 보상으로 전환하세요.",
     color: "from-[#0ea5e9] to-[#0284c7]"
@@ -261,7 +260,7 @@ const features = [
     color: "from-[#f49d25] to-[#dc8b1e]"
   },
   {
-    icon: TrendingUp,
+    icon: TrendUp,
     title: "신뢰 레벨",
     description: "아이가 책임감을 보여줄수록 자율성을 점진적으로 높여주세요. 시간이 지남에 따라 더욱 독립적으로 성장하는 모습을 지켜보세요.",
     color: "from-[#8b5cf6] to-[#7c3aed]"
@@ -297,12 +296,12 @@ const steps = [
 
 const benefits = [
   {
-    icon: Zap,
+    icon: Lightning,
     title: "즉각적인 동기부여",
     description: "\"하기 싫어\"를 \"빨리 하고 싶어!\"로 바꿔보세요. 게임화된 진행 추적과 시각적 보상으로 가능합니다."
   },
   {
-    icon: Award,
+    icon: Medal,
     title: "실제 기술 형성",
     description: "책임감, 시간 관리, 지연된 만족 - 평생 지속될 습관을 만들어갑니다."
   },
