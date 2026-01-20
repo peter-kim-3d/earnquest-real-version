@@ -70,6 +70,7 @@ export async function PATCH(request: Request) {
     if (taskData.name !== undefined) updates.name = taskData.name;
     if (taskData.description !== undefined) updates.description = taskData.description;
     if (taskData.category !== undefined) updates.category = taskData.category;
+    if (taskData.time_context !== undefined) updates.time_context = taskData.time_context;
     if (taskData.points !== undefined) updates.points = taskData.points;
     if (taskData.frequency !== undefined) updates.frequency = taskData.frequency;
     if (taskData.approval_type !== undefined) updates.approval_type = taskData.approval_type;

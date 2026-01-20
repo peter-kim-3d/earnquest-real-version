@@ -150,6 +150,7 @@ export async function POST(request: Request) {
       name: string;
       description?: string;
       category: 'learning' | 'household' | 'health';
+      time_context?: 'morning' | 'after_school' | 'evening' | 'anytime';
       points: number;
       frequency: 'daily' | 'weekly' | 'monthly' | 'one_time';
       approval_type: 'parent' | 'auto' | 'timer' | 'checklist';
@@ -267,6 +268,7 @@ export async function POST(request: Request) {
           // Optional fields
           description: taskData.description || null,
           child_id: taskData.child_id || null,
+          time_context: taskData.time_context || null,
 
           // Task v2 specific fields
           timer_minutes: taskData.timer_minutes || null,

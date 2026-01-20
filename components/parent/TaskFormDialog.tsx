@@ -77,6 +77,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
     metadata: {} as Record<string, any>,
     child_id: initialChildId,
     color: '', // Custom color override
+    time_context: 'anytime' as 'morning' | 'after_school' | 'evening' | 'anytime',
   });
 
   // Update form when task changes or dialog opens
@@ -103,6 +104,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           metadata: (task as any).metadata || {},
           child_id: (task as any).child_id || initialChildId, // Use task's child_id or fallback to initial
           color: (task as any).metadata?.color || '',
+          time_context: (task as any).time_context || 'anytime',
         });
         // Set image mode based on whether task has image_url
         setImageMode(task.image_url ? 'image' : 'icon');
@@ -128,6 +130,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           metadata: {},
           child_id: initialChildId,
           color: '',
+          time_context: 'anytime',
         });
         setImageMode('icon');
       }
@@ -478,6 +481,37 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                 />
               </div>
             </div>
+          </div>
+
+          {/* Time Context */}
+          <div className="space-y-3">
+            <Label>{t('form.timeContext')}</Label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {[
+                { value: 'morning', label: t('timeContexts.morning'), icon: '☀️' },
+                { value: 'after_school', label: t('timeContexts.afterSchool'), icon: '🏠' },
+                { value: 'evening', label: t('timeContexts.evening'), icon: '🌙' },
+                { value: 'anytime', label: t('timeContexts.anytime'), icon: '📚' },
+              ].map((context) => (
+                <button
+                  key={context.value}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, time_context: context.value as any })}
+                  className={`p-3 rounded-xl border-2 transition-all ${formData.time_context === context.value
+                    ? 'border-primary bg-primary/10 shadow-sm'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    }`}
+                >
+                  <div className="text-2xl mb-1">{context.icon}</div>
+                  <div className="text-sm font-semibold text-text-main dark:text-white">
+                    {context.label}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t('form.timeContextHelp')}
+            </p>
           </div>
 
           {/* Child Selection - Only shown in Task View (not child profile) */}
