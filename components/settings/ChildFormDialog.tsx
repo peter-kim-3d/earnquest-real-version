@@ -168,6 +168,7 @@ export function ChildFormDialog({
             <Label htmlFor="name">{t('nameLabel')}</Label>
             <Input
               id="name"
+              name="childName"
               placeholder={t('namePlaceholder')}
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -180,7 +181,9 @@ export function ChildFormDialog({
             <Label htmlFor="birthdate">{t('birthdateLabel')}</Label>
             <Input
               id="birthdate"
+              name="birthdate"
               type="date"
+              autoComplete="bday"
               value={birthYear} // State variable is birthYear but holds YYYY-MM-DD
               onChange={(e) => setBirthYear(e.target.value)}
               max={new Date().toISOString().split('T')[0]}
@@ -216,6 +219,7 @@ export function ChildFormDialog({
             <Label htmlFor="pin">{t('pinLabel')}</Label>
             <Input
               id="pin"
+              name="pinCode"
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"

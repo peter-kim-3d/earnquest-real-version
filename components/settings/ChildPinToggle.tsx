@@ -175,9 +175,12 @@ export default function ChildPinToggle() {
           </p>
         </div>
         <button
+          role="switch"
+          aria-checked={requirePin}
+          aria-label={t('title')}
           onClick={handleToggleClick}
           disabled={loading}
-          className={`relative w-14 h-8 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed ${
+          className={`relative w-14 h-8 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
             requirePin ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'
           }`}
         >
@@ -212,6 +215,8 @@ export default function ChildPinToggle() {
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
+                    name={`pin-${child.id}`}
+                    aria-label={`PIN for ${child.name}`}
                     inputMode="numeric"
                     pattern="[0-9]*"
                     maxLength={4}
@@ -222,7 +227,7 @@ export default function ChildPinToggle() {
                         handleSavePin(child.id);
                       }
                     }}
-                    className={`w-20 px-3 py-2 text-center font-mono text-lg tracking-widest rounded-lg border bg-white dark:bg-gray-900 text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 ${
+                    className={`w-20 px-3 py-2 text-center font-mono text-lg tracking-widest rounded-lg border bg-white dark:bg-gray-900 text-text-main dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                       isPinChanged(child.id)
                         ? 'border-primary ring-2 ring-primary/30'
                         : 'border-gray-300 dark:border-gray-600'

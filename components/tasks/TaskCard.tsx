@@ -172,7 +172,7 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
 
                 {/* v2: Timer Duration Badge */}
                 {task.approval_type === 'timer' && task.timer_minutes && (
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${localMetadata?.timer_state?.remainingSeconds && localMetadata?.timer_state?.remainingSeconds < task.timer_minutes * 60
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums ${localMetadata?.timer_state?.remainingSeconds && localMetadata?.timer_state?.remainingSeconds < task.timer_minutes * 60
                     ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
                     : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
                     }`}>
@@ -196,7 +196,7 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
           <div className="shrink-0">
             <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
               <Sparkle size={16} weight="fill" className="text-primary" />
-              <span className="text-sm font-bold text-primary">
+              <span className="text-sm font-bold text-primary tabular-nums">
                 +{task.points} XP
               </span>
             </div>

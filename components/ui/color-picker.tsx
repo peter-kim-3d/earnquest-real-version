@@ -63,7 +63,7 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
                             key={color.value}
                             onSelect={() => onChange(color.value)}
                             className={cn(
-                                'h-8 w-8 rounded-full border border-transparent hover:scale-110 transition-transform flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer p-0',
+                                'h-8 w-8 rounded-full border border-transparent hover:scale-110 transition-transform flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer p-0',
                                 value === color.value && 'border-black dark:border-white ring-2 ring-offset-2'
                             )}
                             style={{ backgroundColor: color.value }}

@@ -176,7 +176,7 @@ export default function RewardCard({
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-1">
             <Sparkle size={16} weight="fill" className="text-primary" />
-            <span className="text-xl font-black text-text-main dark:text-white">
+            <span className="text-xl font-black text-text-main dark:text-white tabular-nums">
               {reward.points_cost}
             </span>
             <span className="text-sm text-text-muted dark:text-gray-400">
@@ -195,10 +195,10 @@ export default function RewardCard({
         {!canAfford && (
           <div className="mb-3">
             <div className="flex justify-between text-xs mb-1">
-              <span className="font-medium text-text-muted dark:text-gray-400">
+              <span className="font-medium text-text-muted dark:text-gray-400 tabular-nums">
                 {t('percentSaved', { percent: Math.floor((currentBalance / reward.points_cost) * 100) })}
               </span>
-              <span className="text-primary font-bold">
+              <span className="text-primary font-bold tabular-nums">
                 {t('qpToGo', { points: reward.points_cost - currentBalance })}
               </span>
             </div>

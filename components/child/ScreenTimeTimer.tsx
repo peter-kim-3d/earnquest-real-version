@@ -223,7 +223,7 @@ export default function ScreenTimeTimer({
   // Show confirmation dialog when timer completes
   if (showConfirmation) {
     return (
-      <div className="rounded-xl bg-gradient-to-br from-yellow-500 to-orange-600 p-6 text-white shadow-lg animate-pulse">
+      <div className="rounded-xl bg-gradient-to-br from-yellow-500 to-orange-600 p-6 text-white shadow-lg motion-safe:animate-pulse">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
           <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -240,7 +240,7 @@ export default function ScreenTimeTimer({
           <div className="text-3xl font-black mb-2">
             {t('screenTimeComplete')}
           </div>
-          <p className="text-sm text-white/80">
+          <p className="text-sm text-white/80 tabular-nums">
             {t('autoClosingIn', { seconds: autoCloseSeconds })}
           </p>
         </div>
@@ -287,7 +287,7 @@ export default function ScreenTimeTimer({
 
       {/* Timer Display */}
       <div className="text-center mb-6">
-        <div className="text-5xl font-black mb-2">
+        <div className="text-5xl font-black mb-2 tabular-nums">
           {formatTime(timeRemaining)}
         </div>
         <p className="text-sm text-white/80">{t('remainingLabel')}</p>

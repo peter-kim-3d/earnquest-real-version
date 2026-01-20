@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Target } from '@phosphor-icons/react';
 import { getTierForPoints, getTierLabel, TIER_RANGES, Tier } from '@/lib/utils/tiers';
@@ -192,6 +193,7 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
             <Label htmlFor="name">{t('form.name')} *</Label>
             <Input
               id="name"
+              name="goalName"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder={t('form.namePlaceholder')}
@@ -206,12 +208,13 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
           {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="description">{t('form.description')}</Label>
-            <textarea
+            <Textarea
               id="description"
+              name="goalDescription"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder={t('form.descriptionPlaceholder')}
-              className="w-full min-h-20 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+              className="min-h-20"
               maxLength={500}
             />
           </div>
@@ -221,6 +224,7 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList }: 
             <Label htmlFor="targetPoints">{t('form.targetPoints')} *</Label>
             <Input
               id="targetPoints"
+              name="targetPoints"
               type="number"
               value={formData.targetPoints}
               onChange={(e) => setFormData({ ...formData, targetPoints: parseInt(e.target.value) || 0 })}

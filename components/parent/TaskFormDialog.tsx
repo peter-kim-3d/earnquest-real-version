@@ -305,6 +305,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
             <Label htmlFor="name">{t('form.nameLabel')}</Label>
             <Input
               id="name"
+              name="taskName"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder={t('form.namePlaceholder')}
@@ -558,6 +559,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
               <div className="flex-1">
                 <input
                   type="range"
+                  name="points"
                   min="5"
                   max="500"
                   step="5"
@@ -651,6 +653,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
               <div className="flex items-center gap-3">
                 <Input
                   type="number"
+                  name="timerMinutes"
                   value={formData.timer_minutes}
                   onChange={(e) => setFormData({ ...formData, timer_minutes: parseInt(e.target.value) || 1 })}
                   min={1}
@@ -724,7 +727,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                   id="auto_assign"
                   checked={formData.auto_assign}
                   onChange={(e) => setFormData({ ...formData, auto_assign: e.target.checked })}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus-visible:ring-primary"
                 />
                 <div className="flex-1">
                   <Label htmlFor="auto_assign" className="cursor-pointer font-semibold text-blue-900 dark:text-blue-100">
@@ -795,7 +798,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                   id="monthly_mode"
                   value={formData.monthly_mode}
                   onChange={(e) => setFormData({ ...formData, monthly_mode: e.target.value as any })}
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full h-10 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-main dark:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <option value="any_day">{t('form.monthlyAnyDay')}</option>
                   <option value="specific_day">{t('form.monthlySpecificDay')}</option>
@@ -809,6 +812,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                   <Label htmlFor="monthly_day">{t('form.monthlyDayLabel')}</Label>
                   <Input
                     id="monthly_day"
+                    name="monthlyDay"
                     type="number"
                     value={formData.monthly_day}
                     onChange={(e) => setFormData({ ...formData, monthly_day: parseInt(e.target.value) || 1 })}

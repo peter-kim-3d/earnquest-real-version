@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { ColorPicker } from '@/components/ui/color-picker';
 import ValueContextPanel from '@/components/parent/ValueContextPanel';
@@ -161,6 +162,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
             <Label htmlFor="name">{t('form.nameLabel')}</Label>
             <Input
               id="name"
+              name="rewardName"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder={t('form.namePlaceholder')}
@@ -175,12 +177,13 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
           {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="description">{t('form.description')}</Label>
-            <textarea
+            <Textarea
               id="description"
+              name="rewardDescription"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder={t('form.descriptionPlaceholder')}
-              className="w-full min-h-20 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+              className="min-h-20"
               maxLength={500}
             />
           </div>
@@ -361,6 +364,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
             <Label htmlFor="points_cost">{t('form.costLabel')}</Label>
             <Input
               id="points_cost"
+              name="pointsCost"
               type="number"
               value={formData.points_cost}
               onChange={(e) => setFormData({ ...formData, points_cost: parseInt(e.target.value) || 0 })}
@@ -387,6 +391,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
             </Label>
             <Input
               id="screen_minutes"
+              name="screenMinutes"
               type="number"
               value={formData.screen_minutes || ''}
               onChange={(e) => setFormData({ ...formData, screen_minutes: e.target.value ? parseInt(e.target.value) : null })}
@@ -405,6 +410,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
             </Label>
             <Input
               id="weekly_limit"
+              name="weeklyLimit"
               type="number"
               value={formData.weekly_limit || ''}
               onChange={(e) => setFormData({ ...formData, weekly_limit: e.target.value ? parseInt(e.target.value) : null })}

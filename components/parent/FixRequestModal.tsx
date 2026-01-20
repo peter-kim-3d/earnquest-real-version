@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import { FIX_TEMPLATES, type FixRequestTemplate } from '@/lib/types/task';
@@ -135,12 +136,13 @@ export default function FixRequestModal({
             <Label htmlFor="customMessage" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
               {t('addCustomMessage')}
             </Label>
-            <textarea
+            <Textarea
               id="customMessage"
+              name="customMessage"
               value={customMessage}
               onChange={(e) => setCustomMessage(e.target.value)}
               placeholder={t('customPlaceholder')}
-              className="w-full min-h-20 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+              className="min-h-20"
               maxLength={200}
             />
             <p className="text-xs text-gray-500 dark:text-gray-400">

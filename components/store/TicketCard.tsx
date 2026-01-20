@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Check, Clock, X, Sparkle, Gift } from '@phosphor-icons/react';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -53,6 +53,7 @@ export default function TicketCard({
   hasPendingRequest = false,
 }: TicketCardProps) {
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations('child.tickets.card');
   const [canceling, setCanceling] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -70,7 +71,7 @@ export default function TicketCard({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(locale, {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
@@ -230,7 +231,7 @@ export default function TicketCard({
           <span className="text-text-muted dark:text-gray-500">
             {t('pointsSpent')}
           </span>
-          <span className="font-bold text-primary">
+          <span className="font-bold text-primary tabular-nums">
             {purchase.points_spent} QP
           </span>
         </div>
@@ -240,7 +241,7 @@ export default function TicketCard({
             <span className="text-text-muted dark:text-gray-500">
               {t('screenTime')}
             </span>
-            <span className="font-bold text-blue-600 dark:text-blue-400">
+            <span className="font-bold text-blue-600 dark:text-blue-400 tabular-nums">
               {t('minutes', { minutes: purchase.reward.screen_minutes })}
             </span>
           </div>
@@ -332,7 +333,7 @@ export default function TicketCard({
               <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
                 {t('cancelDialog.pointsToRefund')}
               </span>
-              <span className="text-lg font-bold text-primary">
+              <span className="text-lg font-bold text-primary tabular-nums">
                 {purchase.points_spent} QP
               </span>
             </div>

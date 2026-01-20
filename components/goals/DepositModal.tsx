@@ -118,7 +118,7 @@ export default function DepositModal({
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 {t('goalProgress')}
               </span>
-              <span className="text-sm font-medium">
+              <span className="text-sm font-medium tabular-nums">
                 {currentProgress.toLocaleString()} / {targetPoints.toLocaleString()} XP
               </span>
             </div>
@@ -140,7 +140,7 @@ export default function DepositModal({
             <span className="text-sm font-medium text-green-700 dark:text-green-400">
               {t('yourBalance')}
             </span>
-            <span className="text-lg font-bold text-green-700 dark:text-green-400">
+            <span className="text-lg font-bold text-green-700 dark:text-green-400 tabular-nums">
               {availableBalance.toLocaleString()} XP
             </span>
           </div>
@@ -152,6 +152,7 @@ export default function DepositModal({
             </label>
             <Input
               type="text"
+              name="depositAmount"
               inputMode="numeric"
               placeholder={t('enterAmount')}
               value={amount}
@@ -220,7 +221,7 @@ export default function DepositModal({
                   style={{ width: `${newProgressPercent}%` }}
                 />
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-400 tabular-nums">
                 {newProgress.toLocaleString()} / {targetPoints.toLocaleString()} XP (
                 {Math.round(newProgressPercent)}%)
               </p>

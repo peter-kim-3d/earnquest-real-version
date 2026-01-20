@@ -132,9 +132,9 @@ export default function GoalCard({
               }`}
               style={{ width: `${progress}%` }}
             />
-            {/* Shimmer effect */}
+            {/* Shimmer effect - respects prefers-reduced-motion */}
             <div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent motion-reduce:hidden"
               style={{
                 backgroundSize: '200% 100%',
                 animation: 'shimmer 2s infinite',
@@ -144,11 +144,11 @@ export default function GoalCard({
 
           {/* Progress text */}
           <div className="flex items-center justify-between text-sm">
-            <span className="font-bold text-gray-900 dark:text-white">
+            <span className="font-bold text-gray-900 dark:text-white tabular-nums">
               {goal.current_points.toLocaleString()} /{' '}
               {goal.target_points.toLocaleString()} XP
             </span>
-            <span className="text-gray-500 dark:text-gray-400">
+            <span className="text-gray-500 dark:text-gray-400 tabular-nums">
               {Math.round(progress)}%
             </span>
           </div>
@@ -222,6 +222,11 @@ export default function GoalCard({
           }
           100% {
             background-position: -200% 0;
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-shimmer {
+            animation: none;
           }
         }
       `}</style>
