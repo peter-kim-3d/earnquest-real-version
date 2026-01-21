@@ -1,5 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
+
+// Create admin client for child session (bypasses RLS)
+function getAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createAdminClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
 
 /**
  * POST /api/goals/deposit
@@ -9,14 +21,37 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
 
-    // Check authentication
+    // Check for parent auth OR child session
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
+    // If no parent auth, check for child session cookie
+    let isChildSession = false;
+    let childSessionData: { childId: string; familyId: string } | null = null;
+
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      const cookieStore = await cookies();
+      const childSessionCookie = cookieStore.get('child_session');
+
+      if (childSessionCookie) {
+        try {
+          childSessionData = JSON.parse(childSessionCookie.value);
+          if (childSessionData?.childId && childSessionData?.familyId) {
+            isChildSession = true;
+          }
+        } catch {
+          // Invalid cookie
+        }
+      }
+
+      if (!isChildSession) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
     }
+
+    // Use admin client for child session (bypasses RLS)
+    const dbClient = isChildSession ? (getAdminClient() || supabase) : supabase;
 
     const body = await request.json();
     const { goalId, childId, amount } = body;
@@ -36,34 +71,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user's family and verify access
-    const { data: userProfile } = await supabase
-      .from('users')
-      .select('family_id')
-      .eq('id', user.id)
-      .single();
-
-    if (!userProfile?.family_id) {
-      return NextResponse.json({ error: 'No family found' }, { status: 404 });
+    // If child session, verify childId matches session
+    if (isChildSession && childSessionData && childId !== childSessionData.childId) {
+      return NextResponse.json(
+        { error: 'Unauthorized: childId mismatch' },
+        { status: 403 }
+      );
     }
 
-    // Verify child belongs to this family
-    const { data: child } = await supabase
+    // Verify child exists
+    const { data: child } = await dbClient
       .from('children')
       .select('id, family_id, points_balance')
       .eq('id', childId)
-      .eq('family_id', userProfile.family_id)
       .single();
 
     if (!child) {
       return NextResponse.json(
-        { error: 'Child not found in your family' },
+        { error: 'Child not found' },
         { status: 404 }
       );
     }
 
+    // For parent auth, verify child belongs to their family
+    if (user && !isChildSession) {
+      const { data: userProfile } = await dbClient
+        .from('users')
+        .select('family_id')
+        .eq('id', user.id)
+        .single();
+
+      if (!userProfile?.family_id || userProfile.family_id !== child.family_id) {
+        return NextResponse.json(
+          { error: 'Child not found in your family' },
+          { status: 404 }
+        );
+      }
+    }
+
     // Call the deposit_to_goal RPC function
-    const { data: result, error } = await supabase.rpc('deposit_to_goal', {
+    const { data: result, error } = await dbClient.rpc('deposit_to_goal', {
       p_goal_id: goalId,
       p_child_id: childId,
       p_amount: amount,

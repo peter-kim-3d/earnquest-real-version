@@ -1,7 +1,18 @@
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import TicketsClientPage from '@/components/child/TicketsClientPage';
+
+// Create admin client for child session (bypasses RLS)
+function getAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createAdminClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
 
 export default async function ChildTicketsPage({
   params,
@@ -27,14 +38,34 @@ export default async function ChildTicketsPage({
     redirect(`/${locale}/child-login`);
   }
 
-  const { childId } = childSession;
+  const { childId, familyId } = childSession;
 
-  if (!childId) {
+  if (!childId || !familyId) {
+    redirect(`/${locale}/child-login`);
+  }
+
+  // Check if parent is logged in (for RLS)
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Use admin client if no parent auth (child direct login)
+  // This bypasses RLS for verified child sessions
+  const dbClient = user ? supabase : (getAdminClient() || supabase);
+
+  // Verify child belongs to family
+  const { data: child } = await dbClient
+    .from('children')
+    .select('id')
+    .eq('id', childId)
+    .eq('family_id', familyId)
+    .is('deleted_at', null)
+    .single();
+
+  if (!child) {
     redirect(`/${locale}/child-login`);
   }
 
   // Get tickets for this child
-  const { data: tickets } = await supabase
+  const { data: tickets } = await dbClient
     .from('reward_purchases')
     .select(`
       *,

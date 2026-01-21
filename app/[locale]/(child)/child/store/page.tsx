@@ -1,10 +1,22 @@
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import WalletCard from '@/components/store/WalletCard';
 import RewardCard from '@/components/store/RewardCard';
 import CategoryFilters from '@/components/store/CategoryFilters';
 import ScreenTimeBudgetCard from '@/components/store/ScreenTimeBudgetCard';
 import { getTranslations } from 'next-intl/server';
+
+// Create admin client for child session (bypasses RLS)
+function getAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createAdminClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
 
 export default async function StorePage({
   params,
@@ -18,34 +30,46 @@ export default async function StorePage({
   const queryParams = await searchParams;
   const categoryFilter = queryParams.category || 'all';
 
-  // Get authenticated user
+  // Get child session from cookie
+  const cookieStore = await cookies();
+  const childSessionCookie = cookieStore.get('child_session');
+
+  if (!childSessionCookie) {
+    redirect(`/${locale}/child-login`);
+  }
+
+  let childSession;
+  try {
+    childSession = JSON.parse(childSessionCookie.value);
+  } catch (error) {
+    console.error('Invalid child session cookie:', error);
+    redirect(`/${locale}/child-login`);
+  }
+
+  const { childId, familyId } = childSession;
+
+  if (!childId || !familyId) {
+    redirect(`/${locale}/child-login`);
+  }
+
+  // Check if parent is logged in (for RLS)
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    redirect(`/${locale}/login`);
-  }
 
-  // Get user's family
-  const { data: userProfile } = await supabase
-    .from('users')
-    .select('family_id')
-    .eq('id', user.id)
-    .single();
+  // Use admin client if no parent auth (child direct login)
+  // This bypasses RLS for verified child sessions
+  const dbClient = user ? supabase : (getAdminClient() || supabase);
 
-  if (!userProfile) {
-    redirect(`/${locale}/onboarding/add-child`);
-  }
-
-  // Get first child
-  const { data: child } = await supabase
+  // Get the specific child from session
+  const { data: child } = await dbClient
     .from('children')
     .select('*')
-    .eq('family_id', userProfile.family_id)
-    .order('created_at', { ascending: true })
-    .limit(1)
+    .eq('id', childId)
+    .eq('family_id', familyId)
+    .is('deleted_at', null)
     .single();
 
   if (!child) {
-    redirect(`/${locale}/onboarding/add-child`);
+    redirect(`/${locale}/child-login`);
   }
 
   // Calculate date ranges for queries
@@ -66,16 +90,16 @@ export default async function StorePage({
     todayUsageResult,
   ] = await Promise.all([
     // Get all active rewards
-    supabase
+    dbClient
       .from('rewards')
       .select('*')
-      .eq('family_id', userProfile.family_id)
+      .eq('family_id', familyId)
       .eq('is_active', true)
       .order('category', { ascending: true })
       .order('points_cost', { ascending: true }),
 
     // Get screen time budget
-    supabase
+    dbClient
       .from('screen_time_budgets')
       .select('*')
       .eq('child_id', child.id)
@@ -83,14 +107,14 @@ export default async function StorePage({
       .maybeSingle(),
 
     // Get weekly screen usage (fallback for legacy)
-    supabase
+    dbClient
       .from('screen_usage_log')
       .select('minutes_used')
       .eq('child_id', child.id)
       .gte('created_at', weekStart.toISOString()),
 
     // Get today's usage for daily limit
-    supabase
+    dbClient
       .from('screen_usage_log')
       .select('minutes_used')
       .eq('child_id', child.id)

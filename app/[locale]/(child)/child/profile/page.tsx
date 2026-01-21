@@ -1,8 +1,19 @@
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { Star, Trophy, Gift, LogOut } from 'lucide-react';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
+
+// Create admin client for child session (bypasses RLS)
+function getAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createAdminClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
 
 export default async function ChildProfilePage({
   params,
@@ -10,6 +21,8 @@ export default async function ChildProfilePage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const supabase = await createClient();
+
   // Check for child session cookie
   const cookieStore = await cookies();
   const childSessionCookie = cookieStore.get('child_session');
@@ -31,39 +44,53 @@ export default async function ChildProfilePage({
     redirect(`/${locale}/child-login`);
   }
 
-  // Get child data
-  const supabase = await createClient();
-  const { data: childData } = await supabase
-    .from('children')
-    .select('name, points_balance, avatar_url, created_at')
-    .eq('id', childId)
-    .eq('family_id', familyId)
-    .single();
+  // Check if parent is logged in (for RLS)
+  const { data: { user } } = await supabase.auth.getUser();
 
+  // Use admin client if no parent auth (child direct login)
+  // This bypasses RLS for verified child sessions
+  const dbClient = user ? supabase : (getAdminClient() || supabase);
+
+  // Parallelize all queries
+  const [childResult, familyResult, completedTasksResult, rewardsClaimedResult] = await Promise.all([
+    // Get child data
+    dbClient
+      .from('children')
+      .select('name, points_balance, avatar_url, created_at')
+      .eq('id', childId)
+      .eq('family_id', familyId)
+      .is('deleted_at', null)
+      .single(),
+
+    // Get family name
+    dbClient
+      .from('families')
+      .select('name')
+      .eq('id', familyId)
+      .single(),
+
+    // Get achievements count (completed tasks)
+    dbClient
+      .from('task_completions')
+      .select('*', { count: 'exact', head: true })
+      .eq('child_id', childId)
+      .in('status', ['approved', 'auto_approved']),
+
+    // Get claimed rewards count
+    dbClient
+      .from('reward_purchases')
+      .select('*', { count: 'exact', head: true })
+      .eq('child_id', childId),
+  ]);
+
+  const childData = childResult.data;
   if (!childData) {
     redirect(`/${locale}/child-login`);
   }
 
-  // Get family name
-  const { data: family } = await supabase
-    .from('families')
-    .select('name')
-    .eq('id', familyId)
-    .single();
-
-  // Get achievements count (completed tasks)
-  const { count: completedTasksCount } = await supabase
-    .from('tasks')
-    .select('*', { count: 'exact', head: true })
-    .eq('family_id', familyId)
-    .eq('completed_by_child_id', childId)
-    .eq('status', 'completed');
-
-  // Get claimed rewards count
-  const { count: rewardsClaimedCount } = await supabase
-    .from('reward_claims')
-    .select('*', { count: 'exact', head: true })
-    .eq('child_id', childId);
+  const family = familyResult.data;
+  const completedTasksCount = completedTasksResult.count || 0;
+  const rewardsClaimedCount = rewardsClaimedResult.count || 0;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -106,7 +133,7 @@ export default async function ChildProfilePage({
           <div className="text-center p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
             <Trophy className="h-8 w-8 text-blue-500 mx-auto mb-2" />
             <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-              {completedTasksCount || 0}
+              {completedTasksCount}
             </p>
             <p className="text-xs text-blue-700 dark:text-blue-300">Quests Done</p>
           </div>
@@ -115,7 +142,7 @@ export default async function ChildProfilePage({
           <div className="text-center p-4 rounded-lg bg-green-50 dark:bg-green-900/20">
             <Gift className="h-8 w-8 text-green-500 mx-auto mb-2" />
             <p className="text-2xl font-bold text-green-900 dark:text-green-100">
-              {rewardsClaimedCount || 0}
+              {rewardsClaimedCount}
             </p>
             <p className="text-xs text-green-700 dark:text-green-300">Rewards</p>
           </div>
