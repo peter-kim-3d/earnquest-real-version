@@ -144,14 +144,21 @@ export async function POST(request: Request) {
     today.setHours(0, 0, 0, 0);
 
     // Check for fix_requested completion first (re-submission case)
-    const { data: fixRequestedCompletion } = await dbClient
+    // Use maybeSingle() to avoid errors when no rows found
+    const { data: fixRequestedCompletion, error: fixCheckError } = await dbClient
       .from('task_completions')
       .select('*')
       .eq('task_id', taskId)
       .eq('child_id', childId)
       .gte('requested_at', today.toISOString())
       .eq('status', 'fix_requested')
-      .single();
+      .order('requested_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (fixCheckError) {
+      console.error('Error checking fix_requested:', fixCheckError);
+    }
 
     // If there's a fix_requested completion, update it instead of creating new
     if (fixRequestedCompletion) {
@@ -225,7 +232,7 @@ export async function POST(request: Request) {
       });
     }
 
-    // Check for already completed/pending today (not fix_requested)
+    // Check for already completed/pending today (including fix_requested to prevent duplicates)
     if (!task.auto_assign || !instanceId) {
       const { data: existingCompletion } = await dbClient
         .from('task_completions')
@@ -233,10 +240,19 @@ export async function POST(request: Request) {
         .eq('task_id', taskId)
         .eq('child_id', childId)
         .gte('requested_at', today.toISOString())
-        .in('status', ['pending', 'approved', 'auto_approved'])
-        .single();
+        .in('status', ['pending', 'approved', 'auto_approved', 'fix_requested'])
+        .order('requested_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
       if (existingCompletion) {
+        // If it's fix_requested, this shouldn't happen (caught above), but handle gracefully
+        if (existingCompletion.status === 'fix_requested') {
+          return NextResponse.json(
+            { error: 'Task needs to be resubmitted via fix request flow' },
+            { status: 400 }
+          );
+        }
         return NextResponse.json(
           { error: 'Task already submitted today' },
           { status: 400 }

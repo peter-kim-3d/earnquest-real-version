@@ -11,7 +11,6 @@ import { getTranslations } from 'next-intl/server';
 function getAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  console.log('🔑 Admin Client Check:', { hasUrl: !!url, hasKey: !!key });
   if (!url || !key) return null;
   return createAdminClient(url, key, {
     auth: { autoRefreshToken: false, persistSession: false },
@@ -54,16 +53,7 @@ export default async function ChildDashboardPage({
 
   // Use admin client if no parent auth (child direct login)
   // This bypasses RLS for verified child sessions
-  const adminClient = getAdminClient();
-  const isUsingAdmin = !user && !!adminClient;
-  const dbClient = user ? supabase : (adminClient || supabase);
-
-  console.log('🔐 Auth Check:', {
-    hasUser: !!user,
-    hasAdminClient: !!adminClient,
-    isUsingAdmin,
-    familyId
-  });
+  const dbClient = user ? supabase : (getAdminClient() || supabase);
 
   // Get the specific child from session
   const { data: child } = await dbClient
@@ -87,28 +77,6 @@ export default async function ChildDashboardPage({
     .eq('child_id', child.id) // Filter by the View's resolved child_id
     .order('category', { ascending: true })
     .order('name', { ascending: true });
-
-  // DEBUG: Also check raw tasks in family
-  const { data: rawTasks, error: rawTasksError } = await dbClient
-    .from('tasks')
-    .select('id, name, is_active, frequency, child_id, deleted_at')
-    .eq('family_id', familyId)
-    .is('deleted_at', null);
-
-  // DEBUG: Log the tasks data
-  console.log('🔍 Child Dashboard Debug:', {
-    childId: child.id,
-    childName: child.name,
-    familyId,
-    viewTasksCount: tasks?.length || 0,
-    viewTasks: tasks,
-    viewError: tasksError,
-    rawTasksCount: rawTasks?.length || 0,
-    rawTasks: rawTasks,
-    rawTasksError,
-    isChildSession: !user,
-    isUsingAdmin,
-  });
 
   // Cast the result to any to avoid 'never' type issues until database types are regenerated
   const typedTasks = (tasks || []) as any[];
