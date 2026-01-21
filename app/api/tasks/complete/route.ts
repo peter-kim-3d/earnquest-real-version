@@ -1,7 +1,18 @@
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { CompleteTaskSchema, formatZodError } from '@/lib/validation/task';
+
+// Create admin client for child session (bypasses RLS)
+function getAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createAdminClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
 
 export async function POST(request: Request) {
   try {
@@ -36,6 +47,9 @@ export async function POST(request: Request) {
       }
     }
 
+    // Use admin client for child session (bypasses RLS)
+    const dbClient = isChildSession ? (getAdminClient() || supabase) : supabase;
+
     const body = await request.json();
 
     // v2: Validate with Zod schema
@@ -64,7 +78,7 @@ export async function POST(request: Request) {
     }
 
     // Get the task
-    const { data: task, error: taskError } = await supabase
+    const { data: task, error: taskError } = await dbClient
       .from('tasks')
       .select('*')
       .eq('id', taskId)
@@ -75,7 +89,7 @@ export async function POST(request: Request) {
     }
 
     // Get child's family_id
-    const { data: child } = await supabase
+    const { data: child } = await dbClient
       .from('children')
       .select('family_id')
       .eq('id', childId)
@@ -108,7 +122,7 @@ export async function POST(request: Request) {
     // Handle auto-assigned tasks with instance (if instanceId provided)
     if (task.auto_assign && instanceId) {
       // Validate instance exists and is pending
-      const { data: instance, error: instanceError } = await supabase
+      const { data: instance, error: instanceError } = await dbClient
         .from('task_instances')
         .select('*')
         .eq('id', instanceId)
@@ -130,7 +144,7 @@ export async function POST(request: Request) {
     today.setHours(0, 0, 0, 0);
 
     // Check for fix_requested completion first (re-submission case)
-    const { data: fixRequestedCompletion } = await supabase
+    const { data: fixRequestedCompletion } = await dbClient
       .from('task_completions')
       .select('*')
       .eq('task_id', taskId)
@@ -159,7 +173,7 @@ export async function POST(request: Request) {
       }
 
       // Update the existing completion
-      const { data: updatedCompletion, error: updateError } = await supabase
+      const { data: updatedCompletion, error: updateError } = await dbClient
         .from('task_completions')
         .update({
           status: newStatus,
@@ -189,7 +203,7 @@ export async function POST(request: Request) {
 
       // If auto-approved, add points
       if (newStatus === 'auto_approved') {
-        const { error: pointsError } = await supabase.rpc('add_points', {
+        const { error: pointsError } = await dbClient.rpc('add_points', {
           p_child_id: childId,
           p_amount: task.points,
           p_type: 'task_completion',
@@ -213,7 +227,7 @@ export async function POST(request: Request) {
 
     // Check for already completed/pending today (not fix_requested)
     if (!task.auto_assign || !instanceId) {
-      const { data: existingCompletion } = await supabase
+      const { data: existingCompletion } = await dbClient
         .from('task_completions')
         .select('*')
         .eq('task_id', taskId)
@@ -257,7 +271,7 @@ export async function POST(request: Request) {
     }
 
     // Create task completion with v2 fields
-    const { data: completion, error: completionError } = await supabase
+    const { data: completion, error: completionError } = await dbClient
       .from('task_completions')
       .insert({
         task_id: taskId,
@@ -295,7 +309,7 @@ export async function POST(request: Request) {
 
     // If auto-approved, add points immediately
     if (initialStatus === 'auto_approved') {
-      const { error: pointsError } = await supabase.rpc('add_points', {
+      const { error: pointsError } = await dbClient.rpc('add_points', {
         p_child_id: childId,
         p_amount: task.points,
         p_type: 'task_completion',
@@ -315,7 +329,7 @@ export async function POST(request: Request) {
       // v2: Auto-approved tasks (auto/timer/checklist) mark instance as 'completed'
       const newInstanceStatus = initialStatus === 'auto_approved' ? 'completed' : 'submitted';
 
-      const { error: instanceUpdateError } = await supabase
+      const { error: instanceUpdateError } = await dbClient
         .from('task_instances')
         .update({
           status: newInstanceStatus,
@@ -333,7 +347,7 @@ export async function POST(request: Request) {
     // v2: If task is "one_time" and status is approved/pending, deactivate it
     if (task.frequency === 'one_time') {
       // Perform the update
-      const { error: deactivateError } = await supabase
+      const { error: deactivateError } = await dbClient
         .from('tasks')
         .update({ is_active: false })
         .eq('id', taskId);

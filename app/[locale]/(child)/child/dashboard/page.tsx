@@ -1,10 +1,21 @@
 import { createClient } from '@/lib/supabase/server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import TaskList from '@/components/child/TaskList';
 import StatsCard from '@/components/child/StatsCard';
 import MotivationalBanner from '@/components/child/MotivationalBanner';
 import { getTranslations } from 'next-intl/server';
+
+// Create admin client for child session (bypasses RLS)
+function getAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createAdminClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
 
 export default async function ChildDashboardPage({
   params,
@@ -31,17 +42,25 @@ export default async function ChildDashboardPage({
     redirect(`/${locale}/child-login`);
   }
 
-  const { childId } = childSession;
+  const { childId, familyId } = childSession;
 
   if (!childId) {
     redirect(`/${locale}/child-login`);
   }
 
+  // Check if parent is logged in (for RLS)
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Use admin client if no parent auth (child direct login)
+  // This bypasses RLS for verified child sessions
+  const dbClient = user ? supabase : (getAdminClient() || supabase);
+
   // Get the specific child from session
-  const { data: child } = await supabase
+  const { data: child } = await dbClient
     .from('children')
     .select('*')
     .eq('id', childId)
+    .eq('family_id', familyId) // Extra security: verify family
     .is('deleted_at', null)
     .single();
 
@@ -52,7 +71,7 @@ export default async function ChildDashboardPage({
   // Get tasks for this child
   // Get active tasks from the View
   // The view handles all scheduling (daily/weekly) and overrides
-  const { data: tasks, error: tasksError } = await supabase
+  const { data: tasks, error: tasksError } = await dbClient
     .from('v_child_today_tasks')
     .select('*')
     .eq('child_id', child.id) // Filter by the View's resolved child_id
@@ -66,13 +85,14 @@ export default async function ChildDashboardPage({
     tasksCount: tasks?.length || 0,
     tasks: tasks,
     error: tasksError,
+    isChildSession: !user,
   });
 
   // Cast the result to any to avoid 'never' type issues until database types are regenerated
   const typedTasks = (tasks || []) as any[];
 
   // Get task completions
-  const { data: completions } = await supabase
+  const { data: completions } = await dbClient
     .from('task_completions')
     .select('*')
     .eq('child_id', child.id)
