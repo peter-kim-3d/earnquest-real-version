@@ -1,18 +1,39 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { CompleteTaskSchema, formatZodError } from '@/lib/validation/task';
 
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
 
-    // Check authentication
+    // Check for parent auth OR child session
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
+    // If no parent auth, check for child session cookie
+    let isChildSession = false;
+    let childSessionData: { childId: string; familyId: string } | null = null;
+
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      const cookieStore = await cookies();
+      const childSessionCookie = cookieStore.get('child_session');
+
+      if (childSessionCookie) {
+        try {
+          childSessionData = JSON.parse(childSessionCookie.value);
+          if (childSessionData?.childId && childSessionData?.familyId) {
+            isChildSession = true;
+          }
+        } catch {
+          // Invalid cookie
+        }
+      }
+
+      if (!isChildSession) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
     }
 
     const body = await request.json();
@@ -33,6 +54,14 @@ export async function POST(request: Request) {
     }
 
     const { taskId, childId, instanceId, evidence } = validationResult.data;
+
+    // If child session, verify childId matches session
+    if (isChildSession && childSessionData && childId !== childSessionData.childId) {
+      return NextResponse.json(
+        { error: 'Unauthorized: childId mismatch' },
+        { status: 403 }
+      );
+    }
 
     // Get the task
     const { data: task, error: taskError } = await supabase
