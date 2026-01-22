@@ -21,10 +21,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Purchase not found' }, { status: 404 });
     }
 
-    // Only allow canceling if status is 'purchased' (not fulfilled)
-    if (purchase.status !== 'purchased') {
+    // Only allow canceling if status is 'purchased' or 'active' (not used/fulfilled)
+    const cancellableStatuses = ['purchased', 'active'];
+    if (!cancellableStatuses.includes(purchase.status)) {
       return NextResponse.json(
-        { error: 'Cannot cancel a fulfilled reward' },
+        { error: 'Cannot cancel a used or fulfilled reward' },
         { status: 400 }
       );
     }
