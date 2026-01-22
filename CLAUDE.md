@@ -443,6 +443,17 @@ export async function POST(request: Request) {
 - Client components use try/catch with toast notifications (sonner)
 - Log errors to console in development
 
+### Bug Fix Logging (자동)
+
+버그를 수정하고 커밋할 때, 반드시 아래 "Issue Tracking" 섹션에 기록을 추가하세요:
+
+1. 버그 수정 완료 후 커밋 전에 Issue Tracking 테이블에 새 행 추가
+2. 형식: `| 날짜 | 이슈명 | 원인 | 수정 | 관련 파일 |`
+3. 날짜는 `YYYY-MM-DD` 형식
+4. 관련 파일은 백틱으로 감싸기
+
+**중요:** 이 단계를 건너뛰지 마세요. 모든 버그 수정은 추적되어야 합니다.
+
 ## Common Tasks
 
 ### Adding a New Task Template
@@ -501,3 +512,15 @@ Auto-refund cron configured in `vercel.json`:
   }]
 }
 ```
+
+## Issue Tracking
+
+버그 수정 기록. 버그 수정 시 자동 추가됨.
+
+| 날짜 | 이슈 | 원인 | 수정 | 관련 파일 |
+|------|------|------|------|----------|
+| 2026-01-22 | v_child_goals 권한 에러 | service_role GRANT 누락 | 063 migration | `supabase/migrations/063_*` |
+| 2026-01-22 | 태스크 타임존 버그 | UTC 비교 오류 | 뷰 + API 수정 | `064_*.sql`, `tasks/complete/route.ts` |
+| 2026-01-22 | approve_ticket_use 500 에러 | approved_by 컬럼 없음 | fulfilled_by 사용 | `065_*.sql` |
+| 2026-01-22 | ticket cancel 400 에러 | 'active' 상태 미허용 | API 수정 | `rewards/cancel/route.ts` |
+| 2026-01-22 | cancel 후 UI 미갱신 | optimistic update 누락 | onCancel 콜백 추가 | `TicketCard.tsx`, `TicketsClientPage.tsx` |
