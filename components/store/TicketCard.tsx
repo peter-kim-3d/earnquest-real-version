@@ -41,6 +41,7 @@ interface TicketCardProps {
   onRequestUse?: (ticketId: string) => void;
   onApprove?: (ticketId: string) => void;
   onFulfill?: (ticketId: string) => void;
+  onCancel?: (ticketId: string) => void;
   hasPendingRequest?: boolean;
 }
 
@@ -50,6 +51,7 @@ export default function TicketCard({
   onRequestUse,
   onApprove,
   onFulfill,
+  onCancel,
   hasPendingRequest = false,
 }: TicketCardProps) {
   const router = useRouter();
@@ -102,6 +104,8 @@ export default function TicketCard({
       toast.success(t('toast.canceled'), {
         description: t('toast.refunded', { points: result.refundedPoints }),
       });
+      // Call onCancel callback to update parent state immediately
+      onCancel?.(purchase.id);
       router.refresh();
     } catch (error: any) {
       console.error('Cancel error:', error);

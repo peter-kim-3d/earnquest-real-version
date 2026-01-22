@@ -114,6 +114,16 @@ export default function TicketsClientPage({
     }
   };
 
+  const handleCancel = (ticketId: string) => {
+    // Optimistic update: remove ticket from active list
+    setTickets({
+      active: tickets.active.filter(t => t.id !== ticketId),
+      use_requested: tickets.use_requested,
+      in_use: tickets.in_use,
+      used: tickets.used,
+    });
+  };
+
   const tabs = [
     {
       id: 'active' as TicketStatus,
@@ -211,6 +221,7 @@ export default function TicketsClientPage({
                     purchase={ticket}
                     viewMode="child"
                     onRequestUse={handleRequestUse}
+                    onCancel={handleCancel}
                     hasPendingRequest={hasActiveScreenTime}
                   />
                 ))}
