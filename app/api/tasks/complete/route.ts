@@ -4,6 +4,44 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { CompleteTaskSchema, formatZodError } from '@/lib/validation/task';
 
+/**
+ * Calculate the start of "today" in the given timezone, returned as UTC ISO string.
+ * This ensures date comparisons work correctly across timezones.
+ */
+function getTodayStartInTimezone(timezone: string): string {
+  const now = new Date();
+  // Format current time in the target timezone to get local date components
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const localDateStr = formatter.format(now); // "YYYY-MM-DD"
+  // Create a date object for midnight in that timezone
+  // Parse as ISO and adjust for timezone offset
+  const midnightLocal = new Date(`${localDateStr}T00:00:00`);
+  // Get the offset for this timezone at this date
+  const tzFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    timeZoneName: 'shortOffset',
+  });
+  const parts = tzFormatter.formatToParts(midnightLocal);
+  const offsetPart = parts.find(p => p.type === 'timeZoneName')?.value || '+00:00';
+  // Parse offset (e.g., "GMT-5" or "UTC+9")
+  const offsetMatch = offsetPart.match(/([+-])(\d{1,2})(?::?(\d{2}))?/);
+  let offsetMinutes = 0;
+  if (offsetMatch) {
+    const sign = offsetMatch[1] === '-' ? -1 : 1;
+    const hours = parseInt(offsetMatch[2], 10);
+    const mins = parseInt(offsetMatch[3] || '0', 10);
+    offsetMinutes = sign * (hours * 60 + mins);
+  }
+  // Midnight in target timezone converted to UTC
+  const utcMidnight = new Date(midnightLocal.getTime() - offsetMinutes * 60 * 1000);
+  return utcMidnight.toISOString();
+}
+
 // Create admin client for child session (bypasses RLS)
 function getAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -88,7 +126,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 });
     }
 
-    // Get child's family_id
+    // Get child's family_id and family timezone
     const { data: child } = await dbClient
       .from('children')
       .select('family_id')
@@ -98,6 +136,15 @@ export async function POST(request: Request) {
     if (!child) {
       return NextResponse.json({ error: 'Child not found' }, { status: 404 });
     }
+
+    // Get family timezone setting for "today" calculation
+    const { data: family } = await dbClient
+      .from('families')
+      .select('settings')
+      .eq('id', child.family_id)
+      .single();
+
+    const familyTimezone = family?.settings?.timezone || 'UTC';
 
     // v2: Validate timer completion
     if (task.approval_type === 'timer') {
@@ -140,8 +187,8 @@ export async function POST(request: Request) {
     }
 
     // For all tasks: check for existing completions today
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    // Use family timezone to determine "today" boundaries
+    const todayStart = getTodayStartInTimezone(familyTimezone);
 
     // Check for fix_requested completion first (re-submission case)
     // Use maybeSingle() to avoid errors when no rows found
@@ -150,7 +197,7 @@ export async function POST(request: Request) {
       .select('*')
       .eq('task_id', taskId)
       .eq('child_id', childId)
-      .gte('requested_at', today.toISOString())
+      .gte('requested_at', todayStart)
       .eq('status', 'fix_requested')
       .order('requested_at', { ascending: false })
       .limit(1)
@@ -239,7 +286,7 @@ export async function POST(request: Request) {
         .select('*')
         .eq('task_id', taskId)
         .eq('child_id', childId)
-        .gte('requested_at', today.toISOString())
+        .gte('requested_at', todayStart)
         .in('status', ['pending', 'approved', 'auto_approved', 'fix_requested'])
         .order('requested_at', { ascending: false })
         .limit(1)
