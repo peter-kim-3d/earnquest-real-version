@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Clock, Sparkles } from 'lucide-react';
+import { Clock, Sparkles, Minimize2, Maximize2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
@@ -29,16 +29,74 @@ export default function ScreenTimeTimer({
   const [isCompleting, setIsCompleting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [autoCloseSeconds, setAutoCloseSeconds] = useState(30);
+  const [isFullscreen, setIsFullscreen] = useState(true); // Start in fullscreen mode
   const hasCompletedRef = useRef(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  const endTimeRef = useRef<number>(0);
+
+  // Calculate remaining time (memoized for reuse)
+  const calculateRemaining = useCallback(() => {
+    const startTime = new Date(startedAt).getTime();
+    const endTime = startTime + screenMinutes * 60 * 1000;
+    endTimeRef.current = endTime;
+    return Math.max(0, endTime - Date.now());
+  }, [startedAt, screenMinutes]);
+
+  // Request Wake Lock to prevent screen from sleeping
+  useEffect(() => {
+    const requestWakeLock = async () => {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLockRef.current = await navigator.wakeLock.request('screen');
+          console.log('Wake Lock activated');
+        }
+      } catch (err) {
+        console.log('Wake Lock not supported or failed:', err);
+      }
+    };
+
+    requestWakeLock();
+
+    // Re-acquire wake lock when page becomes visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !wakeLockRef.current) {
+        requestWakeLock();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release();
+        wakeLockRef.current = null;
+      }
+    };
+  }, []);
+
+  // Handle visibility change - recalculate time when returning from background
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        const remaining = calculateRemaining();
+        setTimeRemaining(remaining);
+
+        // Check if timer expired while in background
+        if (remaining === 0 && !hasCompletedRef.current) {
+          handleTimerComplete();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [calculateRemaining]);
 
   useEffect(() => {
     // Calculate time remaining
-    const startTime = new Date(startedAt).getTime();
-    const endTime = startTime + screenMinutes * 60 * 1000;
-    const now = Date.now();
-    const remaining = Math.max(0, endTime - now);
-
+    const remaining = calculateRemaining();
     setTimeRemaining(remaining);
 
     // If already expired, show confirmation
@@ -49,8 +107,7 @@ export default function ScreenTimeTimer({
 
     // Update timer every second
     const interval = setInterval(() => {
-      const now = Date.now();
-      const remaining = Math.max(0, endTime - now);
+      const remaining = Math.max(0, endTimeRef.current - Date.now());
       setTimeRemaining(remaining);
 
       // Show confirmation when timer reaches 0
@@ -61,7 +118,7 @@ export default function ScreenTimeTimer({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [startedAt, screenMinutes]);
+  }, [calculateRemaining]);
 
   // Auto-close confirmation after 30 seconds
   useEffect(() => {
@@ -220,69 +277,152 @@ export default function ScreenTimeTimer({
 
   const progress = ((screenMinutes * 60 * 1000 - timeRemaining) / (screenMinutes * 60 * 1000)) * 100;
 
+  // Confirmation dialog content
+  const ConfirmationContent = () => (
+    <div className="w-full max-w-md mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-center gap-3 mb-6">
+        <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+          <Sparkles className="h-8 w-8" />
+        </div>
+      </div>
+
+      {/* Message */}
+      <div className="text-center mb-8">
+        <h3 className="text-2xl font-bold mb-2">{t('timesUp')}</h3>
+        <p className="text-white/80 mb-4">{rewardName}</p>
+        <div className="text-4xl font-black mb-2">
+          {t('screenTimeComplete')}
+        </div>
+        <p className="text-sm text-white/80 tabular-nums">
+          {t('autoClosingIn', { seconds: autoCloseSeconds })}
+        </p>
+      </div>
+
+      {/* Okay Button */}
+      <button
+        onClick={completeScreenTime}
+        disabled={isCompleting}
+        className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white text-orange-600 font-bold text-lg transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+      >
+        {isCompleting ? (
+          <>{t('processing')}</>
+        ) : (
+          <>
+            <Sparkles className="h-5 w-5" />
+            {t('okay')}
+          </>
+        )}
+      </button>
+
+      {/* Auto-close progress */}
+      <div className="mt-4 relative h-2 bg-white/20 rounded-full overflow-hidden">
+        <div
+          className="absolute top-0 left-0 h-full bg-white transition-all duration-1000"
+          style={{ width: `${((30 - autoCloseSeconds) / 30) * 100}%` }}
+        />
+      </div>
+    </div>
+  );
+
+  // Timer content
+  const TimerContent = () => (
+    <div className="w-full max-w-md mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-center gap-3 mb-6">
+        <div className="h-20 w-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+          <Clock className="h-10 w-10" />
+        </div>
+      </div>
+
+      <div className="text-center mb-2">
+        <h3 className="text-xl font-bold">{t('screenTimeActive')}</h3>
+        <p className="text-white/80">{rewardName}</p>
+      </div>
+
+      {/* Timer Display */}
+      <div className="text-center mb-8">
+        <div className="text-7xl md:text-8xl font-black mb-2 tabular-nums">
+          {formatTime(timeRemaining)}
+        </div>
+        <p className="text-lg text-white/80">{t('remainingLabel')}</p>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="relative h-4 bg-white/20 rounded-full overflow-hidden mb-6">
+        <div
+          className="absolute top-0 left-0 h-full bg-white transition-all duration-1000"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      {/* Status */}
+      <div className="flex items-center justify-center gap-2 text-lg text-white/90">
+        <Sparkles className="h-5 w-5" />
+        <span>{t('enjoyYourTime')}</span>
+      </div>
+    </div>
+  );
+
   // Show confirmation dialog when timer completes
   if (showConfirmation) {
+    // Confirmation is always fullscreen
     return (
-      <div className="rounded-xl bg-gradient-to-br from-yellow-500 to-orange-600 p-6 text-white shadow-lg motion-safe:animate-pulse">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <Sparkles className="h-6 w-6" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold">{t('timesUp')}</h3>
-            <p className="text-sm text-white/80">{rewardName}</p>
-          </div>
+      <div className="fixed inset-0 z-50 bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center p-6 text-white motion-safe:animate-pulse">
+        <ConfirmationContent />
+      </div>
+    );
+  }
+
+  // Fullscreen mode - covers entire screen to prevent accidental navigation
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 z-50 bg-gradient-to-br from-green-500 to-emerald-600 flex flex-col text-white">
+        {/* Minimize button - top right */}
+        <div className="absolute top-4 right-4">
+          <button
+            onClick={() => setIsFullscreen(false)}
+            className="p-3 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+            aria-label="Minimize timer"
+          >
+            <Minimize2 className="h-6 w-6" />
+          </button>
         </div>
 
-        {/* Message */}
-        <div className="text-center mb-6">
-          <div className="text-3xl font-black mb-2">
-            {t('screenTimeComplete')}
-          </div>
-          <p className="text-sm text-white/80 tabular-nums">
-            {t('autoClosingIn', { seconds: autoCloseSeconds })}
-          </p>
+        {/* Centered content */}
+        <div className="flex-1 flex items-center justify-center p-6">
+          <TimerContent />
         </div>
 
-        {/* Okay Button */}
-        <button
-          onClick={completeScreenTime}
-          disabled={isCompleting}
-          className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white text-orange-600 font-bold text-lg transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
-        >
-          {isCompleting ? (
-            <>{t('processing')}</>
-          ) : (
-            <>
-              <Sparkles className="h-5 w-5" />
-              {t('okay')}
-            </>
-          )}
-        </button>
-
-        {/* Auto-close progress */}
-        <div className="mt-4 relative h-2 bg-white/20 rounded-full overflow-hidden">
-          <div
-            className="absolute top-0 left-0 h-full bg-white transition-all duration-1000"
-            style={{ width: `${((30 - autoCloseSeconds) / 30) * 100}%` }}
-          />
+        {/* Touch protection notice */}
+        <div className="text-center pb-6 text-white/60 text-sm">
+          {t('tapMinimize') || 'Tap the button above to minimize'}
         </div>
       </div>
     );
   }
 
+  // Minimized card mode
   return (
     <div className="rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 p-6 text-white shadow-lg">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-          <Clock className="h-6 w-6" />
+      {/* Header with maximize button */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+            <Clock className="h-6 w-6" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold">{t('screenTimeActive')}</h3>
+            <p className="text-sm text-white/80">{rewardName}</p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-lg font-bold">{t('screenTimeActive')}</h3>
-          <p className="text-sm text-white/80">{rewardName}</p>
-        </div>
+        <button
+          onClick={() => setIsFullscreen(true)}
+          className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+          aria-label="Maximize timer"
+        >
+          <Maximize2 className="h-5 w-5" />
+        </button>
       </div>
 
       {/* Timer Display */}

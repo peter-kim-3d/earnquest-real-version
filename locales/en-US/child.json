@@ -164,7 +164,8 @@
       "processing": "Processing...",
       "okay": "Okay",
       "timeWellSpent": "Time well spent! 🎮",
-      "failedToComplete": "Failed to complete"
+      "failedToComplete": "Failed to complete",
+      "tapMinimize": "Tap the button above to minimize"
     },
     "card": {
       "waitingForParent": "Waiting for Parent",

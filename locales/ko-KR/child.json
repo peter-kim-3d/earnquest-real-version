@@ -164,7 +164,8 @@
       "processing": "처리 중...",
       "okay": "확인",
       "timeWellSpent": "잘 보낸 시간! 🎮",
-      "failedToComplete": "완료 실패"
+      "failedToComplete": "완료 실패",
+      "tapMinimize": "위 버튼을 눌러 최소화"
     },
     "card": {
       "waitingForParent": "부모님 대기 중",
