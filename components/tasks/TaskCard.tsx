@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Sparkle, Timer, ListChecks, Checks } from '@phosphor-icons/react/dist/ssr';
@@ -31,20 +31,43 @@ type Task = {
 
 interface TaskCardProps {
   task: Task;
+  childId?: string; // Required for per-child timer state
   onComplete: (taskId: string, evidence?: {
     timerCompleted?: boolean;
     checklistState?: boolean[];
   }, instanceId?: string) => Promise<void>;
 }
 
-export default function TaskCard({ task, onComplete }: TaskCardProps) {
+export default function TaskCard({ task, childId, onComplete }: TaskCardProps) {
   const router = useRouter();
   const t = useTranslations('tasks.taskCard');
   const [loading, setLoading] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
   const [showChecklist, setShowChecklist] = useState(false);
 
-  // Local state for optimistic updates
+  // Local state for timer (per-child)
+  const [timerState, setTimerState] = useState<{ remainingSeconds: number; totalSeconds: number } | null>(null);
+  const [timerStateLoaded, setTimerStateLoaded] = useState(false);
+
+  // Load timer state from server on mount (if childId available)
+  useEffect(() => {
+    if (childId && task.approval_type === 'timer' && task.timer_minutes && !timerStateLoaded) {
+      fetch(`/api/tasks/timer-state?taskId=${task.id}&childId=${childId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.timerState?.remainingSeconds !== undefined) {
+            setTimerState(data.timerState);
+          }
+          setTimerStateLoaded(true);
+        })
+        .catch(err => {
+          console.error('Failed to load timer state:', err);
+          setTimerStateLoaded(true);
+        });
+    }
+  }, [childId, task.id, task.approval_type, task.timer_minutes, timerStateLoaded]);
+
+  // Legacy: Local state for non-child views (parent dashboard)
   const [localMetadata, setLocalMetadata] = useState(task.metadata || {});
 
   const handleComplete = async () => {
@@ -76,8 +99,27 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
     setLoading(true);
     try {
       await onComplete(task.id, { timerCompleted: true }, task.instance_id || undefined);
-      // Reset local metadata
-      setLocalMetadata({ ...localMetadata, timer_state: null });
+      // Reset timer state
+      if (childId) {
+        setTimerState(null);
+        // Clear timer state in database
+        try {
+          await fetch('/api/tasks/timer-state', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              taskId: task.id,
+              childId,
+              remainingSeconds: 0,
+              totalSeconds: 0
+            })
+          });
+        } catch (err) {
+          console.error("Failed to clear timer state", err);
+        }
+      } else {
+        setLocalMetadata({ ...localMetadata, timer_state: null });
+      }
     } catch (error) {
       console.error('Failed to complete task:', error);
       toast.error(t('submitFailed'), { description: t('failedToSubmit') });
@@ -117,7 +159,11 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
   const getButtonText = () => {
     if (loading) return t('submitting');
     if (task.approval_type === 'timer') {
-      if (localMetadata?.timer_state?.remainingSeconds) {
+      // Use per-child timerState if childId available, otherwise fall back to localMetadata
+      const hasProgress = childId
+        ? timerState?.remainingSeconds && timerState.remainingSeconds < (task.timer_minutes || 0) * 60
+        : localMetadata?.timer_state?.remainingSeconds;
+      if (hasProgress) {
         return t('resumeTimer');
       }
       return t('startTimer');
@@ -171,18 +217,23 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
                 </span>
 
                 {/* v2: Timer Duration Badge */}
-                {task.approval_type === 'timer' && task.timer_minutes && (
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums ${localMetadata?.timer_state?.remainingSeconds && localMetadata?.timer_state?.remainingSeconds < task.timer_minutes * 60
-                    ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
-                    : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                    }`}>
-                    <Timer className="w-3 h-3 mr-1" />
-                    {localMetadata?.timer_state?.remainingSeconds
-                      ? t('minutesLeft', { minutes: Math.ceil(localMetadata.timer_state.remainingSeconds / 60) })
-                      : t('minutes', { minutes: task.timer_minutes })
-                    }
-                  </span>
-                )}
+                {task.approval_type === 'timer' && task.timer_minutes && (() => {
+                  // Use per-child timerState if childId available
+                  const currentTimerState = childId ? timerState : localMetadata?.timer_state;
+                  const hasProgress = currentTimerState?.remainingSeconds && currentTimerState.remainingSeconds < task.timer_minutes * 60;
+                  return (
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums ${hasProgress
+                      ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
+                      : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                      }`}>
+                      <Timer className="w-3 h-3 mr-1" />
+                      {hasProgress
+                        ? t('minutesLeft', { minutes: Math.ceil(currentTimerState.remainingSeconds / 60) })
+                        : t('minutes', { minutes: task.timer_minutes })
+                      }
+                    </span>
+                  );
+                })()}
 
                 {/* Frequency */}
                 <span className="text-xs text-text-muted dark:text-gray-500 capitalize">
@@ -219,30 +270,50 @@ export default function TaskCard({ task, onComplete }: TaskCardProps) {
         <TimerModal
           taskName={task.name}
           timerMinutes={task.timer_minutes}
-          initialState={localMetadata?.timer_state}
+          initialState={childId ? timerState : localMetadata?.timer_state}
           isOpen={showTimer}
           onComplete={handleTimerComplete}
           onCancel={() => setShowTimer(false)} // Just close, state is saved internally via onSave
           onSave={async (state) => {
-            // Optimistic update
-            const newMetadata = { ...localMetadata, timer_state: state };
-            setLocalMetadata(newMetadata);
+            // Use per-child API if childId available
+            if (childId) {
+              // Optimistic update
+              setTimerState(state);
 
-            // Persist timer state to metadata
-            try {
-              await fetch('/api/tasks/update', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  taskId: task.id,
-                  metadata: newMetadata
-                })
-              });
+              // Persist timer state to child_task_overrides
+              try {
+                await fetch('/api/tasks/timer-state', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    taskId: task.id,
+                    childId,
+                    remainingSeconds: state.remainingSeconds,
+                    totalSeconds: state.totalSeconds
+                  })
+                });
+              } catch (err) {
+                console.error("Failed to save timer state", err);
+              }
+            } else {
+              // Legacy: save to task metadata (parent dashboard)
+              const newMetadata = { ...localMetadata, timer_state: state };
+              setLocalMetadata(newMetadata);
 
-              router.refresh();
+              try {
+                await fetch('/api/tasks/update', {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    taskId: task.id,
+                    metadata: newMetadata
+                  })
+                });
 
-            } catch (err) {
-              console.error("Failed to save timer state", err);
+                router.refresh();
+              } catch (err) {
+                console.error("Failed to save timer state", err);
+              }
             }
           }}
         />

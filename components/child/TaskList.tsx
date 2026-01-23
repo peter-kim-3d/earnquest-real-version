@@ -247,7 +247,7 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
 
                   {/* Tasks in this context */}
                   {tasksInContext.map((task) => (
-                    <TaskCard key={task.id} task={task} onComplete={handleTaskComplete} />
+                    <TaskCard key={task.id} task={task} childId={childId} onComplete={handleTaskComplete} />
                   ))}
                 </div>
               );
