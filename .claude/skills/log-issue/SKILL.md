@@ -1,3 +1,9 @@
+---
+name: log-issue
+description: 버그 수정 후 qa/ISSUES.md에 이슈 기록 추가
+user-invocable: true
+---
+
 # Log Issue Skill
 
 버그 수정 후 `qa/ISSUES.md`의 Issue Tracking 테이블에 기록을 추가합니다.
