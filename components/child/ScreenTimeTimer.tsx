@@ -12,8 +12,12 @@ interface ScreenTimeTimerProps {
   rewardName: string;
   screenMinutes: number;
   startedAt: string;
+  initialElapsedSeconds?: number; // Saved elapsed time from database
   onComplete?: () => void;
 }
+
+// Save progress every 10 seconds
+const SAVE_INTERVAL_MS = 10000;
 
 export default function ScreenTimeTimer({
   purchaseId,
@@ -21,6 +25,7 @@ export default function ScreenTimeTimer({
   rewardName,
   screenMinutes,
   startedAt,
+  initialElapsedSeconds = 0,
   onComplete,
 }: ScreenTimeTimerProps) {
   const router = useRouter();
@@ -33,15 +38,45 @@ export default function ScreenTimeTimer({
   const hasCompletedRef = useRef(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
-  const endTimeRef = useRef<number>(0);
+  const totalDurationRef = useRef<number>(screenMinutes * 60 * 1000);
+  const startTimeRef = useRef<number>(0);
+  const savedElapsedRef = useRef<number>(initialElapsedSeconds * 1000); // Convert to ms
+  const lastSaveRef = useRef<number>(Date.now());
 
-  // Calculate remaining time (memoized for reuse)
+  // Calculate remaining time based on elapsed time
   const calculateRemaining = useCallback(() => {
-    const startTime = new Date(startedAt).getTime();
-    const endTime = startTime + screenMinutes * 60 * 1000;
-    endTimeRef.current = endTime;
-    return Math.max(0, endTime - Date.now());
-  }, [startedAt, screenMinutes]);
+    const now = Date.now();
+    // If startTimeRef is set, calculate elapsed since component mounted
+    // Add the previously saved elapsed time
+    const currentSessionElapsed = startTimeRef.current > 0 ? now - startTimeRef.current : 0;
+    const totalElapsed = savedElapsedRef.current + currentSessionElapsed;
+    const remaining = Math.max(0, totalDurationRef.current - totalElapsed);
+    return remaining;
+  }, []);
+
+  // Get current elapsed seconds (for saving to DB)
+  const getCurrentElapsedSeconds = useCallback(() => {
+    const now = Date.now();
+    const currentSessionElapsed = startTimeRef.current > 0 ? now - startTimeRef.current : 0;
+    const totalElapsedMs = savedElapsedRef.current + currentSessionElapsed;
+    return Math.floor(totalElapsedMs / 1000);
+  }, []);
+
+  // Save progress to database
+  const saveProgress = useCallback(async () => {
+    const elapsedSeconds = getCurrentElapsedSeconds();
+
+    try {
+      await fetch(`/api/tickets/${purchaseId}/save-progress`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ childId, elapsedSeconds }),
+      });
+      lastSaveRef.current = Date.now();
+    } catch (err) {
+      console.error('Failed to save progress:', err);
+    }
+  }, [purchaseId, childId, getCurrentElapsedSeconds]);
 
   // Request Wake Lock to prevent screen from sleeping
   useEffect(() => {
@@ -76,26 +111,36 @@ export default function ScreenTimeTimer({
     };
   }, []);
 
-  // Handle visibility change - recalculate time when returning from background
+  // Handle visibility change - recalculate time and save progress when returning from background
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         const remaining = calculateRemaining();
         setTimeRemaining(remaining);
 
+        // Save progress when coming back from background
+        saveProgress();
+
         // Check if timer expired while in background
         if (remaining === 0 && !hasCompletedRef.current) {
           handleTimerComplete();
         }
+      } else if (document.visibilityState === 'hidden') {
+        // Save progress when going to background
+        saveProgress();
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [calculateRemaining]);
+  }, [calculateRemaining, saveProgress]);
 
+  // Main timer effect
   useEffect(() => {
-    // Calculate time remaining
+    // Set start time for this session
+    startTimeRef.current = Date.now();
+
+    // Calculate initial remaining time
     const remaining = calculateRemaining();
     setTimeRemaining(remaining);
 
@@ -105,20 +150,30 @@ export default function ScreenTimeTimer({
       return;
     }
 
-    // Update timer every second
+    // Update timer every second and periodically save progress
     const interval = setInterval(() => {
-      const remaining = Math.max(0, endTimeRef.current - Date.now());
+      const remaining = calculateRemaining();
       setTimeRemaining(remaining);
+
+      // Periodically save progress (every SAVE_INTERVAL_MS)
+      if (Date.now() - lastSaveRef.current >= SAVE_INTERVAL_MS) {
+        saveProgress();
+      }
 
       // Show confirmation when timer reaches 0
       if (remaining === 0) {
         clearInterval(interval);
+        saveProgress(); // Final save
         handleTimerComplete();
       }
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [calculateRemaining]);
+    return () => {
+      clearInterval(interval);
+      // Save progress when component unmounts
+      saveProgress();
+    };
+  }, [calculateRemaining, saveProgress]);
 
   // Auto-close confirmation after 30 seconds
   useEffect(() => {
