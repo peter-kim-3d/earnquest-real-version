@@ -7,6 +7,9 @@ import { CheckCircle, Ticket, Package } from '@/components/ui/ClientIcons';
 import { getAuthUserWithProfile } from '@/lib/supabase/cached-queries';
 import { DEFAULT_EXCHANGE_RATE, ExchangeRate } from '@/lib/utils/exchange-rate';
 
+// Force dynamic rendering to ensure fresh data
+export const dynamic = 'force-dynamic';
+
 export default async function RewardManagementPage({
   params,
 }: {
