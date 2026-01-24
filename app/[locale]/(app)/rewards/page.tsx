@@ -57,7 +57,7 @@ export default async function RewardManagementPage({
     // Get children for gift feature
     supabase
       .from('children')
-      .select('id, name, avatar_url, avatar_preset')
+      .select('id, name, avatar_url')
       .eq('family_id', userProfile.family_id)
       .order('name'),
   ]);
@@ -66,14 +66,7 @@ export default async function RewardManagementPage({
   const purchaseStats = (purchaseStatsResult.data || []) as { reward_id: string; status: string }[];
   const exchangeRate = (familyResult.data?.point_exchange_rate || DEFAULT_EXCHANGE_RATE) as ExchangeRate;
 
-  // Debug: log children query result
-  console.log('[rewards/page] Children query result:', {
-    data: childrenResult.data,
-    error: childrenResult.error,
-    familyId: userProfile.family_id
-  });
-
-  const children = (childrenResult.data || []) as { id: string; name: string; avatar_url: string | null; avatar_preset: string | null }[];
+  const children = (childrenResult.data || []) as { id: string; name: string; avatar_url: string | null }[];
 
   // Calculate purchase count per reward
   const rewardPurchases = new Map<string, number>();
@@ -138,13 +131,6 @@ export default async function RewardManagementPage({
           </p>
         </div>
       </div>
-
-      {/* Debug: Show children count */}
-      {process.env.NODE_ENV === 'development' || true ? (
-        <div className="mb-4 p-2 bg-yellow-100 dark:bg-yellow-900 rounded text-sm">
-          Debug: Children count = {children.length}, Error = {childrenResult.error?.message || 'none'}
-        </div>
-      ) : null}
 
       {/* Reward List */}
       <RewardList rewards={rewards || []} rewardPurchases={rewardPurchases} exchangeRate={exchangeRate} familyChildren={children} />

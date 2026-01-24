@@ -34,7 +34,6 @@ type Child = {
   id: string;
   name: string;
   avatar_url: string | null;
-  avatar_preset: string | null;
 };
 
 interface RewardListProps {
@@ -45,9 +44,6 @@ interface RewardListProps {
 }
 
 export default function RewardList({ rewards, rewardPurchases, exchangeRate = DEFAULT_EXCHANGE_RATE, familyChildren = [] }: RewardListProps) {
-  // Debug: log familyChildren
-  console.log('[RewardList] familyChildren:', familyChildren.length, familyChildren);
-
   const t = useTranslations('rewards');
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);

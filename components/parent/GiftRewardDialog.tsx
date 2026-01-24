@@ -32,7 +32,6 @@ type Child = {
   id: string;
   name: string;
   avatar_url: string | null;
-  avatar_preset: string | null;
 };
 
 interface GiftRewardDialogProps {
@@ -196,14 +195,6 @@ export default function GiftRewardDialog({
                     {child.avatar_url ? (
                       <Image
                         src={child.avatar_url}
-                        alt={child.name}
-                        width={48}
-                        height={48}
-                        className="object-cover w-full h-full"
-                      />
-                    ) : child.avatar_preset ? (
-                      <Image
-                        src={`/avatars/${child.avatar_preset}.png`}
                         alt={child.name}
                         width={48}
                         height={48}
