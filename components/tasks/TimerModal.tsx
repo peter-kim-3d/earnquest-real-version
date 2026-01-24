@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl';
 interface TimerModalProps {
   taskName: string;
   timerMinutes: number;
+  points: number;
   initialState?: { remainingSeconds: number; totalSeconds: number };
   isOpen: boolean;
   onComplete: () => void;
@@ -19,6 +20,7 @@ interface TimerModalProps {
 export default function TimerModal({
   taskName,
   timerMinutes,
+  points,
   initialState,
   isOpen,
   onComplete,
@@ -282,7 +284,7 @@ export default function TimerModal({
           </DialogTitle>
           <div className="text-center mt-2">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-primary/10 text-primary border border-primary/20">
-              + {Math.max(5, Math.round(Math.round(timerMinutes * 1.5) / 5) * 5)} XP
+              + {points} XP
             </span>
           </div>
         </DialogHeader>

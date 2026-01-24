@@ -270,6 +270,7 @@ export default function TaskCard({ task, childId, onComplete }: TaskCardProps) {
         <TimerModal
           taskName={task.name}
           timerMinutes={task.timer_minutes}
+          points={task.points}
           initialState={childId ? timerState : localMetadata?.timer_state}
           isOpen={showTimer}
           onComplete={handleTimerComplete}
