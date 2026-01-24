@@ -154,5 +154,18 @@
       "hoursAgo": "{count}h ago",
       "daysAgo": "{count}d ago"
     }
+  },
+  "gift": {
+    "menuItem": "Gift to Child",
+    "title": "Gift Reward",
+    "description": "Send this reward to one of your children as a special gift!",
+    "selectChild": "Choose a child",
+    "messageLabel": "Add a message",
+    "messagePlaceholder": "e.g., Great job this week!",
+    "send": "Send Gift",
+    "sending": "Sending...",
+    "success": "Gift sent!",
+    "successDescription": "{name} received {reward}!",
+    "failed": "Gift failed"
   }
 }

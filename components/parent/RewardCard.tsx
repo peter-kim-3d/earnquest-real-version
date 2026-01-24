@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Edit, Trash2, MoreVertical } from 'lucide-react';
+import { Edit, Trash2, MoreVertical, Gift } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import {
@@ -34,9 +34,10 @@ interface RewardCardProps {
   reward: Reward;
   purchaseCount: number;
   onEdit: () => void;
+  onGift?: () => void;
 }
 
-export default function RewardCard({ reward, purchaseCount, onEdit }: RewardCardProps) {
+export default function RewardCard({ reward, purchaseCount, onEdit, onGift }: RewardCardProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -171,6 +172,12 @@ export default function RewardCard({ reward, purchaseCount, onEdit }: RewardCard
                 <Edit className="h-4 w-4 mr-2" />
                 {t('card.edit')}
               </DropdownMenuItem>
+              {onGift && reward.is_active && (
+                <DropdownMenuItem onClick={onGift}>
+                  <Gift className="h-4 w-4 mr-2" />
+                  {t('gift.menuItem')}
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={handleToggleActive}>
                 {reward.is_active ? t('actions.deactivate') : t('actions.activate')}
               </DropdownMenuItem>

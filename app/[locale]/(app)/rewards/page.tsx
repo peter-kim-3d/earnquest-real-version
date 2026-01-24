@@ -27,7 +27,7 @@ export default async function RewardManagementPage({
   }
 
   // Parallelize all queries that depend on family_id
-  const [rewardsResult, purchaseStatsResult, familyResult] = await Promise.all([
+  const [rewardsResult, purchaseStatsResult, familyResult, childrenResult] = await Promise.all([
     // Get all rewards for this family (exclude deleted)
     supabase
       .from('rewards')
@@ -50,11 +50,19 @@ export default async function RewardManagementPage({
       .select('point_exchange_rate')
       .eq('id', userProfile.family_id)
       .single(),
+
+    // Get children for gift feature
+    supabase
+      .from('children')
+      .select('id, name, avatar_url, avatar_preset')
+      .eq('family_id', userProfile.family_id)
+      .order('name'),
   ]);
 
   const rewards = (rewardsResult.data || []) as any[];
   const purchaseStats = (purchaseStatsResult.data || []) as { reward_id: string; status: string }[];
   const exchangeRate = (familyResult.data?.point_exchange_rate || DEFAULT_EXCHANGE_RATE) as ExchangeRate;
+  const children = (childrenResult.data || []) as { id: string; name: string; avatar_url: string | null; avatar_preset: string | null }[];
 
   // Calculate purchase count per reward
   const rewardPurchases = new Map<string, number>();
@@ -121,7 +129,7 @@ export default async function RewardManagementPage({
       </div>
 
       {/* Reward List */}
-      <RewardList rewards={rewards || []} rewardPurchases={rewardPurchases} exchangeRate={exchangeRate} />
+      <RewardList rewards={rewards || []} rewardPurchases={rewardPurchases} exchangeRate={exchangeRate} familyChildren={children} />
 
       {/* Empty State */}
       {rewards?.length === 0 && (

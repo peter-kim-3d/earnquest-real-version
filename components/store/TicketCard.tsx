@@ -24,6 +24,8 @@ type Purchase = {
   purchased_at: string;
   fulfilled_at: string | null;
   used_at: string | null;
+  is_gift?: boolean;
+  gift_message?: string | null;
   reward: {
     id: string;
     name: string;
@@ -70,6 +72,7 @@ export default function TicketCard({
   const isActive = purchase.status === 'active';
   const isPending = purchase.status === 'use_requested';
   const isUsed = purchase.status === 'used';
+  const isGift = purchase.is_gift === true;
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -141,7 +144,8 @@ export default function TicketCard({
   const showApproveButton = viewMode === 'parent' && isPending;
   const showFulfillButton =
     viewMode === 'parent' && isActive && !isScreen;
-  const showCancelButton = viewMode === 'child' && isActive;
+  // Don't show cancel button for gifts (nothing to refund)
+  const showCancelButton = viewMode === 'child' && isActive && !isGift;
 
   return (
     <div
@@ -163,11 +167,22 @@ export default function TicketCard({
             ? 'bg-yellow-50 dark:bg-yellow-900/20'
             : isUsed
               ? 'bg-green-50 dark:bg-green-900/20'
-              : 'bg-gray-50 dark:bg-gray-900/20'
+              : isGift
+                ? 'bg-pink-50 dark:bg-pink-900/20'
+                : 'bg-gray-50 dark:bg-gray-900/20'
           }
         `}
       >
         <div className="flex items-center gap-2">
+          {isGift && (
+            <>
+              <Gift size={16} weight="fill" className="text-pink-500" />
+              <span className="text-sm font-semibold text-pink-600 dark:text-pink-400">
+                {t('gift')}
+              </span>
+              <span className="text-text-muted dark:text-gray-500">·</span>
+            </>
+          )}
           {isPending ? (
             <>
               <Clock size={16} className="text-yellow-600 dark:text-yellow-400" />
@@ -231,14 +246,26 @@ export default function TicketCard({
           </p>
         )}
 
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-text-muted dark:text-gray-500">
-            {t('pointsSpent')}
-          </span>
-          <span className="font-bold text-primary tabular-nums">
-            {purchase.points_spent} QP
-          </span>
-        </div>
+        {/* Gift Message */}
+        {isGift && purchase.gift_message && (
+          <div className="mb-3 p-3 rounded-lg bg-pink-50 dark:bg-pink-900/20 border border-pink-200 dark:border-pink-800">
+            <p className="text-sm text-pink-800 dark:text-pink-200 italic">
+              &ldquo;{purchase.gift_message}&rdquo;
+            </p>
+          </div>
+        )}
+
+        {/* Only show points spent if not a gift */}
+        {!isGift && (
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-text-muted dark:text-gray-500">
+              {t('pointsSpent')}
+            </span>
+            <span className="font-bold text-primary tabular-nums">
+              {purchase.points_spent} QP
+            </span>
+          </div>
+        )}
 
         {purchase.reward.screen_minutes && (
           <div className="mt-2 flex items-center justify-between text-sm">

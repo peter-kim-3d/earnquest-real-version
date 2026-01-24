@@ -154,5 +154,18 @@
       "hoursAgo": "{count}시간 전",
       "daysAgo": "{count}일 전"
     }
+  },
+  "gift": {
+    "menuItem": "아이에게 선물하기",
+    "title": "보상 선물",
+    "description": "아이에게 특별한 선물로 이 보상을 보내세요!",
+    "selectChild": "아이 선택",
+    "messageLabel": "메시지 추가",
+    "messagePlaceholder": "예: 이번 주 정말 잘했어!",
+    "send": "선물 보내기",
+    "sending": "보내는 중...",
+    "success": "선물 완료!",
+    "successDescription": "{name}에게 {reward}을(를) 보냈어요!",
+    "failed": "선물 실패"
   }
 }

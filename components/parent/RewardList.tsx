@@ -7,8 +7,12 @@ import dynamic from 'next/dynamic';
 import RewardCard from './RewardCard';
 import { ExchangeRate, DEFAULT_EXCHANGE_RATE } from '@/lib/utils/exchange-rate';
 
-// Dynamic import for heavy dialog component
+// Dynamic import for heavy dialog components
 const RewardFormDialog = dynamic(() => import('./RewardFormDialog'), {
+  ssr: false,
+});
+
+const GiftRewardDialog = dynamic(() => import('./GiftRewardDialog'), {
   ssr: false,
 });
 
@@ -26,16 +30,26 @@ type Reward = {
   created_at: string;
 };
 
+type Child = {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  avatar_preset: string | null;
+};
+
 interface RewardListProps {
   rewards: Reward[];
   rewardPurchases: Map<string, number>;
   exchangeRate?: ExchangeRate;
+  familyChildren?: Child[];
 }
 
-export default function RewardList({ rewards, rewardPurchases, exchangeRate = DEFAULT_EXCHANGE_RATE }: RewardListProps) {
+export default function RewardList({ rewards, rewardPurchases, exchangeRate = DEFAULT_EXCHANGE_RATE, familyChildren = [] }: RewardListProps) {
   const t = useTranslations('rewards');
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isGiftDialogOpen, setIsGiftDialogOpen] = useState(false);
+  const [giftReward, setGiftReward] = useState<Reward | null>(null);
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
 
   const handleNew = useCallback(() => {
@@ -51,6 +65,16 @@ export default function RewardList({ rewards, rewardPurchases, exchangeRate = DE
   const handleCloseDialog = useCallback(() => {
     setSelectedReward(null);
     setIsDialogOpen(false);
+  }, []);
+
+  const handleGift = useCallback((reward: Reward) => {
+    setGiftReward(reward);
+    setIsGiftDialogOpen(true);
+  }, []);
+
+  const handleCloseGiftDialog = useCallback(() => {
+    setGiftReward(null);
+    setIsGiftDialogOpen(false);
   }, []);
 
   const filteredRewards = useMemo(() => rewards.filter((reward) => {
@@ -136,6 +160,7 @@ export default function RewardList({ rewards, rewardPurchases, exchangeRate = DE
                   reward={reward}
                   purchaseCount={rewardPurchases.get(reward.id) || 0}
                   onEdit={() => handleEdit(reward)}
+                  onGift={familyChildren.length > 0 ? () => handleGift(reward) : undefined}
                 />
               ))}
             </div>
@@ -149,6 +174,14 @@ export default function RewardList({ rewards, rewardPurchases, exchangeRate = DE
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
         exchangeRate={exchangeRate}
+      />
+
+      {/* Gift Reward Dialog */}
+      <GiftRewardDialog
+        reward={giftReward}
+        familyChildren={familyChildren}
+        isOpen={isGiftDialogOpen}
+        onClose={handleCloseGiftDialog}
       />
     </div >
   );
