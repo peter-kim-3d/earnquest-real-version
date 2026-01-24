@@ -65,10 +65,15 @@ export default async function RewardManagementPage({
   const rewards = (rewardsResult.data || []) as any[];
   const purchaseStats = (purchaseStatsResult.data || []) as { reward_id: string; status: string }[];
   const exchangeRate = (familyResult.data?.point_exchange_rate || DEFAULT_EXCHANGE_RATE) as ExchangeRate;
-  const children = (childrenResult.data || []) as { id: string; name: string; avatar_url: string | null; avatar_preset: string | null }[];
 
-  // Debug: log children data
-  console.log('[rewards/page] Children fetched:', children.length, children.map(c => c.name));
+  // Debug: log children query result
+  console.log('[rewards/page] Children query result:', {
+    data: childrenResult.data,
+    error: childrenResult.error,
+    familyId: userProfile.family_id
+  });
+
+  const children = (childrenResult.data || []) as { id: string; name: string; avatar_url: string | null; avatar_preset: string | null }[];
 
   // Calculate purchase count per reward
   const rewardPurchases = new Map<string, number>();
@@ -133,6 +138,13 @@ export default async function RewardManagementPage({
           </p>
         </div>
       </div>
+
+      {/* Debug: Show children count */}
+      {process.env.NODE_ENV === 'development' || true ? (
+        <div className="mb-4 p-2 bg-yellow-100 dark:bg-yellow-900 rounded text-sm">
+          Debug: Children count = {children.length}, Error = {childrenResult.error?.message || 'none'}
+        </div>
+      ) : null}
 
       {/* Reward List */}
       <RewardList rewards={rewards || []} rewardPurchases={rewardPurchases} exchangeRate={exchangeRate} familyChildren={children} />
