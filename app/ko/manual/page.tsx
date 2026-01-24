@@ -3,7 +3,9 @@
 'use client';
 
 import { useState } from 'react';
-import { BookOpen, Users, Baby, Settings, Gift, Heart, CheckCircle, Home } from 'lucide-react';
+import { Users, Baby, Settings, Gift, Heart, CheckCircle, Home } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function ManualPageKo() {
   const [activeSection, setActiveSection] = useState('getting-started');
@@ -14,24 +16,32 @@ export default function ManualPageKo() {
       <header className="bg-white border-b border-[#2bb800]/20 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <BookOpen className="w-8 h-8 text-[#2bb800]" />
+            <Image src="/logo.png" alt="EarnQuest" width={40} height={40} />
             <div>
-              <h1 className="font-display text-2xl font-bold text-[#121811]">EarnQuest 사용자 매뉴얼</h1>
-              <p className="text-sm text-[#688961]">부모님과 아이들을 위한 완전한 가이드</p>
+              <h1 className="font-display text-2xl font-bold text-[#121811]">EarnQuest 매뉴얼</h1>
+              <p className="text-sm text-[#688961]">가족을 위한 완전한 가이드</p>
             </div>
           </div>
-          <a href="/ko/pamphlet" className="text-[#2bb800] hover:text-[#229900] font-semibold flex items-center gap-2">
-            <Home className="w-4 h-4" />
-            홈으로
-          </a>
+          <div className="flex items-center gap-4">
+            <a href="/ko/pamphlet" className="text-[#688961] hover:text-[#121811] font-medium flex items-center gap-2 transition-colors">
+              <Home className="w-4 h-4" />
+              홈
+            </a>
+            <Link href="/ko-KR/login" className="bg-[#2bb800] hover:bg-[#229900] px-5 py-2 rounded-full text-white font-semibold transition-all">
+              로그인
+            </Link>
+          </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-12 flex gap-8">
         {/* Sidebar Navigation */}
-        <aside className="w-64 flex-shrink-0 sticky top-24 h-fit">
-          <nav className="bg-white rounded-2xl p-6 shadow-card">
-            <h3 className="font-display font-bold text-[#121811] mb-4 text-sm uppercase tracking-wide">목차</h3>
+        <aside className="w-64 flex-shrink-0 sticky top-24 h-fit hidden md:block">
+          <nav className="bg-gradient-to-br from-white to-[#f6f8f6] rounded-2xl p-6 shadow-card border border-[#2bb800]/10">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-2 h-2 rounded-full bg-[#2bb800]" />
+              <h3 className="font-display font-bold text-[#121811] text-sm uppercase tracking-wide">목차</h3>
+            </div>
             <ul className="space-y-2">
               {sections.map((section) => (
                 <li key={section.id}>
@@ -39,8 +49,8 @@ export default function ManualPageKo() {
                     onClick={() => setActiveSection(section.id)}
                     className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3 ${
                       activeSection === section.id
-                        ? 'bg-[#2bb800] text-white'
-                        : 'text-[#688961] hover:bg-[#f6f8f6]'
+                        ? 'bg-gradient-to-r from-[#2bb800] to-[#25a000] text-white shadow-md'
+                        : 'text-[#688961] hover:bg-white hover:shadow-sm'
                     }`}
                   >
                     <section.icon className="w-5 h-5 flex-shrink-0" />

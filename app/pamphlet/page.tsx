@@ -1,21 +1,42 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 /* eslint-disable react/no-unescaped-entities */
 
-import { Sparkle, Target, Heart, TrendUp, Users, Shield, Lightning, Medal, Star, CheckCircle } from '@phosphor-icons/react/dist/ssr';
+import { Sparkle, Target, Heart, TrendUp, Users, Shield, Lightning, Medal } from '@phosphor-icons/react/dist/ssr';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function PamphletPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f6f8f6] via-white to-[#f6f8f6]">
       {/* Hero Section with Family Image */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#2bb800] to-[#229900] text-white py-24 px-6">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#2bb800] via-[#25a000] to-[#1d8500] text-white pt-6 pb-24 px-6">
+        {/* Navigation Header */}
+        <nav className="max-w-6xl mx-auto mb-12 relative z-20">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm p-1">
+                <Image src="/logo.png" alt="EarnQuest" width={32} height={32} />
+              </div>
+              <span className="font-display text-xl font-bold text-white">EarnQuest</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <a href="/manual" className="text-white/80 hover:text-white transition-colors font-medium">
+                Manual
+              </a>
+              <Link href="/en-US/login" className="bg-white/20 hover:bg-white/30 px-5 py-2 rounded-full text-white font-semibold backdrop-blur-sm transition-all">
+                Login
+              </Link>
+            </div>
+          </div>
+        </nav>
+
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Text Content */}
             <div className="text-center md:text-left">
               <div className="inline-block mb-6">
-                <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                  <Star size={48} weight="fill" />
+                <div className="w-24 h-24 bg-white/20 rounded-3xl flex items-center justify-center backdrop-blur-sm p-3 shadow-lg">
+                  <Image src="/logo.png" alt="EarnQuest" width={80} height={80} />
                 </div>
               </div>
               <h1 className="font-display text-6xl md:text-7xl font-bold mb-6 tracking-tight">
@@ -27,9 +48,9 @@ export default function PamphletPage() {
               <p className="text-lg md:text-xl font-body opacity-90 leading-relaxed mb-8">
                 Transform family routines into exciting adventures. Watch your children develop lifelong habits through motivation, trust, and positive reinforcement.
               </p>
-              <button className="bg-white text-[#2bb800] px-10 py-4 rounded-full text-lg font-bold hover:bg-opacity-90 transition-all transform hover:scale-105 shadow-xl">
+              <Link href="/en-US/signup" className="inline-block bg-white text-[#2bb800] px-10 py-4 rounded-full text-lg font-bold hover:bg-opacity-90 transition-all transform hover:scale-105 shadow-xl">
                 Get Started Free
-              </button>
+              </Link>
             </div>
 
             {/* Hero Image */}
@@ -135,17 +156,19 @@ export default function PamphletPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6 bg-gradient-to-br from-[#2bb800] to-[#229900] text-white">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="py-24 px-6 bg-gradient-to-br from-[#2bb800] via-[#25a000] to-[#1d8500] text-white relative overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
+        <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="font-display text-5xl md:text-6xl font-bold mb-8">
             Start Your Family's Quest Today
           </h2>
           <p className="text-2xl mb-12 opacity-95">
             Join thousands of families building better habits together
           </p>
-          <button className="bg-white text-[#2bb800] px-16 py-5 rounded-full text-xl font-bold hover:bg-opacity-90 transition-all transform hover:scale-105 shadow-2xl">
+          <Link href="/en-US/signup" className="inline-block bg-white text-[#2bb800] px-16 py-5 rounded-full text-xl font-bold hover:bg-opacity-90 transition-all transform hover:scale-105 shadow-2xl">
             Get Started Free
-          </button>
+          </Link>
           <p className="mt-8 text-sm opacity-75">No credit card required • Free forever plan available</p>
         </div>
       </section>
@@ -155,7 +178,10 @@ export default function PamphletPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-12 mb-12">
             <div>
-              <h3 className="font-display text-2xl font-bold mb-4">EarnQuest</h3>
+              <div className="flex items-center gap-3 mb-4">
+                <Image src="/logo.png" alt="EarnQuest" width={40} height={40} />
+                <h3 className="font-display text-2xl font-bold">EarnQuest</h3>
+              </div>
               <p className="text-[#688961]">Growing habits, shining rewards</p>
             </div>
             <div>
@@ -176,7 +202,7 @@ export default function PamphletPage() {
             </div>
           </div>
           <div className="border-t border-[#688961]/30 pt-8 text-center text-[#688961] text-sm">
-            © 2025 EarnQuest. All rights reserved.
+            © 2026 EarnQuest. All rights reserved.
           </div>
         </div>
       </footer>
