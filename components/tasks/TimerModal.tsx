@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, RotateCcw, Check } from 'lucide-react';
@@ -29,34 +29,113 @@ export default function TimerModal({
   const [adjustedMinutes, setAdjustedMinutes] = useState(
     initialState ? Math.ceil(initialState.totalSeconds / 60) : timerMinutes
   );
-  // If initialState exists, stick to it, otherwise default calculation
   const [timeLeft, setTimeLeft] = useState(
     initialState ? initialState.remainingSeconds : timerMinutes * 60
   );
   const [isRunning, setIsRunning] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const startTimeRef = useRef<number>(0);
+  const pausedTimeLeftRef = useRef<number>(0);
 
   const totalSeconds = adjustedMinutes * 60;
-  // Fix progress calculation: if saved state exists, we need consistent total
-  // Actually, let's trust adjustedMinutes derived from totalSeconds or passed in
-
   const progress = totalSeconds > 0 ? ((totalSeconds - timeLeft) / totalSeconds) * 100 : 0;
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
-  // Countdown logic
+  // Request Wake Lock to prevent screen from sleeping
+  const requestWakeLock = useCallback(async () => {
+    try {
+      if ('wakeLock' in navigator && isRunning) {
+        wakeLockRef.current = await navigator.wakeLock.request('screen');
+        console.log('Wake Lock activated for task timer');
+      }
+    } catch (err) {
+      console.log('Wake Lock not supported or failed:', err);
+    }
+  }, [isRunning]);
+
+  // Release Wake Lock
+  const releaseWakeLock = useCallback(() => {
+    if (wakeLockRef.current) {
+      wakeLockRef.current.release();
+      wakeLockRef.current = null;
+      console.log('Wake Lock released');
+    }
+  }, []);
+
+  // Wake Lock management
+  useEffect(() => {
+    if (isRunning && isOpen) {
+      requestWakeLock();
+    } else {
+      releaseWakeLock();
+    }
+
+    // Re-acquire wake lock when page becomes visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && isRunning && isOpen) {
+        requestWakeLock();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      releaseWakeLock();
+    };
+  }, [isRunning, isOpen, requestWakeLock, releaseWakeLock]);
+
+  // Handle visibility change - recalculate time when returning from background
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && isRunning && startTimeRef.current > 0) {
+        // Calculate how much time has actually passed since timer started
+        const now = Date.now();
+        const elapsedSeconds = Math.floor((now - startTimeRef.current) / 1000);
+        const newTimeLeft = Math.max(0, pausedTimeLeftRef.current - elapsedSeconds);
+
+        setTimeLeft(newTimeLeft);
+
+        // Check if timer expired while in background
+        if (newTimeLeft === 0) {
+          setIsRunning(false);
+          setIsCompleted(true);
+          playAlarmSound();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isRunning]);
+
+  // Timer countdown logic using real time
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
+      // Record start time and initial time left
+      startTimeRef.current = Date.now();
+      pausedTimeLeftRef.current = timeLeft;
+
       intervalRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            setIsRunning(false);
-            setIsCompleted(true);
-            return 0;
+        const now = Date.now();
+        const elapsedSeconds = Math.floor((now - startTimeRef.current) / 1000);
+        const newTimeLeft = Math.max(0, pausedTimeLeftRef.current - elapsedSeconds);
+
+        setTimeLeft(newTimeLeft);
+
+        if (newTimeLeft === 0) {
+          setIsRunning(false);
+          setIsCompleted(true);
+          playAlarmSound();
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
           }
-          return prev - 1;
-        });
+        }
       }, 1000);
     } else {
       if (intervalRef.current) {
@@ -69,7 +148,68 @@ export default function TimerModal({
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning, timeLeft]);
+  }, [isRunning]);
+
+  // Play alarm sound when timer completes
+  const playAlarmSound = () => {
+    try {
+      // Try to play notification sound from public folder
+      if (!audioRef.current) {
+        audioRef.current = new Audio('/sounds/timer-complete.mp3');
+      }
+      audioRef.current.play().catch(() => {
+        // If file doesn't exist, generate beep sound with Web Audio API
+        playBeepSound();
+      });
+    } catch {
+      // Fallback to beep sound
+      playBeepSound();
+    }
+  };
+
+  const playBeepSound = () => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+
+      // Create oscillator for beep sound - 3 beeps
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = 800;
+      gainNode.gain.value = 0.3;
+
+      oscillator.start(audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      oscillator.stop(audioContext.currentTime + 0.3);
+
+      // Second beep
+      const osc2 = audioContext.createOscillator();
+      const gain2 = audioContext.createGain();
+      osc2.connect(gain2);
+      gain2.connect(audioContext.destination);
+      osc2.frequency.value = 800;
+      gain2.gain.value = 0.3;
+      osc2.start(audioContext.currentTime + 0.4);
+      gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.7);
+      osc2.stop(audioContext.currentTime + 0.7);
+
+      // Third beep (higher pitch)
+      const osc3 = audioContext.createOscillator();
+      const gain3 = audioContext.createGain();
+      osc3.connect(gain3);
+      gain3.connect(audioContext.destination);
+      osc3.frequency.value = 1000;
+      gain3.gain.value = 0.3;
+      osc3.start(audioContext.currentTime + 0.8);
+      gain3.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.2);
+      osc3.stop(audioContext.currentTime + 1.2);
+    } catch (err) {
+      console.log('Could not play beep sound:', err);
+    }
+  };
 
   // Reset when modal opens
   useEffect(() => {
@@ -78,7 +218,6 @@ export default function TimerModal({
         // Resume mode
         setAdjustedMinutes(Math.ceil(initialState.totalSeconds / 60));
         setTimeLeft(initialState.remainingSeconds);
-        // Don't auto-start on resume, let user click Resume
       } else {
         // Fresh start
         setAdjustedMinutes(timerMinutes);
@@ -86,8 +225,9 @@ export default function TimerModal({
       }
       setIsRunning(false);
       setIsCompleted(false);
+      startTimeRef.current = 0;
     }
-  }, [isOpen, timerMinutes]); // Added initialState to deps only if deep checked, but here okay.
+  }, [isOpen, timerMinutes, initialState]);
 
   const handleStart = () => {
     setIsRunning(true);
@@ -104,8 +244,9 @@ export default function TimerModal({
   const handleReset = () => {
     setIsRunning(false);
     setTimeLeft(timerMinutes * 60);
-    setAdjustedMinutes(timerMinutes); // Reset total too
+    setAdjustedMinutes(timerMinutes);
     setIsCompleted(false);
+    startTimeRef.current = 0;
     // Clear saved state
     if (onSave) {
       onSave({ remainingSeconds: timerMinutes * 60, totalSeconds: timerMinutes * 60 });
@@ -147,8 +288,6 @@ export default function TimerModal({
         </DialogHeader>
 
         <div className="py-6">
-          {/* v2: Removed +/- buttons as per request. Duration is fixed to parent setting initially. */}
-
           {/* Circular Progress Timer */}
           <div className="relative w-48 h-48 mx-auto mb-8">
             <svg className="transform -rotate-90 w-48 h-48">
@@ -229,12 +368,6 @@ export default function TimerModal({
                   <Play className="h-5 w-5 mr-2" />
                   {t('resume')}
                 </Button>
-                {/* User asked for "midway stop... show as progress".
-                    This is effectively the 'Paused' state displayed here.
-                    To fully "start again later" after closing, we would need backend persistence.
-                    For MVP, keeping the modal open in background or re-opening reset is standard.
-                    We'll stick to 'Pause' concept for now.
-                */}
               </>
             )}
 
