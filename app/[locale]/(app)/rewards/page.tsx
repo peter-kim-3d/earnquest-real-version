@@ -67,6 +67,9 @@ export default async function RewardManagementPage({
   const exchangeRate = (familyResult.data?.point_exchange_rate || DEFAULT_EXCHANGE_RATE) as ExchangeRate;
   const children = (childrenResult.data || []) as { id: string; name: string; avatar_url: string | null; avatar_preset: string | null }[];
 
+  // Debug: log children data
+  console.log('[rewards/page] Children fetched:', children.length, children.map(c => c.name));
+
   // Calculate purchase count per reward
   const rewardPurchases = new Map<string, number>();
   purchaseStats?.forEach((purchase) => {
