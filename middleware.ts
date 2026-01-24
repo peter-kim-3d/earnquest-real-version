@@ -26,7 +26,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - api (API routes)
+     * - pamphlet, manual (static marketing pages)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|pamphlet|manual|ko/pamphlet|ko/manual|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
