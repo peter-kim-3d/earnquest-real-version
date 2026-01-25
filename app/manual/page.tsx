@@ -95,7 +95,7 @@ function GettingStarted() {
           </li>
           <li className="flex items-center gap-3">
             <CheckCircle className="w-5 h-5 text-[#2bb800]" />
-            <span>Google, Apple, or email account</span>
+            <span>Google or email account</span>
           </li>
           <li className="flex items-center gap-3">
             <CheckCircle className="w-5 h-5 text-[#2bb800]" />
@@ -110,10 +110,6 @@ function GettingStarted() {
           <li className="flex gap-3">
             <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
             <div><strong>Google OAuth</strong> - One-click sign up with your Google account</div>
-          </li>
-          <li className="flex gap-3">
-            <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
-            <div><strong>Apple Sign In</strong> - Use your Apple ID for quick access</div>
           </li>
           <li className="flex gap-3">
             <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />

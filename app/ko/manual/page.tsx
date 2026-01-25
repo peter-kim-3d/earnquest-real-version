@@ -95,7 +95,7 @@ function GettingStarted() {
           </li>
           <li className="flex items-center gap-3">
             <CheckCircle className="w-5 h-5 text-[#2bb800]" />
-            <span>Google, Apple 또는 이메일 계정</span>
+            <span>Google 또는 이메일 계정</span>
           </li>
           <li className="flex items-center gap-3">
             <CheckCircle className="w-5 h-5 text-[#2bb800]" />
@@ -110,10 +110,6 @@ function GettingStarted() {
           <li className="flex gap-3">
             <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
             <div><strong>Google OAuth</strong> - Google 계정으로 원클릭 가입</div>
-          </li>
-          <li className="flex gap-3">
-            <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
-            <div><strong>Apple 로그인</strong> - Apple ID로 빠른 접속</div>
           </li>
           <li className="flex gap-3">
             <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />

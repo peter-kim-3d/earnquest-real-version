@@ -135,25 +135,6 @@ export default function PamphletPageKo() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-12 text-center">
-            <div>
-              <div className="text-5xl font-bold text-[#2bb800] mb-4">95%</div>
-              <div className="text-xl text-[#688961]">태스크 완료율</div>
-            </div>
-            <div>
-              <div className="text-5xl font-bold text-[#2bb800] mb-4">10K+</div>
-              <div className="text-xl text-[#688961]">행복한 가족들</div>
-            </div>
-            <div>
-              <div className="text-5xl font-bold text-[#2bb800] mb-4">50%</div>
-              <div className="text-xl text-[#688961]">부모-자녀 갈등 감소</div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="py-24 px-6 bg-gradient-to-br from-[#2bb800] via-[#25a000] to-[#1d8500] text-white relative overflow-hidden">
