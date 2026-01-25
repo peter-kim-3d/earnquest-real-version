@@ -19,6 +19,8 @@ type Purchase = {
   used_at: string | null;
   started_at?: string | null;
   elapsed_seconds?: number | null;
+  paused_at?: string | null;
+  paused_seconds?: number | null;
   reward: {
     id: string;
     name: string;
@@ -272,6 +274,8 @@ export default function TicketsClientPage({
                     screenMinutes={ticket.reward.screen_minutes || 0}
                     startedAt={ticket.started_at || ticket.fulfilled_at || ''}
                     initialElapsedSeconds={ticket.elapsed_seconds || 0}
+                    initialPausedAt={ticket.paused_at}
+                    initialPausedSeconds={ticket.paused_seconds || 0}
                     onComplete={() => handleScreenTimeComplete(ticket.id)}
                   />
                 ))}

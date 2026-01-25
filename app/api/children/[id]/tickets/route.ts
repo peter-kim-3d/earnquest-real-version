@@ -27,7 +27,7 @@ export async function GET(
       `
       )
       .eq('child_id', id)
-      .in('status', ['active', 'use_requested', 'used'])
+      .in('status', ['active', 'use_requested', 'in_use', 'used'])
       .order('purchased_at', { ascending: false });
 
     if (error) {
@@ -42,6 +42,7 @@ export async function GET(
     const grouped = {
       active: tickets?.filter((t) => t.status === 'active') || [],
       use_requested: tickets?.filter((t) => t.status === 'use_requested') || [],
+      in_use: tickets?.filter((t) => t.status === 'in_use') || [],
       used: tickets?.filter((t) => t.status === 'used') || [],
     };
 
