@@ -3,12 +3,25 @@
 'use client';
 
 import { useState } from 'react';
-import { Users, Baby, Settings, Gift, Heart, CheckCircle, Home } from 'lucide-react';
+import { Users, Baby, Settings, Gift, Heart, CheckCircle, Home, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function ManualPageKo() {
   const [activeSection, setActiveSection] = useState('getting-started');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Get current section index for navigation
+  const currentIndex = sections.findIndex(s => s.id === activeSection);
+  const prevSection = currentIndex > 0 ? sections[currentIndex - 1] : null;
+  const nextSection = currentIndex < sections.length - 1 ? sections[currentIndex + 1] : null;
+  const currentSection = sections[currentIndex];
+
+  const navigateTo = (sectionId: string) => {
+    setActiveSection(sectionId);
+    setMobileMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f6f8f6] to-white">
@@ -35,7 +48,53 @@ export default function ManualPageKo() {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-12 flex gap-8">
-        {/* Sidebar Navigation */}
+        {/* Mobile Contents Toggle */}
+        <div className="md:hidden fixed bottom-4 left-4 right-4 z-40">
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="w-full bg-white rounded-2xl shadow-lg border border-[#2bb800]/20 p-4 flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-[#2bb800] to-[#25a000] flex items-center justify-center">
+                {currentSection && <currentSection.icon className="w-5 h-5 text-white" />}
+              </div>
+              <div className="text-left">
+                <p className="text-xs text-[#688961]">현재 보는 중</p>
+                <p className="font-semibold text-[#121811]">{currentSection?.title}</p>
+              </div>
+            </div>
+            <ChevronDown className={`w-5 h-5 text-[#688961] transition-transform ${mobileMenuOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {/* Mobile Menu Dropdown */}
+          {mobileMenuOpen && (
+            <nav className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-2xl shadow-lg border border-[#2bb800]/10 p-4 max-h-[60vh] overflow-y-auto">
+              <div className="flex items-center gap-2 mb-3 pb-3 border-b border-[#688961]/10">
+                <div className="w-2 h-2 rounded-full bg-[#2bb800]" />
+                <h3 className="font-display font-bold text-[#121811] text-sm uppercase tracking-wide">목차</h3>
+              </div>
+              <ul className="space-y-1">
+                {sections.map((section) => (
+                  <li key={section.id}>
+                    <button
+                      onClick={() => navigateTo(section.id)}
+                      className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3 ${
+                        activeSection === section.id
+                          ? 'bg-gradient-to-r from-[#2bb800] to-[#25a000] text-white shadow-md'
+                          : 'text-[#688961] hover:bg-[#f6f8f6]'
+                      }`}
+                    >
+                      <section.icon className="w-5 h-5 flex-shrink-0" />
+                      <span className="font-medium text-sm">{section.title}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+        </div>
+
+        {/* Sidebar Navigation - Desktop */}
         <aside className="w-64 flex-shrink-0 sticky top-24 h-fit hidden md:block">
           <nav className="bg-gradient-to-br from-white to-[#f6f8f6] rounded-2xl p-6 shadow-card border border-[#2bb800]/10">
             <div className="flex items-center gap-2 mb-4">
@@ -46,7 +105,7 @@ export default function ManualPageKo() {
               {sections.map((section) => (
                 <li key={section.id}>
                   <button
-                    onClick={() => setActiveSection(section.id)}
+                    onClick={() => navigateTo(section.id)}
                     className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3 ${
                       activeSection === section.id
                         ? 'bg-gradient-to-r from-[#2bb800] to-[#25a000] text-white shadow-md'
@@ -63,8 +122,8 @@ export default function ManualPageKo() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1">
-          <div className="bg-white rounded-2xl p-12 shadow-card">
+        <main className="flex-1 pb-24 md:pb-0">
+          <div className="bg-white rounded-2xl p-6 md:p-12 shadow-card">
             {activeSection === 'getting-started' && <GettingStarted />}
             {activeSection === 'parent-guide' && <ParentGuide />}
             {activeSection === 'child-guide' && <ChildGuide />}
@@ -72,6 +131,59 @@ export default function ManualPageKo() {
             {activeSection === 'rewards' && <RewardsGuide />}
             {activeSection === 'kindness' && <KindnessGuide />}
             {activeSection === 'settings' && <SettingsGuide />}
+
+            {/* Bottom Navigation */}
+            <div className="mt-12 pt-8 border-t border-[#688961]/20">
+              <div className="flex items-center justify-between gap-4">
+                {/* Previous */}
+                {prevSection ? (
+                  <button
+                    onClick={() => navigateTo(prevSection.id)}
+                    className="flex-1 flex items-center gap-3 p-4 rounded-xl border border-[#688961]/20 hover:border-[#2bb800] hover:bg-[#2bb800]/5 transition-all group text-left"
+                  >
+                    <ChevronLeft className="w-5 h-5 text-[#688961] group-hover:text-[#2bb800] flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs text-[#688961]">이전</p>
+                      <p className="font-semibold text-[#121811] truncate">{prevSection.title}</p>
+                    </div>
+                  </button>
+                ) : (
+                  <div className="flex-1" />
+                )}
+
+                {/* Current Page Indicator */}
+                <div className="hidden md:flex items-center gap-1">
+                  {sections.map((section, index) => (
+                    <button
+                      key={section.id}
+                      onClick={() => navigateTo(section.id)}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        index === currentIndex
+                          ? 'w-6 bg-[#2bb800]'
+                          : 'bg-[#688961]/30 hover:bg-[#688961]/50'
+                      }`}
+                      title={section.title}
+                    />
+                  ))}
+                </div>
+
+                {/* Next */}
+                {nextSection ? (
+                  <button
+                    onClick={() => navigateTo(nextSection.id)}
+                    className="flex-1 flex items-center justify-end gap-3 p-4 rounded-xl border border-[#688961]/20 hover:border-[#2bb800] hover:bg-[#2bb800]/5 transition-all group text-right"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-xs text-[#688961]">다음</p>
+                      <p className="font-semibold text-[#121811] truncate">{nextSection.title}</p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-[#688961] group-hover:text-[#2bb800] flex-shrink-0" />
+                  </button>
+                ) : (
+                  <div className="flex-1" />
+                )}
+              </div>
+            </div>
           </div>
         </main>
       </div>
