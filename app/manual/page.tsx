@@ -95,51 +95,87 @@ function GettingStarted() {
           </li>
           <li className="flex items-center gap-3">
             <CheckCircle className="w-5 h-5 text-[#2bb800]" />
-            <span>Email address or Google/Apple account</span>
+            <span>Google, Apple, or email account</span>
           </li>
           <li className="flex items-center gap-3">
             <CheckCircle className="w-5 h-5 text-[#2bb800]" />
-            <span>Your child's age and name</span>
+            <span>Your child's name and birthdate</span>
           </li>
         </ul>
       </div>
 
-      <h2 className="font-display text-3xl font-bold text-[#121811] mt-10 mb-6">Step-by-Step Setup</h2>
+      <Section title="Parent Sign Up">
+        <p className="text-[#688961] mb-4">Three ways to create your parent account:</p>
+        <ul className="space-y-2 text-[#688961]">
+          <li className="flex gap-3">
+            <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
+            <div><strong>Google OAuth</strong> - One-click sign up with your Google account</div>
+          </li>
+          <li className="flex gap-3">
+            <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
+            <div><strong>Apple Sign In</strong> - Use your Apple ID for quick access</div>
+          </li>
+          <li className="flex gap-3">
+            <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
+            <div><strong>Email + Password</strong> - Traditional sign up with email confirmation</div>
+          </li>
+        </ul>
+      </Section>
 
-      <StepItem
-        number={1}
-        title="Create Your Account"
-        description="Sign up using your email, Google, or Apple account. This will be your parent account."
-      />
+      <Section title="4-Step Onboarding">
+        <StepItem
+          number={1}
+          title="Add Your Children"
+          description="Enter each child's name and birthdate. The system automatically assigns an age group:"
+          items={[
+            "🐣 Mini Earners (5-7 years) - Simple tasks, lots of encouragement",
+            "🚀 Pro Earners (8-11 years) - Balanced challenge and responsibility",
+            "🎓 Teen Earners (12-14 years) - More autonomy and complex tasks"
+          ]}
+        />
 
-      <StepItem
-        number={2}
-        title="Add Your Children"
-        description="Enter your child's name, age, and choose an avatar. You can add multiple children to the same family account."
-      />
+        <StepItem
+          number={2}
+          title="Select Your Style"
+          description="Choose a task preset and optional add-on modules:"
+          items={[
+            "🌱 Starter (5 tasks, ~70 daily XP) - Minimal set for building habits gradually",
+            "⭐ Balanced (8 tasks, ~125 daily XP) - Recommended for most families",
+            "📖 Learning Focus (6 tasks, ~110 daily XP) - Academic emphasis"
+          ]}
+        />
 
-      <StepItem
-        number={3}
-        title="Choose a Parenting Style"
-        description="Select from three presets that match your family's values:"
-        items={[
-          "Easy Start - Minimal tasks, focus on building habits gradually",
-          "Balanced - Mix of tasks across learning, chores, and health",
-          "Learning Focus - Emphasize homework and educational activities"
-        ]}
-      />
+        <div className="bg-[#f6f8f6] rounded-xl p-4 ml-14 mb-6">
+          <p className="text-sm text-[#688961] font-medium mb-2">Optional Add-on Modules:</p>
+          <ul className="text-sm text-[#688961] space-y-1">
+            <li>🧼 <strong>Hygiene Routine</strong> - Brush teeth, wash hands, shower</li>
+            <li>💪 <strong>Fitness</strong> - Exercise and outdoor play</li>
+            <li>🎵 <strong>Hobby</strong> - Practice instrument, art/craft</li>
+          </ul>
+        </div>
 
-      <StepItem
-        number={4}
-        title="Review Default Tasks & Rewards"
-        description="We've created age-appropriate tasks and rewards based on your choices. You can customize them anytime."
-      />
+        <StepItem
+          number={3}
+          title="Family Values"
+          description="Toggle family values that appear as daily reminders (optional). Examples: Gratitude, Greetings, Honesty, Respect, Clean Spaces."
+        />
 
-      <StepItem
-        number={5}
-        title="Launch and Share"
-        description="Show your child the app! Walk through their dashboard together and explain how they can earn points and redeem rewards."
-      />
+        <StepItem
+          number={4}
+          title="Complete & Launch"
+          description="Review your setup summary and start using EarnQuest! You can always adjust tasks and rewards later from the dashboard."
+        />
+      </Section>
+
+      <Section title="Child Login Setup">
+        <p className="text-[#688961] mb-4">After onboarding, set up child access:</p>
+        <ol className="space-y-3 text-[#688961]">
+          <li>1. Go to <strong>Settings → Device Connection</strong> to find your 6-character family code</li>
+          <li>2. (Optional) Enable <strong>PIN Protection</strong> and set a 4-digit PIN for each child</li>
+          <li>3. On the child's device, go to the child login page and enter the family code</li>
+          <li>4. Select the child's profile (and enter PIN if required)</li>
+        </ol>
+      </Section>
 
       <div className="bg-[#0ea5e9]/10 rounded-xl p-6 mt-10">
         <h3 className="font-display text-xl font-bold text-[#121811] mb-2 flex items-center gap-2">
@@ -160,86 +196,114 @@ function ParentGuide() {
       <h1 className="font-display text-5xl font-bold text-[#121811] mb-6">Parent Guide</h1>
       <p className="text-xl text-[#688961] mb-8">Everything you need to manage your family's EarnQuest experience.</p>
 
-      <Section title="Managing Tasks">
-        <p className="text-[#688961] mb-4">As a parent, you have full control over the task system.</p>
+      <Section title="Dashboard Overview">
+        <p className="text-[#688961] mb-4">Your dashboard shows everything at a glance:</p>
+        <div className="grid md:grid-cols-3 gap-4 my-6">
+          <div className="bg-blue-50 rounded-xl p-4">
+            <h4 className="font-bold text-[#121811] mb-2">⚡ Active Tasks</h4>
+            <p className="text-sm text-[#688961]">Total tasks currently active for your family</p>
+          </div>
+          <div className="bg-orange-50 rounded-xl p-4">
+            <h4 className="font-bold text-[#121811] mb-2">🔔 Pending Approvals</h4>
+            <p className="text-sm text-[#688961]">Tasks waiting for your review</p>
+          </div>
+          <div className="bg-purple-50 rounded-xl p-4">
+            <h4 className="font-bold text-[#121811] mb-2">📈 Weekly XP</h4>
+            <p className="text-sm text-[#688961]">Total family points earned this week</p>
+          </div>
+        </div>
+        <p className="text-[#688961]">The <strong>Action Center</strong> shows all pending task completions. You can approve tasks individually or use batch approval to handle multiple tasks at once.</p>
+      </Section>
 
+      <Section title="Managing Tasks">
         <SubSection title="Creating a Task">
           <ol className="space-y-3 text-[#688961]">
-            <li>1. Go to Parent Dashboard → Tasks</li>
-            <li>2. Click "Add Task"</li>
-            <li>3. Fill in task details:
+            <li>1. Go to <strong>Tasks</strong> page and click "New Task"</li>
+            <li>2. Fill in task details:
               <ul className="ml-6 mt-2 space-y-1">
-                <li>• Task name and description</li>
-                <li>• Category (Learning, Chores, Health)</li>
-                <li>• Point value (typically 20-50 points)</li>
-                <li>• Approval method</li>
+                <li>• <strong>Task name</strong> and optional description</li>
+                <li>• <strong>Icon or image</strong> - Choose from library or upload custom</li>
+                <li>• <strong>Category</strong> - 📚 Learning, 🏡 Life Skills, or ❤️ Health</li>
+                <li>• <strong>Time context</strong> - ☀️ Morning, 🏠 After School, 🌙 Evening, or 📚 Anytime</li>
+                <li>• <strong>Points</strong> - 5 to 500 XP (use slider)</li>
               </ul>
             </li>
-            <li>4. Set schedule (daily, weekly, or custom)</li>
-            <li>5. Assign to children</li>
+            <li>3. Set frequency: Daily, Weekly (specific days), Monthly, or One Time</li>
+            <li>4. Choose approval method and assign to children</li>
           </ol>
         </SubSection>
 
         <SubSection title="Approval Methods">
           <ul className="space-y-3 text-[#688961]">
             <li className="flex gap-3">
-              <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
+              <span className="text-xl">👤</span>
               <div>
-                <strong>Parent Approval</strong> - You manually review and approve completion
+                <strong>Parent</strong> - You manually review and approve each completion
               </div>
             </li>
             <li className="flex gap-3">
-              <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
+              <span className="text-xl">⏱️</span>
               <div>
-                <strong>Auto-Approve</strong> - System automatically approves when child marks complete (for trusted tasks)
+                <strong>Timer</strong> - Child runs a timer (1-180 mins), auto-completes when done. Points auto-calculate at 1.5 XP/minute.
               </div>
             </li>
             <li className="flex gap-3">
-              <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
+              <span className="text-xl">✓</span>
               <div>
-                <strong>Timer</strong> - Child starts a timer, task auto-completes when timer ends
+                <strong>Checklist</strong> - Child checks off sub-steps, then submits for your approval
               </div>
             </li>
             <li className="flex gap-3">
-              <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
+              <span className="text-xl">⚡</span>
               <div>
-                <strong>Checklist</strong> - Child checks off sub-items, parent approves final checklist
+                <strong>Auto</strong> - Auto-approves after 24 hours (use sparingly for trusted tasks)
               </div>
             </li>
           </ul>
         </SubSection>
       </Section>
 
-      <Section title="Approving Completed Tasks">
-        <p className="text-[#688961] mb-4">When your child completes a task requiring approval:</p>
-        <ol className="space-y-2 text-[#688961]">
-          <li>1. You'll receive a notification</li>
-          <li>2. Review the task completion (check photo if required)</li>
-          <li>3. Tap "Approve" to award points, or "Reject" with feedback</li>
-          <li>4. Your child receives points instantly upon approval</li>
-        </ol>
+      <Section title="Action Center">
+        <p className="text-[#688961] mb-4">Handle task approvals efficiently:</p>
+        <ul className="space-y-2 text-[#688961]">
+          <li>• <strong>Confirm Complete</strong> - Approve the task and award XP</li>
+          <li>• <strong>Request Fix</strong> - Send feedback and ask child to redo (choose from quick fixes or write custom message)</li>
+          <li>• <strong>Batch Approve</strong> - Select multiple tasks and approve all at once</li>
+        </ul>
       </Section>
 
-      <Section title="Managing the Reward Store">
-        <SubSection title="Adding Rewards">
-          <ol className="space-y-2 text-[#688961]">
-            <li>1. Navigate to Parent Dashboard → Store</li>
-            <li>2. Click "Add Reward"</li>
-            <li>3. Choose reward type:
-              <ul className="ml-6 mt-2 space-y-1">
-                <li>• Screen Time (e.g., "30 mins iPad time")</li>
-                <li>• Experience (e.g., "Movie night choice")</li>
-                <li>• Privilege (e.g., "Stay up 30 mins late")</li>
-                <li>• Physical (e.g., "Small toy from store")</li>
-              </ul>
-            </li>
-            <li>4. Set the cost in points</li>
-            <li>5. Add description and optional image</li>
-          </ol>
+      <Section title="Managing Rewards">
+        <SubSection title="Reward Categories">
+          <div className="grid md:grid-cols-2 gap-3 my-4">
+            <div className="bg-blue-50 rounded-lg p-3">
+              <strong>📺 Screen Time</strong>
+              <p className="text-sm text-[#688961]">Digital device time with built-in timer</p>
+            </div>
+            <div className="bg-orange-50 rounded-lg p-3">
+              <strong>🔓 Power Ups</strong>
+              <p className="text-sm text-[#688961]">Instant redemption (e.g., skip a chore)</p>
+            </div>
+            <div className="bg-pink-50 rounded-lg p-3">
+              <strong>🎉 Fun Stuff</strong>
+              <p className="text-sm text-[#688961]">Experiences you fulfill manually</p>
+            </div>
+            <div className="bg-teal-50 rounded-lg p-3">
+              <strong>💰 Savings</strong>
+              <p className="text-sm text-[#688961]">Points deducted instantly (virtual savings)</p>
+            </div>
+            <div className="bg-purple-50 rounded-lg p-3">
+              <strong>🎁 Gift Cards</strong>
+              <p className="text-sm text-[#688961]">Physical items you provide later</p>
+            </div>
+          </div>
         </SubSection>
 
-        <SubSection title="Approving Purchases">
-          <p className="text-[#688961] mb-3">When your child redeems a reward, you'll receive a notification. Review and approve the purchase to confirm.</p>
+        <SubSection title="Pending Tickets">
+          <p className="text-[#688961]">When children purchase rewards, you may need to:</p>
+          <ul className="space-y-1 text-[#688961] mt-2">
+            <li>• <strong>Approve Use Request</strong> - For screen time rewards, child requests to start timer</li>
+            <li>• <strong>Mark as Given</strong> - For physical rewards/experiences you've fulfilled</li>
+          </ul>
         </SubSection>
       </Section>
 
@@ -247,10 +311,10 @@ function ParentGuide() {
         <h3 className="font-display text-xl font-bold text-[#121811] mb-2">Best Practices</h3>
         <ul className="space-y-2 text-[#688961]">
           <li>✓ Keep tasks age-appropriate and achievable</li>
-          <li>✓ Balance different task categories</li>
+          <li>✓ Balance different task categories and time contexts</li>
           <li>✓ Respond to task approvals within 24 hours</li>
           <li>✓ Review and adjust point values monthly</li>
-          <li>✓ Celebrate milestones together as a family</li>
+          <li>✓ Use the "Gift to Child" feature to reward spontaneous good behavior</li>
         </ul>
       </div>
     </div>
@@ -261,93 +325,130 @@ function ChildGuide() {
   return (
     <div className="prose prose-lg max-w-none">
       <h1 className="font-display text-5xl font-bold text-[#121811] mb-6">Guide for Kids</h1>
-      <p className="text-xl text-[#688961] mb-8">Learn how to complete tasks, earn points, and get awesome rewards!</p>
+      <p className="text-xl text-[#688961] mb-8">Learn how to complete quests, earn XP, and get awesome rewards!</p>
 
-      <Section title="Your Dashboard">
-        <p className="text-[#688961] mb-4">When you open EarnQuest, you'll see your personal dashboard with:</p>
+      <Section title="Your Quest Dashboard">
+        <p className="text-[#688961] mb-4">When you log in, you'll see your personal dashboard with:</p>
         <ul className="space-y-3 text-[#688961]">
           <li className="flex gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#2bb800]/10 flex items-center justify-center flex-shrink-0">
               <span className="text-lg">⭐</span>
             </div>
             <div>
-              <strong>Your Points</strong> - How many points you've earned
+              <strong>Your XP Balance</strong> - Quest Points you've earned and can spend
             </div>
           </li>
           <li className="flex gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#2bb800]/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-lg">📋</span>
+              <span className="text-lg">🔥</span>
             </div>
             <div>
-              <strong>Today's Tasks</strong> - Things you can do to earn points
+              <strong>Day Streak</strong> - How many days in a row you've completed tasks
             </div>
           </li>
           <li className="flex gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#2bb800]/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-lg">🏆</span>
+              <span className="text-lg">🎯</span>
             </div>
             <div>
-              <strong>Your Stats</strong> - Streak, total points, and achievements
+              <strong>Weekly Goal</strong> - Progress bar showing how close you are to your weekly XP target
             </div>
           </li>
         </ul>
+
+        <SubSection title="Task Tabs">
+          <div className="grid md:grid-cols-3 gap-3 my-4">
+            <div className="bg-green-50 rounded-lg p-3 text-center">
+              <strong>📋 To Do</strong>
+              <p className="text-sm text-[#688961]">Tasks ready to complete</p>
+            </div>
+            <div className="bg-yellow-50 rounded-lg p-3 text-center">
+              <strong>⏳ Parent Checking</strong>
+              <p className="text-sm text-[#688961]">Waiting for approval</p>
+            </div>
+            <div className="bg-blue-50 rounded-lg p-3 text-center">
+              <strong>✅ Completed</strong>
+              <p className="text-sm text-[#688961]">Done for today!</p>
+            </div>
+          </div>
+        </SubSection>
+
+        <SubSection title="Task Groups">
+          <p className="text-[#688961]">Tasks are organized by when to do them:</p>
+          <ul className="text-[#688961] mt-2 space-y-1">
+            <li>☀️ <strong>Morning</strong> - Before school tasks</li>
+            <li>🏠 <strong>After School</strong> - When you get home</li>
+            <li>🌙 <strong>Evening</strong> - Before bedtime</li>
+            <li>📚 <strong>Anytime</strong> - Do these whenever you want</li>
+          </ul>
+        </SubSection>
       </Section>
 
       <Section title="Completing Tasks">
-        <p className="text-[#688961] mb-4">Here's how to complete tasks and earn points:</p>
+        <p className="text-[#688961] mb-4">Here's how to complete tasks and earn XP:</p>
 
-        <StepItem
-          number={1}
-          title="Pick a Task"
-          description="Look at your task list and choose one to do"
-        />
+        <StepItem number={1} title="Pick a Task" description="Choose a task from your 'To Do' list" />
+        <StepItem number={2} title="Do the Task" description="Complete the activity! Do your best work." />
+        <StepItem number={3} title="Mark Complete" description="Tap the task card. For timer tasks, the timer runs automatically. For checklist tasks, check off each step." />
+        <StepItem number={4} title="Get Your XP!" description="If it's auto-approved, you get XP right away. Otherwise, wait for your parent to approve it." />
 
-        <StepItem
-          number={2}
-          title="Do the Task"
-          description="Complete the activity! Make sure you do it well."
-        />
-
-        <StepItem
-          number={3}
-          title="Mark Complete"
-          description="Tap the task and click 'Mark Complete'. Some tasks need a photo or timer."
-        />
-
-        <StepItem
-          number={4}
-          title="Wait for Approval"
-          description="Your parent will check your work and approve it. Then you get the points!"
-        />
+        <div className="bg-orange-50 rounded-xl p-4 mt-4">
+          <p className="text-sm text-[#688961]"><strong>⚠️ Needs Attention:</strong> If a parent asks you to fix something, it will show at the top of your task list with their feedback.</p>
+        </div>
       </Section>
 
       <Section title="The Reward Store">
-        <p className="text-[#688961] mb-4">Once you have enough points, you can buy rewards from the store:</p>
-        <ol className="space-y-3 text-[#688961]">
-          <li>1. Tap the "Store" button</li>
-          <li>2. Browse rewards and see how many points they cost</li>
-          <li>3. When you find something you want, tap "Redeem"</li>
-          <li>4. Your parent will approve it, and you get your reward!</li>
-        </ol>
+        <p className="text-[#688961] mb-4">Spend your hard-earned XP on rewards!</p>
+        <ul className="space-y-2 text-[#688961]">
+          <li>• <strong>Wallet Card</strong> - Shows your current XP balance</li>
+          <li>• <strong>Screen Time Budget</strong> - See how much screen time you have left today/this week</li>
+          <li>• <strong>Reward Cards</strong> - Browse and buy rewards (green = can afford, gray = need more XP)</li>
+        </ul>
+        <p className="text-[#688961] mt-4">When you buy a reward, it becomes a <strong>Ticket</strong> that goes to your "My Tickets" page.</p>
+      </Section>
+
+      <Section title="My Tickets">
+        <p className="text-[#688961] mb-4">Tickets are rewards you've purchased:</p>
+        <div className="grid md:grid-cols-2 gap-3 my-4">
+          <div className="bg-green-50 rounded-lg p-3">
+            <strong>✨ Active</strong>
+            <p className="text-sm text-[#688961]">Ready to use</p>
+          </div>
+          <div className="bg-yellow-50 rounded-lg p-3">
+            <strong>⏳ Waiting</strong>
+            <p className="text-sm text-[#688961]">Waiting for parent approval</p>
+          </div>
+          <div className="bg-blue-50 rounded-lg p-3">
+            <strong>▶️ Playing</strong>
+            <p className="text-sm text-[#688961]">Screen time running now</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-3">
+            <strong>✅ Used</strong>
+            <p className="text-sm text-[#688961]">Already enjoyed!</p>
+          </div>
+        </div>
+        <p className="text-[#688961]">For screen time rewards, tap "Use Now" to start a fullscreen timer. When time's up, you'll hear a sound!</p>
       </Section>
 
       <div className="bg-[#f49d25]/10 rounded-xl p-6 mt-8">
-        <h3 className="font-display text-xl font-bold text-[#121811] mb-3">🌟 Special: Kindness Points</h3>
+        <h3 className="font-display text-xl font-bold text-[#121811] mb-3">🌟 Kindness Badges</h3>
         <p className="text-[#688961] mb-3">
-          Did something kind without being asked? Tell your parents! Kindness actions can earn you bonus points.
+          Check your <strong>Badges</strong> page to see gratitude cards from your family! Collect cards to earn badges:
         </p>
-        <p className="text-[#688961] font-semibold">
-          Examples: Helping a sibling, sharing toys, comforting someone who's sad
-        </p>
+        <ul className="text-[#688961] space-y-1">
+          <li>🥉 <strong>Bronze Badge</strong> - 5 cards</li>
+          <li>🥈 <strong>Silver Badge</strong> - 10 cards</li>
+          <li>🥇 <strong>Gold Badge</strong> - 20 cards</li>
+        </ul>
       </div>
 
       <div className="bg-[#2bb800]/10 rounded-xl p-6 mt-6">
         <h3 className="font-display text-xl font-bold text-[#121811] mb-3">Tips for Success 💪</h3>
         <ul className="space-y-2 text-[#688961]">
           <li>✓ Check your tasks every morning</li>
-          <li>✓ Do your tasks before playing</li>
-          <li>✓ Take photos to prove completion</li>
-          <li>✓ Save points for bigger rewards</li>
+          <li>✓ Do morning tasks before school</li>
+          <li>✓ Complete timer tasks fully - don't skip!</li>
+          <li>✓ Save XP for bigger rewards (check Goals!)</li>
           <li>✓ Ask for help if a task is too hard</li>
         </ul>
       </div>
@@ -362,57 +463,107 @@ function TasksGuide() {
       <p className="text-xl text-[#688961] mb-8">Deep dive into how tasks work in EarnQuest.</p>
 
       <Section title="Task Categories">
+        <p className="text-[#688961] mb-4">Every task belongs to one of three main categories:</p>
         <div className="grid md:grid-cols-3 gap-6 my-6">
           <div className="bg-[#2bb800]/10 rounded-xl p-6">
             <h4 className="font-display text-xl font-bold text-[#121811] mb-3">📚 Learning</h4>
-            <p className="text-[#688961] text-sm">Homework, reading, educational apps, practice instruments</p>
+            <p className="text-[#688961] text-sm">Homework, reading, educational apps, writing practice, check planner</p>
           </div>
           <div className="bg-[#0ea5e9]/10 rounded-xl p-6">
-            <h4 className="font-display text-xl font-bold text-[#121811] mb-3">🏠 Chores</h4>
-            <p className="text-[#688961] text-sm">Room cleaning, dishes, laundry, pet care, yard work</p>
+            <h4 className="font-display text-xl font-bold text-[#121811] mb-3">🏡 Life Skills</h4>
+            <p className="text-[#688961] text-sm">Make bed, put away backpack, prep for tomorrow, clean desk, organize</p>
           </div>
           <div className="bg-[#f49d25]/10 rounded-xl p-6">
-            <h4 className="font-display text-xl font-bold text-[#121811] mb-3">💪 Health</h4>
-            <p className="text-[#688961] text-sm">Exercise, brushing teeth, morning routine, bedtime routine</p>
+            <h4 className="font-display text-xl font-bold text-[#121811] mb-3">❤️ Health</h4>
+            <p className="text-[#688961] text-sm">Brush teeth, shower, exercise, outdoor play, hygiene routines</p>
           </div>
         </div>
       </Section>
 
-      <Section title="Point Values Guide">
-        <p className="text-[#688961] mb-4">Recommended point values based on task difficulty and time:</p>
-        <ul className="space-y-3 text-[#688961]">
-          <li><strong>10-20 points</strong> - Quick tasks (5-10 mins): Brush teeth, make bed</li>
-          <li><strong>20-30 points</strong> - Medium tasks (10-20 mins): Clean room, read for 15 mins</li>
-          <li><strong>30-50 points</strong> - Longer tasks (20-40 mins): Homework, exercise 30 mins</li>
-          <li><strong>50+ points</strong> - Major tasks (40+ mins): Deep clean room, big school project</li>
-        </ul>
+      <Section title="Time Contexts">
+        <p className="text-[#688961] mb-4">Tasks are organized by when they should be done:</p>
+        <div className="grid md:grid-cols-4 gap-4 my-6">
+          <div className="bg-yellow-50 rounded-xl p-4 text-center">
+            <span className="text-2xl">☀️</span>
+            <h4 className="font-bold text-[#121811] mt-2">Morning</h4>
+            <p className="text-xs text-[#688961]">Before school</p>
+          </div>
+          <div className="bg-blue-50 rounded-xl p-4 text-center">
+            <span className="text-2xl">🏠</span>
+            <h4 className="font-bold text-[#121811] mt-2">After School</h4>
+            <p className="text-xs text-[#688961]">When home</p>
+          </div>
+          <div className="bg-purple-50 rounded-xl p-4 text-center">
+            <span className="text-2xl">🌙</span>
+            <h4 className="font-bold text-[#121811] mt-2">Evening</h4>
+            <p className="text-xs text-[#688961]">Before bed</p>
+          </div>
+          <div className="bg-green-50 rounded-xl p-4 text-center">
+            <span className="text-2xl">📚</span>
+            <h4 className="font-bold text-[#121811] mt-2">Anytime</h4>
+            <p className="text-xs text-[#688961]">Flexible</p>
+          </div>
+        </div>
       </Section>
 
-      <Section title="Setting Up Recurring Tasks">
-        <p className="text-[#688961] mb-4">Tasks can repeat automatically on your chosen schedule:</p>
+      <Section title="XP Values Guide">
+        <p className="text-[#688961] mb-4">Recommended XP values based on task difficulty and time:</p>
+        <ul className="space-y-3 text-[#688961]">
+          <li><strong>10-20 XP</strong> - Quick tasks (5-10 mins): Lunchbox to sink, wash hands</li>
+          <li><strong>20-30 XP</strong> - Medium tasks (10-20 mins): Make bed, brush teeth, clean desk</li>
+          <li><strong>30-50 XP</strong> - Longer tasks (20-40 mins): Put away items, prep for tomorrow</li>
+          <li><strong>50-60 XP</strong> - Major tasks (40+ mins): Homework, reading time, practice instrument</li>
+        </ul>
+        <div className="bg-gray-50 rounded-lg p-4 mt-4">
+          <p className="text-sm text-[#688961]"><strong>Timer tasks:</strong> Points auto-calculate at ~1.5 XP per minute</p>
+        </div>
+      </Section>
+
+      <Section title="Frequency Options">
+        <p className="text-[#688961] mb-4">Tasks can repeat automatically:</p>
         <ul className="space-y-2 text-[#688961]">
-          <li>• <strong>Daily</strong> - Task appears every day (e.g., "Brush teeth")</li>
-          <li>• <strong>Weekdays</strong> - Monday through Friday only (e.g., "Do homework")</li>
-          <li>• <strong>Weekends</strong> - Saturday and Sunday only (e.g., "Help with yard work")</li>
-          <li>• <strong>Specific Days</strong> - Choose exact days (e.g., "Piano practice" on Mon/Wed/Fri)</li>
-          <li>• <strong>Weekly</strong> - Once per week on chosen day (e.g., "Deep clean room" every Saturday)</li>
+          <li>• <strong>☀️ Daily</strong> - Task appears every day</li>
+          <li>• <strong>📅 Weekly</strong> - Choose specific days (Mon, Wed, Fri, etc.)</li>
+          <li>• <strong>📆 Monthly</strong> - Once per month (anytime, specific date, first/last day)</li>
+          <li>• <strong>⚡ One Time</strong> - Single occurrence, then done</li>
         </ul>
       </Section>
 
       <Section title="Trust Levels">
-        <p className="text-[#688961] mb-4">As your child proves responsibility, you can increase their trust level to enable auto-approval for certain tasks.</p>
+        <p className="text-[#688961] mb-4">As your child proves responsibility, their trust level increases:</p>
         <div className="space-y-4">
-          <div className="border-l-4 border-[#2bb800] pl-4">
+          <div className="border-l-4 border-gray-300 pl-4">
             <strong className="text-[#121811]">Level 1 (Starting Out)</strong>
-            <p className="text-[#688961] text-sm mt-1">All tasks require parent approval</p>
+            <p className="text-[#688961] text-sm mt-1">All tasks require parent approval. Default for new children.</p>
           </div>
           <div className="border-l-4 border-[#0ea5e9] pl-4">
             <strong className="text-[#121811]">Level 2 (Building Trust)</strong>
-            <p className="text-[#688961] text-sm mt-1">Simple daily tasks auto-approve</p>
+            <p className="text-[#688961] text-sm mt-1">Simple routine tasks can auto-approve.</p>
           </div>
-          <div className="border-l-4 border-[#f49d25] pl-4">
+          <div className="border-l-4 border-[#2bb800] pl-4">
             <strong className="text-[#121811]">Level 3 (Trusted)</strong>
-            <p className="text-[#688961] text-sm mt-1">Most routine tasks auto-approve</p>
+            <p className="text-[#688961] text-sm mt-1">Most tasks auto-approve. Child has proven consistent responsibility.</p>
+          </div>
+        </div>
+        <p className="text-sm text-[#688961] mt-4">Trust level is visible in the child's profile page and affects which approval methods are available.</p>
+      </Section>
+
+      <Section title="Task Templates">
+        <p className="text-[#688961] mb-4">EarnQuest includes 18 pre-built task templates organized by time:</p>
+        <div className="bg-gray-50 rounded-xl p-4">
+          <div className="grid md:grid-cols-2 gap-4 text-sm text-[#688961]">
+            <div>
+              <strong className="text-[#121811]">Morning:</strong> Wake up on time, Make bed, Brush teeth
+            </div>
+            <div>
+              <strong className="text-[#121811]">After School:</strong> Put away backpack, Lunchbox to sink, Check planner
+            </div>
+            <div>
+              <strong className="text-[#121811]">Evening:</strong> Prep for tomorrow, Brush teeth, Shower
+            </div>
+            <div>
+              <strong className="text-[#121811]">Anytime:</strong> Homework, Reading, Exercise, Practice instrument
+            </div>
           </div>
         </div>
       </Section>
@@ -426,61 +577,117 @@ function RewardsGuide() {
       <h1 className="font-display text-5xl font-bold text-[#121811] mb-6">Reward Store Guide</h1>
       <p className="text-xl text-[#688961] mb-8">Create motivating rewards that your kids will love.</p>
 
-      <Section title="Types of Rewards">
+      <Section title="Reward Categories">
+        <p className="text-[#688961] mb-4">Six categories with different fulfillment behaviors:</p>
         <div className="space-y-6">
           <RewardType
-            icon="📱"
+            icon="📺"
             title="Screen Time"
-            description="Digital device time - the most requested reward!"
+            description="Digital device time with built-in timer. Child requests to use → Parent approves → Timer starts automatically."
             examples={[
-              "30 minutes iPad time - 100 points",
-              "1 hour video game time - 150 points",
-              "Watch a movie - 200 points"
+              "30 minutes iPad time - 100 XP",
+              "1 hour video game time - 150 XP",
+              "Watch a movie - 200 XP"
+            ]}
+          />
+
+          <RewardType
+            icon="🔓"
+            title="Power Ups"
+            description="Instant redemption rewards. Points deducted immediately, no approval needed."
+            examples={[
+              "Skip one chore today - 100 XP",
+              "Stay up 30 mins late - 120 XP",
+              "Extra dessert - 50 XP"
             ]}
           />
 
           <RewardType
             icon="🎉"
-            title="Experiences"
-            description="Fun activities and special time together"
+            title="Fun Stuff"
+            description="Experiences you fulfill manually. Child purchases → Parent marks as 'Given' when done."
             examples={[
-              "Choose family movie - 150 points",
-              "Extra bedtime story - 80 points",
-              "Friend sleepover - 300 points"
+              "Choose family movie - 150 XP",
+              "Friend sleepover - 300 XP",
+              "Trip to ice cream shop - 200 XP"
             ]}
           />
 
           <RewardType
-            icon="⭐"
-            title="Privileges"
-            description="Special permissions and freedoms"
+            icon="💰"
+            title="Savings"
+            description="Virtual savings category. Points deducted instantly. Great for teaching delayed gratification."
             examples={[
-              "Stay up 30 mins late - 120 points",
-              "Skip one chore - 100 points",
-              "Choose dinner menu - 150 points"
+              "Save for vacation fund - 500 XP",
+              "Birthday party upgrade - 1000 XP"
             ]}
           />
 
           <RewardType
             icon="🎁"
-            title="Physical Items"
-            description="Tangible rewards and treats"
+            title="Gift Cards"
+            description="Physical items you provide later. Child purchases → You give the item when ready."
             examples={[
-              "Small toy ($5-10) - 250 points",
-              "Favorite snack - 50 points",
-              "New book - 200 points"
+              "Small toy ($5-10) - 250 XP",
+              "New book - 200 XP",
+              "$10 gift card - 500 XP"
             ]}
           />
         </div>
       </Section>
 
-      <Section title="Pricing Strategy">
-        <p className="text-[#688961] mb-4">Good pricing makes rewards feel achievable while encouraging delayed gratification:</p>
-        <ul className="space-y-3 text-[#688961]">
-          <li><strong>Quick wins (50-100 points)</strong> - Achievable in 1-2 days to maintain motivation</li>
-          <li><strong>Medium goals (150-300 points)</strong> - Requires a week of effort, teaches saving</li>
-          <li><strong>Big rewards (400+ points)</strong> - Long-term goals for major rewards</li>
+      <Section title="Screen Time Budget">
+        <p className="text-[#688961] mb-4">The Screen Time Budget system helps manage device time:</p>
+        <ul className="space-y-2 text-[#688961]">
+          <li>• <strong>Daily Limit</strong> - Maximum screen time per day</li>
+          <li>• <strong>Weekly Limit</strong> - Total screen time for the week</li>
+          <li>• <strong>Timer</strong> - Fullscreen countdown when using screen time rewards</li>
+          <li>• <strong>Bonus Time</strong> - Extra time earned through achievements (shown in green)</li>
         </ul>
+        <div className="bg-blue-50 rounded-lg p-4 mt-4">
+          <p className="text-sm text-[#688961]">Children see their remaining budget on the Store page. When the limit is reached, screen time rewards show as "Limit Reached".</p>
+        </div>
+      </Section>
+
+      <Section title="Goals System">
+        <p className="text-[#688961] mb-4">Help children save for bigger rewards with Goals:</p>
+        <div className="grid md:grid-cols-4 gap-3 my-4">
+          <div className="bg-green-50 rounded-lg p-3 text-center">
+            <strong>Small</strong>
+            <p className="text-sm text-[#688961]">200 XP</p>
+            <p className="text-xs text-[#688961]">~1 week</p>
+          </div>
+          <div className="bg-blue-50 rounded-lg p-3 text-center">
+            <strong>Medium</strong>
+            <p className="text-sm text-[#688961]">500 XP</p>
+            <p className="text-xs text-[#688961]">~2-3 weeks</p>
+          </div>
+          <div className="bg-purple-50 rounded-lg p-3 text-center">
+            <strong>Large</strong>
+            <p className="text-sm text-[#688961]">1000 XP</p>
+            <p className="text-xs text-[#688961]">~1 month</p>
+          </div>
+          <div className="bg-yellow-50 rounded-lg p-3 text-center">
+            <strong>XL</strong>
+            <p className="text-sm text-[#688961]">2000 XP</p>
+            <p className="text-xs text-[#688961]">Major goal</p>
+          </div>
+        </div>
+        <SubSection title="Milestone Bonuses">
+          <p className="text-[#688961]">Enable milestone bonuses to reward progress at 25%, 50%, and 75% of the goal. This keeps children motivated during long-term saving!</p>
+        </SubSection>
+      </Section>
+
+      <Section title="Pricing Strategy">
+        <p className="text-[#688961] mb-4">Good pricing makes rewards feel achievable:</p>
+        <ul className="space-y-3 text-[#688961]">
+          <li><strong>Quick wins (50-100 XP)</strong> - Achievable in 1-2 days to maintain motivation</li>
+          <li><strong>Medium goals (150-300 XP)</strong> - Requires a week of effort, teaches saving</li>
+          <li><strong>Big rewards (500+ XP)</strong> - Use Goals feature for long-term targets</li>
+        </ul>
+        <div className="bg-gray-50 rounded-lg p-4 mt-4">
+          <p className="text-sm text-[#688961]"><strong>Exchange Rate:</strong> Set your family's XP-to-dollar ratio in Settings (e.g., 100 XP = $1) to help price rewards consistently.</p>
+        </div>
       </Section>
 
       <div className="bg-[#0ea5e9]/10 rounded-xl p-6 mt-8">
@@ -488,9 +695,9 @@ function RewardsGuide() {
         <ul className="space-y-2 text-[#688961]">
           <li>✓ Offer a mix of quick wins and bigger goals</li>
           <li>✓ Include non-material rewards (experiences, privileges)</li>
-          <li>✓ Update the store seasonally to keep it fresh</li>
+          <li>✓ Use weekly limits to prevent over-redemption</li>
           <li>✓ Let kids suggest rewards they'd like</li>
-          <li>✓ Avoid rewards that contradict your values</li>
+          <li>✓ Use "Gift to Child" to reward spontaneous good behavior</li>
         </ul>
       </div>
     </div>
@@ -506,29 +713,55 @@ function KindnessGuide() {
       <div className="bg-gradient-to-br from-[#f49d25]/20 to-[#0ea5e9]/20 rounded-2xl p-8 mb-8">
         <h3 className="font-display text-2xl font-bold text-[#121811] mb-4">What is the Kindness System?</h3>
         <p className="text-[#688961]">
-          The Kindness System is separate from regular tasks. It's designed to notice and celebrate when your child shows empathy, helps others, or does kind things without being asked. These moments are precious - the system helps you capture and celebrate them.
+          The Kindness System is separate from regular tasks. It's designed to notice and celebrate when your child shows empathy, helps others, or does kind things without being asked. Send gratitude cards to recognize these moments!
         </p>
       </div>
 
-      <Section title="How It Works">
-        <ol className="space-y-4 text-[#688961]">
-          <li>
-            <strong className="text-[#121811]">Child reports or parent notices</strong>
-            <p className="mt-1">When a kind action happens, either the child can report it or you can add it</p>
-          </li>
-          <li>
-            <strong className="text-[#121811]">Parent reviews and approves</strong>
-            <p className="mt-1">You write a short note about why it was kind and approve it</p>
-          </li>
-          <li>
-            <strong className="text-[#121811]">Child receives recognition</strong>
-            <p className="mt-1">Bonus points are awarded + a special badge in their profile</p>
-          </li>
-          <li>
-            <strong className="text-[#121811]">Build a kindness history</strong>
-            <p className="mt-1">All kindness actions are saved - a beautiful record of growth</p>
-          </li>
-        </ol>
+      <Section title="Sending Gratitude Cards">
+        <p className="text-[#688961] mb-4">Navigate to <strong>Kindness → Send Kindness</strong> to send a card:</p>
+        <StepItem number={1} title="Choose Recipient" description="Select which child you want to thank" />
+        <StepItem number={2} title="Pick a Theme" description="Choose from 4 beautiful card themes:" />
+        <div className="grid grid-cols-4 gap-3 ml-14 mb-6">
+          <div className="bg-purple-100 rounded-lg p-3 text-center">
+            <span className="text-xl">✨</span>
+            <p className="text-xs font-medium">Cosmic</p>
+          </div>
+          <div className="bg-green-100 rounded-lg p-3 text-center">
+            <span className="text-xl">🌿</span>
+            <p className="text-xs font-medium">Nature</p>
+          </div>
+          <div className="bg-orange-100 rounded-lg p-3 text-center">
+            <span className="text-xl">⚡</span>
+            <p className="text-xs font-medium">Super Hero</p>
+          </div>
+          <div className="bg-pink-100 rounded-lg p-3 text-center">
+            <span className="text-xl">❤️</span>
+            <p className="text-xs font-medium">Love</p>
+          </div>
+        </div>
+        <StepItem number={3} title="Write Message" description="Write a personal message (up to 140 characters). Use quick prompts like 'Helping out' or 'Made my day better' for inspiration." />
+      </Section>
+
+      <Section title="Kindness Badges">
+        <p className="text-[#688961] mb-4">Children earn badges based on gratitude cards received:</p>
+        <div className="grid md:grid-cols-3 gap-4 my-6">
+          <div className="bg-amber-50 rounded-xl p-6 text-center border-2 border-amber-200">
+            <span className="text-4xl">🥉</span>
+            <h4 className="font-bold text-[#121811] mt-2">Bronze Badge</h4>
+            <p className="text-sm text-[#688961]">5 gratitude cards</p>
+          </div>
+          <div className="bg-gray-100 rounded-xl p-6 text-center border-2 border-gray-300">
+            <span className="text-4xl">🥈</span>
+            <h4 className="font-bold text-[#121811] mt-2">Silver Badge</h4>
+            <p className="text-sm text-[#688961]">10 gratitude cards</p>
+          </div>
+          <div className="bg-yellow-50 rounded-xl p-6 text-center border-2 border-yellow-300">
+            <span className="text-4xl">🥇</span>
+            <h4 className="font-bold text-[#121811] mt-2">Gold Badge</h4>
+            <p className="text-sm text-[#688961]">20 gratitude cards</p>
+          </div>
+        </div>
+        <p className="text-[#688961]">Children can view their badge progress and recent cards on the <strong>Badges</strong> page in their dashboard.</p>
       </Section>
 
       <Section title="Examples of Kindness Actions">
@@ -568,15 +801,6 @@ function KindnessGuide() {
         </div>
       </Section>
 
-      <Section title="Point Awards for Kindness">
-        <p className="text-[#688961] mb-4">Kindness points are bonus rewards:</p>
-        <ul className="space-y-2 text-[#688961]">
-          <li>• <strong>Small kindness</strong> - 20-30 bonus points</li>
-          <li>• <strong>Significant kindness</strong> - 40-60 bonus points</li>
-          <li>• <strong>Exceptional kindness</strong> - 80-100 bonus points</li>
-        </ul>
-      </Section>
-
       <div className="bg-[#0ea5e9]/10 rounded-xl p-6 mt-8">
         <h3 className="font-display text-xl font-bold text-[#121811] mb-3">✨ Why It Matters</h3>
         <p className="text-[#688961]">
@@ -593,73 +817,81 @@ function SettingsGuide() {
       <h1 className="font-display text-5xl font-bold text-[#121811] mb-6">Settings & Customization</h1>
       <p className="text-xl text-[#688961] mb-8">Configure EarnQuest to work perfectly for your family.</p>
 
-      <Section title="Family Settings">
+      <Section title="Device Connection">
+        <p className="text-[#688961] mb-4">Set up child access to EarnQuest:</p>
         <SettingItem
-          title="Add/Remove Children"
-          description="Manage which children are part of your family account. Each child gets their own profile and progress tracking."
+          title="Family Join Code"
+          description="A unique 6-character code (e.g., 'ABC123') that children enter to access their accounts. You can copy this code or generate a new one if needed."
+        />
+        <div className="bg-yellow-50 rounded-lg p-4 mb-6">
+          <p className="text-sm text-[#688961]"><strong>⚠️ Note:</strong> Generating a new code disables the old one. All devices using the old code will need to re-enter the new code.</p>
+        </div>
+      </Section>
+
+      <Section title="Child Login Security">
+        <SettingItem
+          title="PIN Protection"
+          description="Toggle to require a 4-digit PIN for children to log in. When enabled, each child needs their own PIN (default: 0000)."
         />
         <SettingItem
-          title="Parent Accounts"
-          description="Add your partner or co-parent so both can approve tasks and manage the system."
-        />
-        <SettingItem
-          title="Notification Preferences"
-          description="Choose which notifications you receive: task completions, reward redemptions, milestones, or daily summaries."
-        />
-        <SettingItem
-          title="Privacy Settings"
-          description="Control what data is collected and how your family information is used. EarnQuest is COPPA compliant."
+          title="Individual Child PINs"
+          description="Set a unique 4-digit PIN for each child. You can change PINs anytime from this section."
         />
       </Section>
 
-      <Section title="Child Profile Settings">
+      <Section title="Exchange Rate">
+        <p className="text-[#688961] mb-4">Set a reference exchange rate for pricing rewards consistently:</p>
+        <div className="grid grid-cols-5 gap-2 my-4">
+          <div className="bg-gray-50 rounded-lg p-2 text-center text-sm">10 XP = $1</div>
+          <div className="bg-gray-50 rounded-lg p-2 text-center text-sm">20 XP = $1</div>
+          <div className="bg-gray-50 rounded-lg p-2 text-center text-sm">50 XP = $1</div>
+          <div className="bg-green-100 rounded-lg p-2 text-center text-sm font-medium">100 XP = $1 ✓</div>
+          <div className="bg-gray-50 rounded-lg p-2 text-center text-sm">200 XP = $1</div>
+        </div>
+        <p className="text-sm text-[#688961]">This is a reference only - it helps you price rewards and goals consistently but doesn't affect children's accounts.</p>
+      </Section>
+
+      <Section title="Co-Parent Access">
         <SettingItem
-          title="Avatar & Customization"
-          description="Let your child choose their avatar, color theme, and display name."
+          title="Invite Co-Parent"
+          description="Generate a 7-day invitation link to share with your partner. They can join your family account and help manage tasks and approvals."
         />
         <SettingItem
-          title="Age & Presets"
-          description="Update as your child grows. Age presets automatically adjust task difficulty and point values."
-        />
-        <SettingItem
-          title="Trust Level"
-          description="Adjust trust level to enable auto-approval for appropriate tasks as responsibility increases."
+          title="Pending Invitations"
+          description="View and manage outstanding invitations with their expiration dates."
         />
       </Section>
 
-      <Section title="Task Defaults">
-        <SettingItem
-          title="Default Point Values"
-          description="Set standard point values for each task category to maintain consistency."
-        />
-        <SettingItem
-          title="Approval Requirements"
-          description="Choose default approval method for new tasks: parent approval, auto-approve, timer, or checklist."
-        />
-        <SettingItem
-          title="Streak Rules"
-          description="Configure how streaks work: consecutive days required, grace periods, and bonus rewards."
-        />
+      <Section title="Children Management">
+        <p className="text-[#688961] mb-4">Navigate to <strong>Settings → Manage Children</strong> to:</p>
+        <ul className="space-y-2 text-[#688961]">
+          <li>• <strong>Add Child</strong> - Enter name, birthdate, and optional PIN</li>
+          <li>• <strong>Edit Profile</strong> - Update name, birthdate, or avatar</li>
+          <li>• <strong>Change Avatar</strong> - Upload photo, take selfie, or choose from presets</li>
+          <li>• <strong>View as Child</strong> - See exactly what your child sees in their dashboard</li>
+        </ul>
+        <div className="bg-gray-50 rounded-lg p-4 mt-4">
+          <p className="text-sm text-[#688961]">Each child card shows their current XP balance, age group, and when they joined.</p>
+        </div>
       </Section>
 
-      <Section title="Store Settings">
-        <SettingItem
-          title="Purchase Approval"
-          description="Require parent approval for all purchases, or set an auto-approve limit for smaller rewards."
-        />
-        <SettingItem
-          title="Savings Goals"
-          description="Help children set savings goals for big rewards and track progress toward them."
-        />
+      <Section title="Avatar Options">
+        <p className="text-[#688961] mb-4">Both parents and children can customize their avatars:</p>
+        <ul className="space-y-2 text-[#688961]">
+          <li>• <strong>📷 Take Photo</strong> - Use device camera for a selfie</li>
+          <li>• <strong>📁 Upload Image</strong> - Choose from your device (up to 5MB)</li>
+          <li>• <strong>🎨 Preset Avatars</strong> - Select from a gallery of pre-made avatars</li>
+        </ul>
       </Section>
 
       <div className="bg-[#2bb800]/10 rounded-xl p-6 mt-8">
         <h3 className="font-display text-xl font-bold text-[#121811] mb-3">⚙️ Pro Tips</h3>
         <ul className="space-y-2 text-[#688961]">
-          <li>✓ Review settings monthly as your child grows</li>
-          <li>✓ Enable notifications for task completions to stay responsive</li>
-          <li>✓ Adjust point values if rewards are being redeemed too quickly or slowly</li>
-          <li>✓ Use trust levels as a reward for consistent responsibility</li>
+          <li>✓ Enable PIN protection for shared devices</li>
+          <li>✓ Invite co-parents early so both can help with approvals</li>
+          <li>✓ Use "View as Child" to understand the child experience</li>
+          <li>✓ Review settings monthly as children grow older</li>
+          <li>✓ Use the exchange rate to price rewards like real-world items</li>
         </ul>
       </div>
     </div>
