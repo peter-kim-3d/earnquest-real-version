@@ -10,11 +10,22 @@ export async function POST() {
   // Sign out from Supabase
   await supabase.auth.signOut();
 
-  // Redirect to login page
-  return NextResponse.redirect(new URL(`/${locale}/login`, process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'));
+  // Return JSON response with redirect URL (client handles redirect)
+  return NextResponse.json({
+    success: true,
+    redirectUrl: `/${locale}/login`,
+  });
 }
 
 export async function GET() {
-  // Also support GET for convenience
-  return POST();
+  // GET request redirects directly (for browser navigation)
+  const cookieStore = await cookies();
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'en-US';
+  const supabase = await createClient();
+
+  await supabase.auth.signOut();
+
+  return NextResponse.redirect(
+    new URL(`/${locale}/login`, process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001')
+  );
 }

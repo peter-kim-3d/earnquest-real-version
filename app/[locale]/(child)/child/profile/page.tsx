@@ -2,8 +2,9 @@ import { createClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { Star, Trophy, Gift, LogOut } from 'lucide-react';
+import { Star, Trophy, Gift } from 'lucide-react';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
+import LogoutButton from '@/components/auth/LogoutButton';
 
 // Create admin client for child session (bypasses RLS)
 function getAdminClient() {
@@ -150,15 +151,11 @@ export default async function ChildProfilePage({
       </div>
 
       {/* Logout Button */}
-      <form action="/api/auth/child-logout" method="POST">
-        <button
-          type="submit"
-          className="w-full flex items-center justify-center gap-3 p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all"
-        >
-          <LogOut className="h-5 w-5 text-red-500" />
-          <span className="font-semibold text-red-500">Logout</span>
-        </button>
-      </form>
+      <LogoutButton
+        locale={locale}
+        variant="child"
+        className="w-full flex items-center justify-center gap-3 p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all"
+      />
 
       {/* Member Since */}
       <div className="mt-6 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700">

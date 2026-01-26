@@ -1,9 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { Settings, Users, Mail, Shield, Smartphone, LogOut } from 'lucide-react';
+import { Settings, Users, Mail, Shield, Smartphone } from 'lucide-react';
 import Link from 'next/link';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
 import { getUser } from '@/lib/services/user';
+import LogoutButton from '@/components/auth/LogoutButton';
 
 export default async function ProfilePage({
   params,
@@ -178,22 +179,7 @@ export default async function ProfilePage({
           </Link>
 
           {/* Logout */}
-          <form action="/api/auth/logout" method="POST" className="contents">
-            <button
-              type="submit"
-              className="flex items-center gap-3 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all group text-left"
-            >
-              <LogOut className="h-6 w-6 text-gray-600 dark:text-gray-400 group-hover:text-red-500 transition-colors" />
-              <div className="flex-1">
-                <h3 className="font-semibold text-text-main dark:text-white group-hover:text-red-500 transition-colors">
-                  Logout
-                </h3>
-                <p className="text-sm text-text-muted dark:text-text-muted">
-                  Sign out of your account
-                </p>
-              </div>
-            </button>
-          </form>
+          <LogoutButton locale={locale} variant="parent" />
         </div>
       </div>
 
