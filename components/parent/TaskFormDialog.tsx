@@ -688,12 +688,28 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                 <Input
                   type="number"
                   name="timerMinutes"
-                  value={formData.timer_minutes}
-                  onChange={(e) => setFormData({ ...formData, timer_minutes: parseInt(e.target.value) || 1 })}
+                  value={formData.timer_minutes === 0 ? '' : formData.timer_minutes}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '') {
+                      setFormData({ ...formData, timer_minutes: 0 });
+                    } else {
+                      const num = parseInt(val);
+                      if (!isNaN(num)) {
+                        setFormData({ ...formData, timer_minutes: Math.min(180, Math.max(0, num)) });
+                      }
+                    }
+                  }}
+                  onBlur={(e) => {
+                    // Ensure minimum value of 1 on blur
+                    if (!e.target.value || formData.timer_minutes < 1) {
+                      setFormData({ ...formData, timer_minutes: 1 });
+                    }
+                  }}
                   min={1}
                   max={180}
                   step={1}
-                  className="w-24 text-center text-lg font-bold"
+                  className="w-24 text-center text-lg font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
                   required
                 />
                 <span className="text-sm text-gray-600 dark:text-gray-400">{t('form.timerMinutes')}</span>
