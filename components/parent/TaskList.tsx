@@ -5,6 +5,8 @@ import { Plus, CheckSquare, Pause, Archive } from '@phosphor-icons/react/dist/ss
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import TaskCard from './TaskCard';
+import ConfirmDialog from '@/components/ui/confirm-dialog';
+import { toast } from 'sonner';
 
 // Dynamic import for heavy dialog component
 const TaskFormDialog = dynamic(() => import('./TaskFormDialog'), {
@@ -50,6 +52,10 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
   const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+
+  // Confirm Dialog State
+  const [confirmArchive, setConfirmArchive] = useState<{ open: boolean; archive: boolean }>({ open: false, archive: true });
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const handleNew = useCallback(() => {
     setSelectedTask(null);
@@ -108,9 +114,6 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
 
   // Bulk Actions
   const handleBulkArchive = async (archive: boolean) => {
-    const action = archive ? t('list.archive') : t('list.unarchive');
-    if (!confirm(t('list.confirmArchive', { action, count: selectedTaskIds.size }))) return;
-
     setIsBulkProcessing(true);
     try {
       await Promise.all(Array.from(selectedTaskIds).map(id =>
@@ -120,11 +123,10 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
           body: JSON.stringify({ taskId: id, archive }),
         })
       ));
-      // Refresh logic would ideally go here or rely on router refresh
-      window.location.reload(); // Simple refresh for now
+      window.location.reload();
     } catch (error) {
       console.error('Bulk archive failed', error);
-      alert(t('list.bulkFailed'));
+      toast.error(t('list.bulkFailed'));
     } finally {
       setIsBulkProcessing(false);
       setIsSelectionMode(false);
@@ -133,8 +135,6 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
   };
 
   const handleBulkDelete = async () => {
-    if (!confirm(t('list.confirmDelete', { count: selectedTaskIds.size }))) return;
-
     setIsBulkProcessing(true);
     try {
       await Promise.all(Array.from(selectedTaskIds).map(id =>
@@ -147,7 +147,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
       window.location.reload();
     } catch (error) {
       console.error('Bulk delete failed', error);
-      alert(t('list.bulkFailed'));
+      toast.error(t('list.bulkFailed'));
     } finally {
       setIsBulkProcessing(false);
       setIsSelectionMode(false);
@@ -268,7 +268,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
 
           {filter !== 'archived' ? (
             <button
-              onClick={() => handleBulkArchive(true)}
+              onClick={() => setConfirmArchive({ open: true, archive: true })}
               disabled={isBulkProcessing}
               className="text-sm font-medium text-text-muted hover:text-primary transition-colors"
             >
@@ -276,7 +276,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
             </button>
           ) : (
             <button
-              onClick={() => handleBulkArchive(false)}
+              onClick={() => setConfirmArchive({ open: true, archive: false })}
               disabled={isBulkProcessing}
               className="text-sm font-medium text-text-muted hover:text-primary transition-colors"
             >
@@ -285,7 +285,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
           )}
 
           <button
-            onClick={handleBulkDelete}
+            onClick={() => setConfirmDelete(true)}
             disabled={isBulkProcessing}
             className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors"
           >
@@ -327,6 +327,35 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
         availableChildren={childrenData}
+      />
+
+      {/* Archive Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={confirmArchive.open}
+        onClose={() => setConfirmArchive({ open: false, archive: true })}
+        onConfirm={() => handleBulkArchive(confirmArchive.archive)}
+        title={confirmArchive.archive ? t('list.archive') : t('list.unarchive')}
+        description={t('list.confirmArchive', {
+          action: confirmArchive.archive ? t('list.archive') : t('list.unarchive'),
+          count: selectedTaskIds.size
+        })}
+        confirmLabel={confirmArchive.archive ? t('list.archive') : t('list.unarchive')}
+        cancelLabel={t('list.cancel')}
+        variant="warning"
+        isLoading={isBulkProcessing}
+      />
+
+      {/* Delete Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        onConfirm={handleBulkDelete}
+        title={t('list.delete')}
+        description={t('list.confirmDelete', { count: selectedTaskIds.size })}
+        confirmLabel={t('list.delete')}
+        cancelLabel={t('list.cancel')}
+        variant="danger"
+        isLoading={isBulkProcessing}
       />
     </div>
   );
