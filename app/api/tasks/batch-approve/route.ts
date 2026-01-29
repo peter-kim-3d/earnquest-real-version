@@ -1,6 +1,25 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { BatchApproveSchema, formatZodError } from '@/lib/validation/task';
+import { getErrorMessage } from '@/lib/api/error-handler';
+
+/** Type for task completion with joined task data from Supabase */
+interface CompletionWithTask {
+  id: string;
+  task_id: string;
+  child_id: string;
+  family_id: string;
+  tasks: { points: number; name: string } | { points: number; name: string }[] | null;
+}
+
+/** Normalized completion with single task object */
+interface NormalizedCompletion {
+  id: string;
+  task_id: string;
+  child_id: string;
+  family_id: string;
+  task: { points: number; name: string };
+}
 
 export async function POST(request: Request) {
   try {
@@ -72,65 +91,104 @@ export async function POST(request: Request) {
     }
 
     const now = new Date().toISOString();
-    const validCompletionIds = completions.map((c) => c.id);
 
-    // Approve each completion individually and add points
-    let approvedCount = 0;
-    let pointsAddedCount = 0;
+    // Helper to extract task from completion (handles both single object and array from Supabase)
+    function getTaskFromCompletion(
+      completion: CompletionWithTask
+    ): { points: number; name: string } | null {
+      if (!completion.tasks) return null;
+      // Supabase returns array for foreign table joins
+      if (Array.isArray(completion.tasks)) {
+        return completion.tasks[0] || null;
+      }
+      return completion.tasks;
+    }
 
-    for (const completion of completions) {
-      const task = (completion.tasks as unknown) as { points: number; name: string } | null;
-      const taskPoints = task?.points;
-      if (!taskPoints) {
+    // Type cast and normalize completions
+    const typedCompletions = completions as CompletionWithTask[];
+
+    // Filter and normalize completions
+    const normalizedCompletions: NormalizedCompletion[] = [];
+    for (const completion of typedCompletions) {
+      const task = getTaskFromCompletion(completion);
+      if (!task?.points) {
         console.warn(`No points found for task ${completion.task_id}`);
         continue;
       }
-
-      // Approve the completion
-      const { error: updateError } = await supabase
-        .from('task_completions')
-        .update({
-          status: 'approved',
-          approved_by: user.id,
-          approved_at: now,
-          completed_at: now,
-          points_awarded: taskPoints,
-          updated_at: now,
-        })
-        .eq('id', completion.id);
-
-      if (updateError) {
-        console.error('Error approving completion:', updateError);
-        // Continue with other completions
-        continue;
-      }
-
-      approvedCount++;
-
-      // Add points
-      const { error: pointsError } = await supabase.rpc('add_points', {
-        p_child_id: completion.child_id,
-        p_amount: taskPoints,
-        p_type: 'task_completion',
-        p_reference_type: 'task_completion',
-        p_reference_id: completion.id,
-        p_description: `${task?.name || 'Task'} completed`,
+      normalizedCompletions.push({
+        id: completion.id,
+        task_id: completion.task_id,
+        child_id: completion.child_id,
+        family_id: completion.family_id,
+        task,
       });
-
-      if (pointsError) {
-        console.error('Error adding points:', pointsError);
-        // Don't fail the entire batch - continue with other completions
-      } else {
-        pointsAddedCount++;
-      }
     }
 
-    if (approvedCount === 0) {
+    if (normalizedCompletions.length === 0) {
       return NextResponse.json(
-        { error: 'Failed to approve any completions' },
+        { error: 'No completions with valid points found' },
+        { status: 400 }
+      );
+    }
+
+    const validCompletionIds = normalizedCompletions.map((c) => c.id);
+
+    // Batch update all completions at once
+    const { error: updateError } = await supabase
+      .from('task_completions')
+      .update({
+        status: 'approved',
+        approved_by: user.id,
+        approved_at: now,
+        completed_at: now,
+        updated_at: now,
+      })
+      .in('id', validCompletionIds);
+
+    if (updateError) {
+      console.error('Error batch approving completions:', updateError);
+      return NextResponse.json(
+        { error: 'Failed to approve completions', details: updateError.message },
         { status: 500 }
       );
     }
+
+    // Update points_awarded for each completion (requires individual updates due to different values)
+    // Use Promise.all for parallel execution
+    const pointsUpdatePromises = normalizedCompletions.map((completion) =>
+      supabase
+        .from('task_completions')
+        .update({ points_awarded: completion.task.points })
+        .eq('id', completion.id)
+    );
+    await Promise.all(pointsUpdatePromises);
+
+    // Add points for each child - using Promise.all for parallel RPC calls
+    const pointsResults = await Promise.all(
+      normalizedCompletions.map((completion) =>
+        supabase.rpc('add_points', {
+          p_child_id: completion.child_id,
+          p_amount: completion.task.points,
+          p_type: 'task_completion',
+          p_reference_type: 'task_completion',
+          p_reference_id: completion.id,
+          p_description: `${completion.task.name || 'Task'} completed`,
+        })
+      )
+    );
+
+    // Count successful points additions
+    const pointsAddedCount = pointsResults.filter((result) => !result.error).length;
+    const pointsErrors = pointsResults.filter((result) => result.error);
+
+    if (pointsErrors.length > 0) {
+      console.error(
+        'Some points additions failed:',
+        pointsErrors.map((r) => r.error)
+      );
+    }
+
+    const approvedCount = normalizedCompletions.length;
 
     // Update task instances if any of these were auto-assigned tasks
     const { error: instanceError } = await supabase
@@ -153,10 +211,10 @@ export async function POST(request: Request) {
       pointsAwarded: pointsAddedCount,
       message: `Successfully approved ${approvedCount} task${approvedCount === 1 ? '' : 's'}!`,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in batch approve:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }

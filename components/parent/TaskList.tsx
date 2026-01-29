@@ -124,7 +124,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
         })
       ));
       window.location.reload();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Bulk archive failed', error);
       toast.error(t('list.bulkFailed'));
     } finally {
@@ -145,7 +145,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
         })
       ));
       window.location.reload();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Bulk delete failed', error);
       toast.error(t('list.bulkFailed'));
     } finally {
@@ -180,43 +180,51 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
           <button
+            type="button"
             onClick={() => setFilter('all')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all ${filter === 'all'
+            aria-pressed={filter === 'all'}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${filter === 'all'
               ? 'bg-primary text-white shadow-md'
               : 'bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
           >
-            <CheckSquare size={16} weight="bold" />
+            <CheckSquare size={16} weight="bold" aria-hidden="true" />
             {t('filter.all')}
           </button>
           <button
+            type="button"
             onClick={() => setFilter('active')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all ${filter === 'active'
+            aria-pressed={filter === 'active'}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${filter === 'active'
               ? 'bg-primary text-white shadow-md'
               : 'bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
           >
-            <CheckSquare size={16} weight="fill" />
+            <CheckSquare size={16} weight="fill" aria-hidden="true" />
             {t('filter.active')}
           </button>
           <button
+            type="button"
             onClick={() => setFilter('inactive')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all ${filter === 'inactive'
+            aria-pressed={filter === 'inactive'}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${filter === 'inactive'
               ? 'bg-primary text-white shadow-md'
               : 'bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
           >
-            <Pause size={16} weight="bold" />
+            <Pause size={16} weight="bold" aria-hidden="true" />
             {t('filter.inactive')}
           </button>
           <button
+            type="button"
             onClick={() => setFilter('archived')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all ${filter === 'archived'
+            aria-pressed={filter === 'archived'}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${filter === 'archived'
               ? 'bg-primary text-white shadow-md'
               : 'bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
           >
-            <Archive size={16} weight="bold" />
+            <Archive size={16} weight="bold" aria-hidden="true" />
             {t('filter.archived')}
           </button>
         </div>
@@ -226,30 +234,34 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
           {!isSelectionMode ? (
             <>
               <button
+                type="button"
                 onClick={toggleSelectionMode}
-                className="px-4 py-2 rounded-full border-2 border-gray-200 dark:border-gray-700 text-text-main dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
+                className="px-4 py-2 rounded-full border-2 border-gray-200 dark:border-gray-700 text-text-main dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 {t('list.select')}
               </button>
               <button
+                type="button"
                 onClick={handleNew}
-                className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all flex items-center gap-2"
+                className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
-                <Plus size={18} weight="bold" />
+                <Plus size={18} weight="bold" aria-hidden="true" />
                 {t('newTask')}
               </button>
             </>
           ) : (
             <div className="flex items-center gap-2">
               <button
+                type="button"
                 onClick={selectAll}
-                className="px-4 py-2 rounded-full border-2 border-gray-200 dark:border-gray-700 text-text-main dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
+                className="px-4 py-2 rounded-full border-2 border-gray-200 dark:border-gray-700 text-text-main dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 {selectedTaskIds.size === filteredTasks.length ? t('list.deselectAll') : t('list.selectAll')}
               </button>
               <button
+                type="button"
                 onClick={toggleSelectionMode}
-                className="px-4 py-2 rounded-full border-2 border-gray-200 dark:border-gray-700 text-text-main dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
+                className="px-4 py-2 rounded-full border-2 border-gray-200 dark:border-gray-700 text-text-main dark:text-white font-semibold text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 {t('list.done')}
               </button>
@@ -260,34 +272,40 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
 
       {/* Bulk Action Bar - Sticky Bottom */}
       {isSelectionMode && selectedTaskIds.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white dark:bg-gray-800 rounded-full shadow-xl border border-gray-200 dark:border-gray-700 p-2 px-6 flex items-center gap-4 animate-in slide-in-from-bottom-4">
-          <span className="text-sm font-semibold text-text-main dark:text-white whitespace-nowrap">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white dark:bg-gray-800 rounded-full shadow-xl border border-gray-200 dark:border-gray-700 p-2 px-6 flex items-center gap-4 motion-safe:animate-in slide-in-from-bottom-4">
+          <span className="text-sm font-semibold text-text-main dark:text-white whitespace-nowrap tabular-nums">
             {t('list.selected', { count: selectedTaskIds.size })}
           </span>
-          <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
+          <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" aria-hidden="true" />
 
           {filter !== 'archived' ? (
             <button
+              type="button"
               onClick={() => setConfirmArchive({ open: true, archive: true })}
               disabled={isBulkProcessing}
-              className="text-sm font-medium text-text-muted hover:text-primary transition-colors"
+              aria-busy={isBulkProcessing}
+              className="text-sm font-medium text-text-muted hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:underline"
             >
               {t('list.archive')}
             </button>
           ) : (
             <button
+              type="button"
               onClick={() => setConfirmArchive({ open: true, archive: false })}
               disabled={isBulkProcessing}
-              className="text-sm font-medium text-text-muted hover:text-primary transition-colors"
+              aria-busy={isBulkProcessing}
+              className="text-sm font-medium text-text-muted hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:underline"
             >
               {t('list.unarchive')}
             </button>
           )}
 
           <button
+            type="button"
             onClick={() => setConfirmDelete(true)}
             disabled={isBulkProcessing}
-            className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors"
+            aria-busy={isBulkProcessing}
+            className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:underline"
           >
             {t('list.delete')}
           </button>
@@ -295,31 +313,53 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
       )}
 
       {/* Task Groups */}
-      {Object.entries(groupedTasks).map(([category, categoryTasks]) => (
-        <div key={category}>
-          <h2 className="text-xl font-bold text-text-main dark:text-white mb-4">
-            {categoryLabels[category] || category}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {categoryTasks.map((task) => {
-              const assignee = task.child_id ? childrenData.find(c => c.id === task.child_id) : null;
-              return (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  assignee={assignee}
-                  completionCount={taskCompletions.get(task.id) || 0}
-                  pendingCount={pendingCounts?.get(task.id) || 0}
-                  onEdit={() => handleEdit(task)}
-                  isSelectionMode={isSelectionMode}
-                  isSelected={selectedTaskIds.has(task.id)}
-                  onToggleSelect={() => toggleTaskSelection(task.id)}
-                />
-              );
-            })}
-          </div>
+      {filteredTasks.length === 0 ? (
+        <div className="text-center py-12 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <CheckSquare size={48} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" aria-hidden="true" />
+          <p className="text-lg font-semibold text-text-muted dark:text-gray-400 mb-2">
+            {filter === 'archived' ? t('list.noArchivedTasks') : t('list.noTasks')}
+          </p>
+          <p className="text-sm text-text-muted dark:text-gray-500 mb-4">
+            {t('list.emptyDescription')}
+          </p>
+          {filter !== 'archived' && (
+            <button
+              type="button"
+              onClick={handleNew}
+              className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all inline-flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
+              <Plus size={18} weight="bold" aria-hidden="true" />
+              {t('list.createFirstButton')}
+            </button>
+          )}
         </div>
-      ))}
+      ) : (
+        Object.entries(groupedTasks).map(([category, categoryTasks]) => (
+          <div key={category}>
+            <h2 className="text-xl font-bold text-text-main dark:text-white mb-4">
+              {categoryLabels[category] || category}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {categoryTasks.map((task) => {
+                const assignee = task.child_id ? childrenData.find(c => c.id === task.child_id) : null;
+                return (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    assignee={assignee}
+                    completionCount={taskCompletions.get(task.id) || 0}
+                    pendingCount={pendingCounts?.get(task.id) || 0}
+                    onEdit={() => handleEdit(task)}
+                    isSelectionMode={isSelectionMode}
+                    isSelected={selectedTaskIds.has(task.id)}
+                    onToggleSelect={() => toggleTaskSelection(task.id)}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        ))
+      )}
 
       {/* Task Form Dialog */}
       <TaskFormDialog

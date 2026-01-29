@@ -81,7 +81,7 @@ export default async function SettingsPage({
         {/* Family Section */}
         <div className="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-4">
-            <Users className="h-6 w-6 text-primary" />
+            <Users className="h-6 w-6 text-primary" aria-hidden="true" />
             <h2 className="text-xl font-bold text-text-main dark:text-white">
               {t('page.familyManagement')}
             </h2>
@@ -91,7 +91,7 @@ export default async function SettingsPage({
             {/* Children Settings */}
             <Link
               href={`/${locale}/settings/children`}
-              className="block p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all"
+              className="block p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -102,7 +102,7 @@ export default async function SettingsPage({
                     {t('page.childrenDesc')}
                   </p>
                 </div>
-                <CaretRight size={20} className="text-gray-400" />
+                <CaretRight size={20} className="text-gray-400" aria-hidden="true" />
               </div>
             </Link>
 
@@ -176,7 +176,7 @@ export default async function SettingsPage({
         {/* Account Section */}
         <div className="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-4">
-            <User size={24} className="text-primary" />
+            <User size={24} className="text-primary" aria-hidden="true" />
             <h2 className="text-xl font-bold text-text-main dark:text-white">
               {t('page.account')}
             </h2>
@@ -204,7 +204,7 @@ export default async function SettingsPage({
         {/* App Info Section */}
         <div className="bg-white dark:bg-card-dark rounded-xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-4">
-            <Shield size={24} className="text-primary" />
+            <Shield size={24} className="text-primary" aria-hidden="true" />
             <h2 className="text-xl font-bold text-text-main dark:text-white">
               {t('about.title')}
             </h2>
@@ -222,7 +222,7 @@ export default async function SettingsPage({
               <span className="text-sm font-medium text-text-muted dark:text-text-muted">
                 {t('page.support')}
               </span>
-              <a href="mailto:support@earnquest.app" className="text-sm text-primary hover:underline">
+              <a href="mailto:support@earnquest.app" className="text-sm text-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded">
                 {t('page.contactUs')}
               </a>
             </div>

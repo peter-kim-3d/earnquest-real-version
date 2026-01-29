@@ -66,7 +66,7 @@ export default function MilestoneModal({
           <div className="mx-auto relative">
             <div className="absolute inset-0 bg-yellow-400 blur-xl opacity-50 rounded-full" />
             <div className="relative bg-gradient-to-br from-yellow-300 to-orange-400 p-6 rounded-full">
-              <Trophy size={48} weight="fill" className="text-white" />
+              <Trophy size={48} weight="fill" className="text-white" aria-hidden="true" />
             </div>
           </div>
 
@@ -82,11 +82,11 @@ export default function MilestoneModal({
         {/* Bonus points highlight */}
         <div className="my-6 p-6 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-2xl border-2 border-yellow-200 dark:border-yellow-700">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Sparkle size={24} weight="fill" className="text-yellow-500" />
+            <Sparkle size={24} weight="fill" className="text-yellow-500" aria-hidden="true" />
             <span className="text-lg font-semibold text-yellow-700 dark:text-yellow-300">
               {t('bonusEarned')}
             </span>
-            <Sparkle size={24} weight="fill" className="text-yellow-500" />
+            <Sparkle size={24} weight="fill" className="text-yellow-500" aria-hidden="true" />
           </div>
           <p className="text-4xl font-bold text-yellow-600 dark:text-yellow-400">
             +{bonusPoints} XP
@@ -95,12 +95,12 @@ export default function MilestoneModal({
 
         {/* Motivational message */}
         <div className="flex items-center justify-center gap-2 text-gray-600 dark:text-gray-400 mb-4">
-          <Star size={16} weight="fill" className="text-primary" />
+          <Star size={16} weight="fill" className="text-primary" aria-hidden="true" />
           <p className="text-sm">{t('keepGoing')}</p>
-          <Star size={16} weight="fill" className="text-primary" />
+          <Star size={16} weight="fill" className="text-primary" aria-hidden="true" />
         </div>
 
-        <Button onClick={onClose} className="w-full bg-primary hover:bg-primary/90">
+        <Button type="button" onClick={onClose} className="w-full bg-primary hover:bg-primary/90">
           {t('awesome')}
         </Button>
 
@@ -117,6 +117,12 @@ export default function MilestoneModal({
           }
           .animate-confetti {
             animation: confetti 3s ease-out forwards;
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .animate-confetti {
+              animation: none;
+              opacity: 0;
+            }
           }
         `}</style>
       </DialogContent>

@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import ChildNav from '@/components/child/ChildNav';
 import SkipToContent from '@/components/SkipToContent';
+import type { PostgrestError } from '@supabase/supabase-js';
+import { getChildSession } from '@/lib/api/child-auth';
 
 export default async function ChildLayout({
   children,
@@ -13,28 +15,14 @@ export default async function ChildLayout({
 }) {
   const { locale } = await params;
 
-  // Check for child session cookie
-  const cookieStore = await cookies();
-  const childSessionCookie = cookieStore.get('child_session');
+  // Get child session from cookie
+  const childSession = await getChildSession();
 
-  if (!childSessionCookie) {
-    redirect(`/${locale}/child-login`);
-  }
-
-  // Parse child session
-  let childSession: { childId: string; familyId: string };
-  try {
-    childSession = JSON.parse(childSessionCookie.value);
-  } catch (error) {
-    // Invalid JSON in cookie, redirect to login
+  if (!childSession) {
     redirect(`/${locale}/child-login`);
   }
 
   const { childId, familyId } = childSession;
-  if (!childId || !familyId) {
-    // Missing required fields, redirect to login
-    redirect(`/${locale}/child-login`);
-  }
 
   // Verify child exists and get data for navigation
   const supabase = await createClient();
@@ -43,7 +31,7 @@ export default async function ChildLayout({
     .select('name, points_balance, avatar_url')
     .eq('id', childId)
     .eq('family_id', familyId)
-    .single() as { data: { name: string; points_balance: number; avatar_url: string | null } | null; error: any };
+    .single() as { data: { name: string; points_balance: number; avatar_url: string | null } | null; error: PostgrestError | null };
 
   if (error || !childData) {
     // Child not found or deleted, redirect to login
@@ -51,6 +39,7 @@ export default async function ChildLayout({
   }
 
   // Check for parent view mode
+  const cookieStore = await cookies();
   const isParentView = cookieStore.get('parent_view')?.value === 'true';
 
   return (

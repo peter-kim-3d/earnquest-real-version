@@ -79,7 +79,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350, ex
       });
 
       router.refresh();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error deleting goal:', error);
       toast.error(t('toast.deleteFailed'), {
         description: t('toast.deleteFailedDescription'),
@@ -118,36 +118,42 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350, ex
         <div className="flex items-center gap-2 flex-wrap">
           {/* Status Filters */}
           <button
+            type="button"
             onClick={() => setFilter('all')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all ${
+            aria-pressed={filter === 'all'}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
               filter === 'all'
                 ? 'bg-primary text-white shadow-md'
                 : 'bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
-            <Target size={16} weight="bold" />
+            <Target size={16} weight="bold" aria-hidden="true" />
             {t('filter.all')}
           </button>
           <button
+            type="button"
             onClick={() => setFilter('active')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all ${
+            aria-pressed={filter === 'active'}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
               filter === 'active'
                 ? 'bg-primary text-white shadow-md'
                 : 'bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
-            <Target size={16} weight="fill" />
+            <Target size={16} weight="fill" aria-hidden="true" />
             {t('filter.active')}
           </button>
           <button
+            type="button"
             onClick={() => setFilter('completed')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all ${
+            aria-pressed={filter === 'completed'}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
               filter === 'completed'
                 ? 'bg-primary text-white shadow-md'
                 : 'bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
-            <Trophy size={16} weight="fill" />
+            <Trophy size={16} weight="fill" aria-hidden="true" />
             {t('filter.completed')}
           </button>
         </div>
@@ -157,6 +163,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350, ex
           <select
             value={selectedChild}
             onChange={(e) => setSelectedChild(e.target.value)}
+            aria-label={t('childFilter.label')}
             className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm font-medium"
           >
             <option value="all">{t('childFilter.all')}</option>
@@ -170,10 +177,11 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350, ex
 
         {/* New Goal Button */}
         <button
+          type="button"
           onClick={handleNew}
-          className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all flex items-center gap-2"
+          className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
-          <Plus size={18} weight="bold" />
+          <Plus size={18} weight="bold" aria-hidden="true" />
           {t('newGoal')}
         </button>
       </div>
@@ -210,9 +218,9 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350, ex
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="flex items-center gap-2">
                         {goal.is_completed ? (
-                          <Trophy size={24} weight="duotone" className="text-yellow-600" />
+                          <Trophy size={24} weight="duotone" className="text-yellow-600" aria-hidden="true" />
                         ) : (
-                          <Target size={24} weight="duotone" className="text-primary" />
+                          <Target size={24} weight="duotone" className="text-primary" aria-hidden="true" />
                         )}
                         <h3 className="font-bold text-gray-900 dark:text-white">
                           {goal.name}
@@ -220,18 +228,21 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350, ex
                       </div>
                       <div className="flex items-center gap-1">
                         <button
+                          type="button"
                           onClick={() => handleEdit(goal)}
-                          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                          title="Edit goal"
+                          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                          aria-label={t('actions.edit')}
                         >
-                          <Pencil size={16} className="text-gray-500" />
+                          <Pencil size={16} className="text-gray-500" aria-hidden="true" />
                         </button>
                         <button
+                          type="button"
                           onClick={() => setDeleteGoal(goal)}
-                          className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                          title="Delete goal"
+                          disabled={isDeleting}
+                          className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                          aria-label={t('actions.delete')}
                         >
-                          <Trash size={16} className="text-red-500" />
+                          <Trash size={16} className="text-red-500" aria-hidden="true" />
                         </button>
                       </div>
                     </div>
@@ -243,7 +254,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350, ex
                     </div>
 
                     {goal.description && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-2" title={goal.description}>
                         {goal.description}
                       </p>
                     )}
@@ -256,7 +267,14 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350, ex
                         </span>
                         <span className="text-gray-500">{Math.round(progress)}%</span>
                       </div>
-                      <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                      <div
+                        className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"
+                        role="progressbar"
+                        aria-valuenow={goal.current_points}
+                        aria-valuemin={0}
+                        aria-valuemax={goal.target_points}
+                        aria-label={t('card.progressLabel', { current: goal.current_points.toLocaleString(), target: goal.target_points.toLocaleString(), percent: Math.round(progress) })}
+                      >
                         <div
                           className={`h-full rounded-full transition-all ${
                             goal.is_completed
@@ -264,6 +282,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350, ex
                               : 'bg-gradient-to-r from-primary to-green-500'
                           }`}
                           style={{ width: `${progress}%` }}
+                          aria-hidden="true"
                         />
                       </div>
                     </div>
@@ -271,7 +290,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350, ex
                     {/* Status */}
                     {goal.is_completed ? (
                       <div className="flex items-center gap-2 text-sm text-yellow-700 dark:text-yellow-400">
-                        <CheckCircle size={16} weight="fill" />
+                        <CheckCircle size={16} weight="fill" aria-hidden="true" />
                         <span className="font-medium">{t('completedStatus')}</span>
                       </div>
                     ) : (
@@ -290,7 +309,7 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350, ex
       {/* Empty State */}
       {filteredGoals.length === 0 && (
         <div className="text-center py-12 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-          <Target size={48} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
+          <Target size={48} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" aria-hidden="true" />
           <p className="text-lg font-semibold text-text-muted dark:text-gray-400 mb-2">
             {filter === 'completed' ? t('noCompletedGoals') : t('noGoals')}
           </p>
@@ -298,10 +317,11 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350, ex
             {t('emptyDescription')}
           </p>
           <button
+            type="button"
             onClick={handleNew}
-            className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all inline-flex items-center gap-2"
+            className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all inline-flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            <Plus size={18} weight="bold" />
+            <Plus size={18} weight="bold" aria-hidden="true" />
             {t('createFirstButton')}
           </button>
         </div>
@@ -319,12 +339,14 @@ export default function GoalList({ goals, childrenList, weeklyEarnings = 350, ex
       {/* Delete Confirmation */}
       <ConfirmDialog
         isOpen={!!deleteGoal}
-        onClose={() => setDeleteGoal(null)}
+        onClose={() => !isDeleting && setDeleteGoal(null)}
         onConfirm={handleDelete}
         title={t('confirm.deleteTitle')}
         description={t('confirm.deleteDescription', { name: deleteGoal?.name || '' })}
-        confirmLabel={isDeleting ? t('confirm.deleting') : t('actions.delete')}
+        confirmLabel={t('actions.delete')}
         cancelLabel={t('confirm.cancel')}
+        isLoading={isDeleting}
+        variant="danger"
       />
     </div>
   );

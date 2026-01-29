@@ -1,20 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
-import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
 import { Star, Trophy, Gift } from 'lucide-react';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
 import LogoutButton from '@/components/auth/LogoutButton';
-
-// Create admin client for child session (bypasses RLS)
-function getAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return createAdminClient(url, key, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-}
+import { getChildSession, getDbClientForChildPage } from '@/lib/api/child-auth';
 
 export default async function ChildProfilePage({
   params,
@@ -24,33 +13,17 @@ export default async function ChildProfilePage({
   const { locale } = await params;
   const supabase = await createClient();
 
-  // Check for child session cookie
-  const cookieStore = await cookies();
-  const childSessionCookie = cookieStore.get('child_session');
+  // Get child session from cookie
+  const childSession = await getChildSession();
 
-  if (!childSessionCookie) {
-    redirect(`/${locale}/child-login`);
-  }
-
-  // Parse child session
-  let childSession: { childId: string; familyId: string };
-  try {
-    childSession = JSON.parse(childSessionCookie.value);
-  } catch (error) {
+  if (!childSession) {
     redirect(`/${locale}/child-login`);
   }
 
   const { childId, familyId } = childSession;
-  if (!childId || !familyId) {
-    redirect(`/${locale}/child-login`);
-  }
 
-  // Check if parent is logged in (for RLS)
-  const { data: { user } } = await supabase.auth.getUser();
-
-  // Use admin client if no parent auth (child direct login)
-  // This bypasses RLS for verified child sessions
-  const dbClient = user ? supabase : (getAdminClient() || supabase);
+  // Get appropriate DB client (admin for child sessions, regular for parent)
+  const dbClient = await getDbClientForChildPage(supabase);
 
   // Parallelize all queries
   const [childResult, familyResult, completedTasksResult, rewardsClaimedResult] = await Promise.all([
@@ -123,7 +96,7 @@ export default async function ChildProfilePage({
         <div className="grid grid-cols-3 gap-4">
           {/* XP Points */}
           <div className="text-center p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20">
-            <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+            <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" aria-hidden="true" />
             <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-100">
               {childData.points_balance}
             </p>
@@ -132,7 +105,7 @@ export default async function ChildProfilePage({
 
           {/* Completed Quests */}
           <div className="text-center p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-            <Trophy className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+            <Trophy className="h-8 w-8 text-blue-500 mx-auto mb-2" aria-hidden="true" />
             <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
               {completedTasksCount}
             </p>
@@ -141,7 +114,7 @@ export default async function ChildProfilePage({
 
           {/* Rewards Claimed */}
           <div className="text-center p-4 rounded-lg bg-green-50 dark:bg-green-900/20">
-            <Gift className="h-8 w-8 text-green-500 mx-auto mb-2" />
+            <Gift className="h-8 w-8 text-green-500 mx-auto mb-2" aria-hidden="true" />
             <p className="text-2xl font-bold text-green-900 dark:text-green-100">
               {rewardsClaimedCount}
             </p>
@@ -160,7 +133,7 @@ export default async function ChildProfilePage({
       {/* Member Since */}
       <div className="mt-6 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
         <p className="text-xs text-text-muted dark:text-text-muted text-center">
-          Quest Hero since {new Date(childData.created_at || '').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          Quest Hero since <time dateTime={childData.created_at}>{new Date(childData.created_at || '').toLocaleDateString(locale, { month: 'long', year: 'numeric' })}</time>
         </p>
       </div>
     </div>

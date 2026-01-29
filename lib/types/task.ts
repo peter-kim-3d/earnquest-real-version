@@ -204,7 +204,7 @@ export interface TaskCompletion {
 
   // Relations (when joined)
   tasks?: Task;
-  children?: any;
+  children?: { id: string; name: string; family_id: string };
 }
 
 /**
@@ -252,7 +252,7 @@ export interface TaskTemplate {
   child_specific: boolean;
 
   // Settings
-  settings?: any; // JSONB
+  settings?: Record<string, unknown>; // JSONB
 
   created_at: string;
   updated_at: string;

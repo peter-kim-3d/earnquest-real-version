@@ -186,7 +186,7 @@ export default async function ProfilePage({
       {/* Account Details */}
       <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
         <p className="text-xs text-text-muted dark:text-text-muted text-center">
-          Member since {new Date(profile?.created_at || '').toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          Member since <time dateTime={profile?.created_at}>{new Date(profile?.created_at || '').toLocaleDateString(locale, { month: 'long', year: 'numeric' })}</time>
         </p>
       </div>
     </div>

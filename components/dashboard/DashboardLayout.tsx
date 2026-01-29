@@ -110,9 +110,9 @@ export default function DashboardLayout({
                                 >
                                     <span className="flex-1">{t(`widgetLabels.${id}`)}</span>
                                     {visibleWidgets[id] ? (
-                                        <Eye size={14} className="ml-2 opacity-50" />
+                                        <Eye size={14} className="ml-2 opacity-50" aria-hidden="true" />
                                     ) : (
-                                        <EyeSlash size={14} className="ml-2 opacity-50" />
+                                        <EyeSlash size={14} className="ml-2 opacity-50" aria-hidden="true" />
                                     )}
                                 </DropdownMenuCheckboxItem>
                             ))}
@@ -123,7 +123,7 @@ export default function DashboardLayout({
 
             {/* Quick Stats */}
             {visibleWidgets.stats && (
-                <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div className="mb-8 motion-safe:animate-in fade-in slide-in-from-top-4 duration-500">
                     {stats}
                 </div>
             )}
@@ -132,25 +132,25 @@ export default function DashboardLayout({
                 {/* Sidebar - Right Column (Inbox & Activity) */}
                 <div className="lg:col-span-1 lg:col-start-3 space-y-6">
                     {visibleWidgets.actionCenter && (
-                        <div className="animate-in fade-in slide-in-from-right-4 duration-500 delay-100">
+                        <div className="motion-safe:animate-in fade-in slide-in-from-right-4 duration-500 delay-100">
                             {actionCenter}
                         </div>
                     )}
 
                     {visibleWidgets.pendingTickets && (
-                        <div className="animate-in fade-in slide-in-from-right-4 duration-500 delay-150">
+                        <div className="motion-safe:animate-in fade-in slide-in-from-right-4 duration-500 delay-150">
                             {pendingTickets}
                         </div>
                     )}
 
                     {visibleWidgets.activityFeed && (
-                        <div className="animate-in fade-in slide-in-from-right-4 duration-500 delay-200">
+                        <div className="motion-safe:animate-in fade-in slide-in-from-right-4 duration-500 delay-200">
                             {activityFeed}
                         </div>
                     )}
 
                     {transactionHistory && visibleWidgets.transactionHistory && (
-                        <div className="animate-in fade-in slide-in-from-right-4 duration-500 delay-250">
+                        <div className="motion-safe:animate-in fade-in slide-in-from-right-4 duration-500 delay-250">
                             {transactionHistory}
                         </div>
                     )}

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 const giftRewardSchema = z.object({
   rewardId: z.string().uuid(),
@@ -65,10 +66,10 @@ export async function POST(request: Request) {
       rewardName: data.reward_name,
       childName: data.child_name,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in reward gift:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }

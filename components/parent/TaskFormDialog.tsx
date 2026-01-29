@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, ImageIcon, Palette } from 'lucide-react';
+import { X, ImageIcon, Palette, Loader2 } from 'lucide-react';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -13,11 +13,39 @@ import { ColorPicker } from '@/components/ui/color-picker';
 import IconPicker from '@/components/tasks/IconPicker';
 import TaskImageUpload from '@/components/tasks/TaskImageUpload';
 import DefaultTaskImagePicker from '@/components/tasks/DefaultTaskImagePicker';
-import { getIconById, TASK_ICON_POOL } from '@/lib/task-icons';
+import { getIconById } from '@/lib/task-icons';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { getErrorMessage } from '@/lib/utils/error';
+import type {
+  TaskCategory,
+  TaskTimeContext,
+  TaskFrequency,
+  ApprovalType,
+  MonthlyMode,
+  TaskMetadata,
+} from '@/lib/types/task';
+import {
+  MIN_TASK_POINTS,
+  MAX_TASK_POINTS,
+  POINTS_STEP,
+  POINTS_PER_MINUTE,
+  DEFAULT_TIMER_MINUTES,
+  MIN_TIMER_MINUTES,
+  MAX_TIMER_MINUTES,
+  DEFAULT_DAYS_OF_WEEK,
+  DEFAULT_MONTHLY_DAY,
+  MAX_CHECKLIST_ITEMS,
+  MAX_CHECKLIST_ITEM_LENGTH,
+  MAX_TASK_NAME_LENGTH,
+} from '@/lib/constants';
 
-type Task = {
+/**
+ * Minimal task props accepted by the dialog
+ * Uses string types for category/frequency/approval_type to be compatible
+ * with existing Task types that use string instead of union types
+ */
+interface TaskProps {
   id: string;
   name: string;
   description: string | null;
@@ -28,7 +56,17 @@ type Task = {
   is_active: boolean;
   icon: string | null;
   image_url: string | null;
-};
+  // Extended fields (may be present depending on API response)
+  monthly_mode?: string;
+  monthly_day?: number;
+  days_of_week?: number[];
+  timer_minutes?: number;
+  checklist?: string[];
+  photo_required?: boolean;
+  metadata?: TaskMetadata;
+  child_id?: string | null;
+  time_context?: string;
+}
 
 type Child = {
   id: string;
@@ -36,12 +74,88 @@ type Child = {
   avatar_url: string | null;
 };
 
-interface TaskFormDialogProps {
-  task: Task | null;
+export interface TaskFormDialogProps {
+  task: TaskProps | null;
   isOpen: boolean;
   onClose: () => void;
   initialChildId?: string | null;
   availableChildren?: Child[]; // List of children for multi-select
+}
+
+/** Form data state type with proper typing */
+interface TaskFormState {
+  name: string;
+  description: string;
+  category: TaskCategory;
+  points: number;
+  frequency: TaskFrequency;
+  approval_type: ApprovalType;
+  icon: string;
+  image_url: string | null;
+  is_active: boolean;
+  auto_assign: boolean;
+  monthly_mode: MonthlyMode;
+  monthly_day: number;
+  days_of_week: number[];
+  timer_minutes: number;
+  checklist: string[];
+  photo_required: boolean;
+  metadata: TaskMetadata;
+  child_id: string | null;
+  color: string;
+  time_context: TaskTimeContext;
+}
+
+/** Creates default form state */
+function createDefaultFormState(initialChildId: string | null): TaskFormState {
+  return {
+    name: '',
+    description: '',
+    category: 'life',
+    points: 50,
+    frequency: 'daily',
+    approval_type: 'parent',
+    icon: 'star',
+    image_url: null,
+    is_active: true,
+    auto_assign: false,
+    monthly_mode: 'any_day',
+    monthly_day: DEFAULT_MONTHLY_DAY,
+    days_of_week: [...DEFAULT_DAYS_OF_WEEK],
+    timer_minutes: DEFAULT_TIMER_MINUTES,
+    checklist: [],
+    photo_required: false,
+    metadata: {},
+    child_id: initialChildId,
+    color: '',
+    time_context: 'anytime',
+  };
+}
+
+/** Creates form state from existing task */
+function createFormStateFromTask(task: TaskProps, initialChildId: string | null): TaskFormState {
+  return {
+    name: task.name,
+    description: task.description || '',
+    category: (task.category as TaskCategory) || 'life',
+    points: task.points,
+    frequency: (task.frequency as TaskFrequency) || 'daily',
+    approval_type: (task.approval_type as ApprovalType) || 'parent',
+    icon: task.icon || 'star',
+    image_url: task.image_url || null,
+    is_active: task.is_active,
+    auto_assign: false,
+    monthly_mode: (task.monthly_mode as MonthlyMode) || 'any_day',
+    monthly_day: task.monthly_day || DEFAULT_MONTHLY_DAY,
+    days_of_week: task.days_of_week || [...DEFAULT_DAYS_OF_WEEK],
+    timer_minutes: task.timer_minutes || DEFAULT_TIMER_MINUTES,
+    checklist: task.checklist || [],
+    photo_required: task.photo_required || false,
+    metadata: task.metadata || {},
+    child_id: task.child_id || initialChildId,
+    color: task.metadata?.color || '',
+    time_context: (task.time_context as TaskTimeContext) || 'anytime',
+  };
 }
 
 export default function TaskFormDialog({ task, isOpen, onClose, initialChildId = null, availableChildren = [] }: TaskFormDialogProps) {
@@ -56,154 +170,88 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showDefaultImagePicker, setShowDefaultImagePicker] = useState(false);
   const [imageMode, setImageMode] = useState<'icon' | 'image'>('icon');
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    category: 'life',
-    points: 50,
-    frequency: 'daily',
-    approval_type: 'parent',
-    icon: 'star', // Default icon
-    image_url: null as string | null, // Custom image URL
-    is_active: true,
-    auto_assign: false, // Changed to false - we don't use task instances
-    monthly_mode: 'any_day' as 'any_day' | 'specific_day' | 'first_day' | 'last_day',
-    monthly_day: 15,
-    days_of_week: [0, 1, 2, 3, 4, 5, 6] as number[], // Default: all days
-    // v2 fields
-    timer_minutes: 20,
-    checklist: [] as string[],
-    photo_required: false,
-    metadata: {} as Record<string, any>,
-    child_id: initialChildId,
-    color: '', // Custom color override
-    time_context: 'anytime' as 'morning' | 'after_school' | 'evening' | 'anytime',
-  });
+  const [formData, setFormData] = useState<TaskFormState>(() => createDefaultFormState(initialChildId));
 
   // Update form when task changes or dialog opens
   useEffect(() => {
     if (isOpen) {
       if (task) {
-        setFormData({
-          name: task.name,
-          description: task.description || '',
-          category: task.category,
-          points: task.points,
-          frequency: task.frequency,
-          approval_type: task.approval_type,
-          icon: task.icon || 'star',
-          image_url: task.image_url || null,
-          is_active: task.is_active,
-          auto_assign: false, // Always false - we don't use task instances
-          monthly_mode: (task as any).monthly_mode || 'any_day',
-          monthly_day: (task as any).monthly_day || 15,
-          days_of_week: (task as any).days_of_week || [0, 1, 2, 3, 4, 5, 6],
-          timer_minutes: (task as any).timer_minutes || 20,
-          checklist: (task as any).checklist || [],
-          photo_required: (task as any).photo_required || false,
-          metadata: (task as any).metadata || {},
-          child_id: (task as any).child_id || initialChildId, // Use task's child_id or fallback to initial
-          color: (task as any).metadata?.color || '',
-          time_context: (task as any).time_context || 'anytime',
-        });
+        setFormData(createFormStateFromTask(task, initialChildId));
         // Set image mode based on whether task has image_url
         setImageMode(task.image_url ? 'image' : 'icon');
       } else {
         // Reset form for new task
-        setFormData({
-          name: '',
-          description: '',
-          category: 'life',
-          points: 50,
-          frequency: 'daily',
-          approval_type: 'parent',
-          icon: 'star',
-          image_url: null,
-          is_active: true,
-          auto_assign: false, // Always false - we don't use task instances
-          monthly_mode: 'any_day',
-          monthly_day: 15,
-          days_of_week: [0, 1, 2, 3, 4, 5, 6],
-          timer_minutes: 20,
-          checklist: [],
-          photo_required: false,
-          metadata: {},
-          child_id: initialChildId,
-          color: '',
-          time_context: 'anytime',
-        });
+        setFormData(createDefaultFormState(initialChildId));
         setImageMode('icon');
       }
     }
   }, [task, isOpen, initialChildId]);
 
+  // Memoize available children IDs to avoid unnecessary effect triggers
+  const availableChildrenIds = useMemo(
+    () => availableChildren.map(c => c.id),
+    [availableChildren]
+  );
+
   // Initialize selected children when dialog opens
   useEffect(() => {
-    if (isOpen) {
-      if (initialChildId) {
-        // Child profile/card: only select the specific child
-        setSelectedChildIds(new Set([initialChildId]));
-      } else if (availableChildren.length > 0) {
-        if (task?.id) {
-          // Edit mode: fetch existing overrides to determine which children are selected
-          fetchTaskOverrides(task.id);
+    if (!isOpen) return;
+
+    if (initialChildId) {
+      // Child profile/card: only select the specific child
+      setSelectedChildIds(new Set([initialChildId]));
+    } else if (availableChildrenIds.length > 0) {
+      if (task?.id) {
+        // Edit mode: fetch existing overrides to determine which children are selected
+        fetchTaskOverrides(task.id, availableChildrenIds);
+      } else {
+        // Create mode: default to all children selected
+        setSelectedChildIds(new Set(availableChildrenIds));
+      }
+    } else {
+      setSelectedChildIds(new Set());
+    }
+
+    async function fetchTaskOverrides(taskId: string, childIds: string[]) {
+      try {
+        const response = await fetch(`/api/tasks/${taskId}/overrides`);
+        if (response.ok) {
+          const data: { overrides: Array<{ child_id: string; is_enabled: boolean }> } = await response.json();
+          const excludedChildIds = new Set(
+            data.overrides
+              .filter(override => !override.is_enabled)
+              .map(override => override.child_id)
+          );
+
+          // Select all children except those that are excluded
+          const selected = childIds.filter(id => !excludedChildIds.has(id));
+          setSelectedChildIds(new Set(selected));
         } else {
-          // Create mode: default to all children selected
-          setSelectedChildIds(new Set(availableChildren.map(c => c.id)));
+          // If fetch fails, default to all children (safer)
+          setSelectedChildIds(new Set(childIds));
         }
-      } else {
-        setSelectedChildIds(new Set());
+      } catch (error: unknown) {
+        console.error('Failed to fetch task overrides:', error);
+        // If fetch fails, default to all children
+        setSelectedChildIds(new Set(childIds));
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, initialChildId, task?.id]);
-
-  // Fetch child_task_overrides for a task
-  const fetchTaskOverrides = async (taskId: string) => {
-    try {
-      const response = await fetch(`/api/tasks/${taskId}/overrides`);
-      if (response.ok) {
-        const data = await response.json();
-        const excludedChildIds = new Set(
-          data.overrides
-            .filter((override: any) => !override.is_enabled)
-            .map((override: any) => override.child_id)
-        );
-
-        // Select all children except those that are excluded
-        const selected = availableChildren
-          .filter(c => !excludedChildIds.has(c.id))
-          .map(c => c.id);
-
-        setSelectedChildIds(new Set(selected));
-      } else {
-        // If fetch fails, default to all children (safer)
-        setSelectedChildIds(new Set(availableChildren.map(c => c.id)));
-      }
-    } catch (error) {
-      console.error('Failed to fetch task overrides:', error);
-      // If fetch fails, default to all children
-      setSelectedChildIds(new Set(availableChildren.map(c => c.id)));
-    }
-  };
+  }, [isOpen, initialChildId, task?.id, availableChildrenIds]);
 
   // v2: Auto-calculate points for timer tasks
   useEffect(() => {
     if (formData.approval_type === 'timer') {
-      const POINTS_PER_MINUTE = 1.5;
       const calculatedPoints = Math.round(formData.timer_minutes * POINTS_PER_MINUTE);
-      // Round to nearest 5
-      const roundedPoints = Math.round(calculatedPoints / 5) * 5;
-
-      // Only update if different to avoid infinite loops if we had bi-directional sync (we don't here but good practice)
-      // and ensure there's a minimum
-      const finalPoints = Math.max(5, roundedPoints);
+      // Round to nearest step
+      const roundedPoints = Math.round(calculatedPoints / POINTS_STEP) * POINTS_STEP;
+      // Ensure minimum points
+      const finalPoints = Math.max(MIN_TASK_POINTS, roundedPoints);
 
       if (finalPoints !== formData.points) {
         setFormData(prev => ({ ...prev, points: finalPoints }));
       }
     }
-  }, [formData.timer_minutes, formData.approval_type]);
+  }, [formData.timer_minutes, formData.approval_type, formData.points]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -244,12 +292,6 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           .map(c => c.id);
 
         // excludedChildIds can be empty array (all children selected) - that's OK!
-        console.log('Task Form: Child assignment', {
-          selectedCount,
-          totalChildren: availableChildren.length,
-          excludedCount: excludedChildIds.length,
-          excludedIds: excludedChildIds,
-        });
       }
 
       const response = await fetch(url, {
@@ -276,18 +318,16 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
 
       router.refresh();
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving task:', error);
-      toast.error(t('dialog.saveFailed'), {
-        description: error.message || tCommon('errors.tryAgain'),
-      });
+      toast.error(t('dialog.saveFailed'), { description: getErrorMessage(error) });
     } finally {
       setLoading(false);
     }
   };
 
-  // v2 categories
-  const categories = [
+  // v2 categories with proper typing
+  const categories: Array<{ value: TaskCategory; label: string; icon: string }> = [
     { value: 'learning', label: t('categoryLabels.learning'), icon: 'school' },
     { value: 'life', label: t('categoryLabels.life'), icon: 'home_work' },
     { value: 'health', label: t('categoryLabels.health'), icon: 'fitness_center' },
@@ -312,11 +352,13 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder={t('form.namePlaceholder')}
-              maxLength={100}
+              maxLength={MAX_TASK_NAME_LENGTH}
+              aria-invalid={hasSubmitted && !formData.name.trim()}
+              aria-describedby={hasSubmitted && !formData.name.trim() ? 'task-name-error' : undefined}
               className={hasSubmitted && !formData.name.trim() ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
             {hasSubmitted && !formData.name.trim() && (
-              <p className="text-sm text-red-500 font-medium">{t('form.nameRequired')}</p>
+              <p id="task-name-error" className="text-sm text-red-500 font-medium" role="alert">{t('form.nameRequired')}</p>
             )}
           </div>
 
@@ -329,25 +371,27 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
               <button
                 type="button"
                 onClick={() => setImageMode('icon')}
+                aria-pressed={imageMode === 'icon'}
                 className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all ${
                   imageMode === 'icon'
                     ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                <Palette className="w-4 h-4" />
+                <Palette className="w-4 h-4" aria-hidden="true" />
                 {t('form.chooseIcon')}
               </button>
               <button
                 type="button"
                 onClick={() => setImageMode('image')}
+                aria-pressed={imageMode === 'image'}
                 className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all ${
                   imageMode === 'image'
                     ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                <ImageIcon className="w-4 h-4" />
+                <ImageIcon className="w-4 h-4" aria-hidden="true" />
                 {t('form.uploadImage')}
               </button>
             </div>
@@ -402,9 +446,10 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, image_url: null })}
-                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold hover:bg-red-600"
+                      aria-label={t('form.removeImage')}
+                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold hover:bg-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-red-500"
                     >
-                      X
+                      <span aria-hidden="true">✕</span>
                     </button>
                   </div>
                 )}
@@ -461,7 +506,8 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                   key={cat.value}
                   type="button"
                   onClick={() => setFormData({ ...formData, category: cat.value, icon: cat.icon })}
-                  className={`p-3 rounded-xl border-2 transition-all text-left ${formData.category === cat.value
+                  aria-pressed={formData.category === cat.value}
+                  className={`p-3 rounded-xl border-2 transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${formData.category === cat.value
                     ? 'border-primary bg-primary/5'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
@@ -487,17 +533,18 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           <div className="space-y-3">
             <Label>{t('form.timeContext')}</Label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {[
+              {([
                 { value: 'morning', label: t('timeContexts.morning'), icon: '☀️' },
                 { value: 'after_school', label: t('timeContexts.afterSchool'), icon: '🏠' },
                 { value: 'evening', label: t('timeContexts.evening'), icon: '🌙' },
                 { value: 'anytime', label: t('timeContexts.anytime'), icon: '📚' },
-              ].map((context) => (
+              ] as const satisfies ReadonlyArray<{ value: TaskTimeContext; label: string; icon: string }>).map((context) => (
                 <button
                   key={context.value}
                   type="button"
-                  onClick={() => setFormData({ ...formData, time_context: context.value as any })}
-                  className={`p-3 rounded-xl border-2 transition-all ${formData.time_context === context.value
+                  onClick={() => setFormData({ ...formData, time_context: context.value })}
+                  aria-pressed={formData.time_context === context.value}
+                  className={`p-3 rounded-xl border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${formData.time_context === context.value
                     ? 'border-primary bg-primary/10 shadow-sm'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
@@ -537,7 +584,8 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                         }
                         setSelectedChildIds(newSelected);
                       }}
-                      className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all ${isSelected
+                      aria-pressed={isSelected}
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${isSelected
                         ? 'border-primary bg-primary/5'
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                         }`}
@@ -585,33 +633,35 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setFormData({ ...formData, points: Math.max(5, formData.points - 5) })}
+                onClick={() => setFormData({ ...formData, points: Math.max(MIN_TASK_POINTS, formData.points - POINTS_STEP) })}
+                aria-label={t('form.decreasePoints')}
                 className="h-10 w-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary hover:bg-primary/5 flex items-center justify-center transition-all"
               >
-                <span className="text-xl font-bold">−</span>
+                <span className="text-xl font-bold" aria-hidden="true">−</span>
               </button>
               <div className="flex-1">
                 <input
                   type="range"
                   name="points"
-                  min="5"
-                  max="500"
-                  step="5"
+                  min={MIN_TASK_POINTS}
+                  max={MAX_TASK_POINTS}
+                  step={POINTS_STEP}
                   value={formData.points}
                   onChange={(e) => setFormData({ ...formData, points: parseInt(e.target.value) })}
                   className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary"
                 />
                 <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  <span>5 XP</span>
-                  <span>500 XP</span>
+                  <span>{MIN_TASK_POINTS} XP</span>
+                  <span>{MAX_TASK_POINTS} XP</span>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => setFormData({ ...formData, points: Math.min(500, formData.points + 5) })}
+                onClick={() => setFormData({ ...formData, points: Math.min(MAX_TASK_POINTS, formData.points + POINTS_STEP) })}
+                aria-label={t('form.increasePoints')}
                 className="h-10 w-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-primary hover:bg-primary/5 flex items-center justify-center transition-all"
               >
-                <span className="text-xl font-bold">+</span>
+                <span className="text-xl font-bold" aria-hidden="true">+</span>
               </button>
             </div>
           </div>
@@ -620,17 +670,18 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           <div className="space-y-3">
             <Label>{t('form.frequencyLabel')}</Label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {[
+              {([
                 { value: 'daily', label: t('frequencies.daily'), icon: '☀️' },
                 { value: 'weekly', label: t('frequencies.weekly'), icon: '📅' },
                 { value: 'monthly', label: t('frequencies.monthly'), icon: '📆' },
                 { value: 'one_time', label: t('frequencies.oneTime'), icon: '⚡' },
-              ].map((freq) => (
+              ] as const satisfies ReadonlyArray<{ value: TaskFrequency; label: string; icon: string }>).map((freq) => (
                 <button
                   key={freq.value}
                   type="button"
                   onClick={() => setFormData({ ...formData, frequency: freq.value })}
-                  className={`p-3 rounded-xl border-2 transition-all ${formData.frequency === freq.value
+                  aria-pressed={formData.frequency === freq.value}
+                  className={`p-3 rounded-xl border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${formData.frequency === freq.value
                     ? 'border-primary bg-primary/10 shadow-sm'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
@@ -648,17 +699,18 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
           <div className="space-y-3">
             <Label>{t('form.approvalLabel')}</Label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {[
+              {([
                 { value: 'parent', label: t('form.approvalParent'), icon: '👤' },
                 { value: 'timer', label: t('form.approvalTimer'), icon: '⏱️' },
                 { value: 'checklist', label: t('form.approvalChecklist'), icon: '✓' },
                 { value: 'auto', label: t('form.approvalAuto'), icon: '⚡' },
-              ].map((method) => (
+              ] as const satisfies ReadonlyArray<{ value: ApprovalType; label: string; icon: string }>).map((method) => (
                 <button
                   key={method.value}
                   type="button"
                   onClick={() => setFormData({ ...formData, approval_type: method.value })}
-                  className={`p-3 rounded-xl border-2 transition-all ${formData.approval_type === method.value
+                  aria-pressed={formData.approval_type === method.value}
+                  className={`p-3 rounded-xl border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${formData.approval_type === method.value
                     ? 'border-primary bg-primary/10 shadow-sm'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
@@ -696,18 +748,18 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                     } else {
                       const num = parseInt(val);
                       if (!isNaN(num)) {
-                        setFormData({ ...formData, timer_minutes: Math.min(180, Math.max(0, num)) });
+                        setFormData({ ...formData, timer_minutes: Math.min(MAX_TIMER_MINUTES, Math.max(0, num)) });
                       }
                     }
                   }}
-                  onBlur={(e) => {
-                    // Ensure minimum value of 1 on blur
-                    if (!e.target.value || formData.timer_minutes < 1) {
-                      setFormData({ ...formData, timer_minutes: 1 });
+                  onBlur={() => {
+                    // Ensure minimum value on blur
+                    if (formData.timer_minutes < MIN_TIMER_MINUTES) {
+                      setFormData({ ...formData, timer_minutes: MIN_TIMER_MINUTES });
                     }
                   }}
-                  min={1}
-                  max={180}
+                  min={MIN_TIMER_MINUTES}
+                  max={MAX_TIMER_MINUTES}
                   step={1}
                   className="w-24 text-center text-lg font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:opacity-100 [&::-webkit-outer-spin-button]:opacity-100"
                   required
@@ -732,7 +784,7 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                         setFormData({ ...formData, checklist: newChecklist });
                       }}
                       placeholder={t('form.checklistPlaceholder', { index: index + 1 })}
-                      maxLength={100}
+                      maxLength={MAX_CHECKLIST_ITEM_LENGTH}
                       required
                     />
                     <button
@@ -741,13 +793,14 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                         const newChecklist = formData.checklist.filter((_, i) => i !== index);
                         setFormData({ ...formData, checklist: newChecklist });
                       }}
+                      aria-label={t('form.removeChecklistItem')}
                       className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600"
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </div>
                 ))}
-                {formData.checklist.length < 10 && (
+                {formData.checklist.length < MAX_CHECKLIST_ITEMS && (
                   <button
                     type="button"
                     onClick={() => {
@@ -767,30 +820,6 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
               </p>
             </div>
           )}
-
-          {/* Auto-Assign - Hidden for now as frequency already handles this
-          {['daily', 'weekly', 'monthly'].includes(formData.frequency) && (
-            <div className="space-y-2 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="auto_assign"
-                  checked={formData.auto_assign}
-                  onChange={(e) => setFormData({ ...formData, auto_assign: e.target.checked })}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus-visible:ring-primary"
-                />
-                <div className="flex-1">
-                  <Label htmlFor="auto_assign" className="cursor-pointer font-semibold text-blue-900 dark:text-blue-100">
-                    {t('form.autoAssignLabel')}
-                  </Label>
-                  <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                    {t('form.autoAssignHelp')}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-          */}
 
           {/* Weekly Task Options */}
           {formData.frequency === 'weekly' && (
@@ -824,7 +853,8 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                           });
                         }
                       }}
-                      className={`p-2 rounded-lg border-2 transition-all text-xs font-semibold ${isSelected
+                      aria-pressed={isSelected}
+                      className={`p-2 rounded-lg border-2 transition-all text-xs font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${isSelected
                         ? 'border-primary bg-primary text-white'
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                         }`}
@@ -848,7 +878,10 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
                 <select
                   id="monthly_mode"
                   value={formData.monthly_mode}
-                  onChange={(e) => setFormData({ ...formData, monthly_mode: e.target.value as any })}
+                  onChange={(e) => {
+                    const value = e.target.value as MonthlyMode;
+                    setFormData({ ...formData, monthly_mode: value });
+                  }}
                   className="w-full h-10 px-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-text-main dark:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <option value="any_day">{t('form.monthlyAnyDay')}</option>
@@ -893,8 +926,10 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
             <Button
               type="submit"
               disabled={loading}
+              aria-busy={loading}
               className="flex-1 h-11 bg-green-600 hover:bg-green-700 text-white font-bold"
             >
+              {loading && <Loader2 className="h-4 w-4 mr-2 motion-safe:animate-spin" aria-hidden="true" />}
               {loading ? t('actions.saving') : task ? t('actions.update') : t('actions.create')}
             </Button>
           </div>

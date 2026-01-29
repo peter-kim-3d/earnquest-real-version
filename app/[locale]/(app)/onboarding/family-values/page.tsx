@@ -111,7 +111,7 @@ export default function FamilyValuesPage() {
 
       // Navigate to next step
       router.push(`/${locale}/onboarding/complete`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to save values:', error);
       toast.error(t('saveFailed'), {
         description: tCommon('errors.generic'),
@@ -133,7 +133,7 @@ export default function FamilyValuesPage() {
             {t('stepTitle')}
           </p>
         </div>
-        <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+        <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700" role="progressbar" aria-valuenow={75} aria-valuemin={0} aria-valuemax={100} aria-label={tProgress('step', { current: 3, total: 4 })}>
           <div className="h-2 w-3/4 rounded-full bg-primary shadow-[0_0_10px_rgba(55,236,19,0.5)]" />
         </div>
       </div>
@@ -149,7 +149,7 @@ export default function FamilyValuesPage() {
 
         {/* Psychology Pro Tip */}
         <div className="mt-2 flex items-start gap-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 p-4 border border-blue-100 dark:border-blue-800/30">
-          <Lightbulb className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+          <Lightbulb className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" aria-hidden="true" />
           <div>
             <p className="text-sm font-bold text-blue-900 dark:text-blue-100">
               {t('whyNoPoints')}
@@ -169,7 +169,7 @@ export default function FamilyValuesPage() {
             className="group relative flex cursor-pointer flex-col gap-4 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-card-dark p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1 has-[:checked]:border-primary has-[:checked]:ring-1 has-[:checked]:ring-primary has-[:checked]:bg-primary/5 dark:has-[:checked]:bg-primary/10"
           >
             <div className="flex items-start justify-between">
-              <div className="flex size-12 items-center justify-center rounded-full bg-background-light dark:bg-background-dark text-text-main dark:text-white">
+              <div className="flex size-12 items-center justify-center rounded-full bg-background-light dark:bg-background-dark text-text-main dark:text-white" aria-hidden="true">
                 <AppIcon name={value.icon} size={24} weight="duotone" />
               </div>
               {/* Toggle Switch */}
@@ -196,9 +196,9 @@ export default function FamilyValuesPage() {
         ))}
 
         {/* Add Custom Value */}
-        <button className="flex min-h-44 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700 bg-transparent p-6 text-text-muted dark:text-text-muted hover:border-primary hover:bg-primary/5 hover:text-primary transition-all">
+        <button type="button" className="flex min-h-44 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-700 bg-transparent p-6 text-text-muted dark:text-text-muted hover:border-primary hover:bg-primary/5 hover:text-primary transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
           <div className="flex size-12 items-center justify-center rounded-full bg-background-light dark:bg-background-dark">
-            <Plus className="h-6 w-6" />
+            <Plus className="h-6 w-6" aria-hidden="true" />
           </div>
           <span className="font-medium">{t('addCustomValue')}</span>
         </button>
@@ -207,18 +207,21 @@ export default function FamilyValuesPage() {
       {/* Footer Actions */}
       <div className="mt-8 flex flex-col-reverse items-center justify-between gap-4 border-t border-gray-200 dark:border-gray-800 pt-8 sm:flex-row">
         <button
+          type="button"
           onClick={handleSkip}
-          className="w-full rounded-xl px-6 py-3 text-base font-bold text-text-muted dark:text-text-muted hover:bg-gray-100 dark:hover:bg-gray-800 sm:w-auto transition-colors"
+          className="w-full rounded-xl px-6 py-3 text-base font-bold text-text-muted dark:text-text-muted hover:bg-gray-100 dark:hover:bg-gray-800 sm:w-auto transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
         >
           {t('skipForNow')}
         </button>
         <button
+          type="button"
           onClick={handleComplete}
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-10 py-3 text-base font-bold text-black shadow-lg shadow-primary/25 hover:bg-primary/90 hover:shadow-primary/40 focus:ring-4 focus:ring-primary/30 sm:w-auto transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-busy={loading}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-10 py-3 text-base font-bold text-black shadow-lg shadow-primary/25 hover:bg-primary/90 hover:shadow-primary/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:w-auto transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span>{loading ? tCommon('status.saving') : t('completeSelection')}</span>
-          <ArrowRight className="h-5 w-5" />
+          <ArrowRight className="h-5 w-5" aria-hidden="true" />
         </button>
       </div>
     </div>

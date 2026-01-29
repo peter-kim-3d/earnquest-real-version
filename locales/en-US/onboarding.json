@@ -25,6 +25,7 @@
     "yearsOld": "{age} years old",
     "childNumber": "Child #{number}",
     "addAnother": "Add Another Child",
+    "removeChild": "Remove child",
     "saveAndContinue": "Save {count, plural, one {# Child} other {# Children}} & Continue",
     "mustHaveOneChild": "You must have at least one child",
     "fillAllFields": "Please fill in all child names and birthdates",

@@ -30,7 +30,7 @@ export default function PresetSelector({ selectedPreset, onSelectPreset }: Prese
         return (
           <label
             key={key}
-            className={`group relative flex flex-col gap-4 rounded-xl border-2 border-solid bg-white dark:bg-card-dark p-6 cursor-pointer hover:shadow-lg transition-all duration-200 ${
+            className={`group relative flex flex-col gap-4 rounded-xl border-2 border-solid bg-white dark:bg-card-dark p-6 cursor-pointer hover:shadow-lg transition-all duration-200 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 ${
               isRecommended
                 ? 'ring-4 ring-transparent hover:ring-primary/10 border-gray-200 dark:border-gray-800'
                 : 'border-gray-200 dark:border-gray-800 hover:border-primary'
@@ -43,13 +43,14 @@ export default function PresetSelector({ selectedPreset, onSelectPreset }: Prese
               value={key}
               checked={isSelected}
               onChange={() => onSelectPreset(key)}
+              aria-label={`${preset.name}${isRecommended ? ` (${t('recommended')})` : ''}`}
             />
 
             {/* Active State Border */}
             <div className="absolute inset-0 rounded-lg border-2 border-transparent peer-checked:border-primary pointer-events-none" />
 
             {/* Active State Checkmark */}
-            <div className="absolute -top-2.5 -right-2.5 bg-primary text-black rounded-full p-1 hidden peer-checked:block shadow-md z-10">
+            <div className="absolute -top-2.5 -right-2.5 bg-primary text-black rounded-full p-1 hidden peer-checked:block shadow-md z-10" aria-hidden="true">
               <CheckCircle2 className="h-4 w-4" />
             </div>
 
@@ -59,7 +60,7 @@ export default function PresetSelector({ selectedPreset, onSelectPreset }: Prese
                 <h2 className="text-text-main dark:text-white text-lg font-bold leading-tight">{preset.name}</h2>
                 {isRecommended && (
                   <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider rounded-full px-2 py-1 bg-primary text-black">
-                    <Star className="h-3 w-3" />
+                    <Star className="h-3 w-3" aria-hidden="true" />
                     {t('recommended')}
                   </span>
                 )}
@@ -67,7 +68,7 @@ export default function PresetSelector({ selectedPreset, onSelectPreset }: Prese
 
               {/* Icon & Description */}
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-3xl">{preset.icon}</span>
+                <span className="text-3xl" aria-hidden="true">{preset.icon}</span>
                 <div className="flex flex-col">
                   <span className="text-text-main dark:text-white text-xl font-black leading-tight tracking-[-0.02em]">
                     {t('tasks', { count: preset.taskKeys.length })}
@@ -92,13 +93,13 @@ export default function PresetSelector({ selectedPreset, onSelectPreset }: Prese
                   key={index}
                   className="text-sm font-normal leading-normal flex items-start gap-3 text-text-main dark:text-white"
                 >
-                  <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                   <span>{example}</span>
                 </div>
               ))}
               {templates.length > 3 && (
                 <div className="text-sm font-normal leading-normal flex items-start gap-3 text-text-main dark:text-white opacity-50">
-                  <Plus className="h-5 w-5 shrink-0 mt-0.5" />
+                  <Plus className="h-5 w-5 shrink-0 mt-0.5" aria-hidden="true" />
                   <span>{t('moreTasks', { count: templates.length - 3 })}</span>
                 </div>
               )}

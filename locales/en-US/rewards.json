@@ -7,6 +7,9 @@
   "newReward": "New Reward",
   "edit": "Edit Reward",
   "noRewards": "No rewards yet",
+  "noInactiveRewards": "No inactive rewards",
+  "emptyDescription": "Create rewards for your children to earn and redeem",
+  "createFirstButton": "Create First Reward",
   "createFirst": "Create your first reward to get started!",
   "clickNewReward": "Click \"New Reward\" above to create your first reward!",
   "pageStats": {
@@ -46,7 +49,8 @@
     "isActiveHelp": "Inactive rewards won't appear in store",
     "dollarValue": "Dollar Value",
     "parentOnly": "Parent Only",
-    "dollarValueHelp": "Based on your exchange rate: $1 = {rate} XP"
+    "dollarValueHelp": "Based on your exchange rate: $1 = {rate} XP",
+    "removeImage": "Remove image"
   },
   "dialog": {
     "editTitle": "Edit Reward",
@@ -130,6 +134,7 @@
   "card": {
     "inactive": "Inactive",
     "edit": "Edit",
+    "moreOptions": "More options",
     "updateFailed": "Failed to update reward. Please try again.",
     "deleteFailed": "Failed to delete reward. Please try again."
   },
@@ -167,5 +172,9 @@
     "success": "Gift sent!",
     "successDescription": "{name} received {reward}!",
     "failed": "Gift failed"
+  },
+  "imagePicker": {
+    "title": "Choose a Default Image",
+    "all": "All"
   }
 }

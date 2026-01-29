@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import { AppIcon } from '@/components/ui/AppIcon';
@@ -42,7 +42,7 @@ export default function TaskCardNeedsWork({ task, completion, onResubmit }: Task
     setLoading(true);
     try {
       await onResubmit(task.id, undefined, task.instance_id || undefined);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to resubmit task:', error);
       toast.error(tCard('submitFailed'), { description: tCard('failedToSubmit') });
     } finally {
@@ -71,7 +71,7 @@ export default function TaskCardNeedsWork({ task, completion, onResubmit }: Task
           {/* Icon & Content */}
           <div className="flex items-start gap-4 flex-1">
             {/* Icon */}
-            <div className={`${getCategoryColor(task.category)} rounded-xl p-3 shrink-0`}>
+            <div className={`${getCategoryColor(task.category)} rounded-xl p-3 shrink-0`} aria-hidden="true">
               <AppIcon name={task.icon || 'task_alt'} size={24} weight="duotone" />
             </div>
 
@@ -97,7 +97,7 @@ export default function TaskCardNeedsWork({ task, completion, onResubmit }: Task
           {/* Points Badge */}
           <div className="shrink-0">
             <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
-              <span className="text-sm font-bold text-primary">
+              <span className="text-sm font-bold text-primary tabular-nums">
                 +{task.points} XP
               </span>
             </div>
@@ -108,7 +108,7 @@ export default function TaskCardNeedsWork({ task, completion, onResubmit }: Task
         {completion.fix_request && (
           <div className="mt-4 p-4 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
             <div className="flex items-start gap-2 mb-2">
-              <AlertCircle className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
+              <AlertCircle className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" aria-hidden="true" />
               <p className="text-sm font-semibold text-orange-800 dark:text-orange-200">
                 {t('pleaseCheck')}
               </p>
@@ -132,10 +132,13 @@ export default function TaskCardNeedsWork({ task, completion, onResubmit }: Task
 
         {/* Action Button */}
         <button
+          type="button"
           onClick={handleResubmit}
           disabled={loading}
-          className="mt-4 w-full px-6 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-base shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-busy={loading}
+          className="mt-4 w-full px-6 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-base shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-600 focus-visible:ring-offset-2"
         >
+          {loading && <Loader2 className="h-5 w-5 motion-safe:animate-spin" aria-hidden="true" />}
           {loading ? t('submitting') : t('tryAgain')}
         </button>
       </div>

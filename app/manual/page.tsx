@@ -37,7 +37,7 @@ export default function ManualPage() {
           </div>
           <div className="flex items-center gap-4">
             <a href="/pamphlet" className="text-[#688961] hover:text-[#121811] font-medium flex items-center gap-2 transition-colors">
-              <Home className="w-4 h-4" />
+              <Home className="w-4 h-4" aria-hidden="true" />
               Home
             </a>
             <Link href="/en-US/login" className="bg-[#2bb800] hover:bg-[#229900] px-5 py-2 rounded-full text-white font-semibold transition-all">
@@ -51,6 +51,7 @@ export default function ManualPage() {
         {/* Mobile Contents Toggle */}
         <div className="md:hidden fixed bottom-4 left-4 right-4 z-40">
           <button
+            type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="w-full bg-white rounded-2xl shadow-lg border border-[#2bb800]/20 p-4 flex items-center justify-between"
           >
@@ -63,7 +64,7 @@ export default function ManualPage() {
                 <p className="font-semibold text-[#121811]">{currentSection?.title}</p>
               </div>
             </div>
-            <ChevronDown className={`w-5 h-5 text-[#688961] transition-transform ${mobileMenuOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-5 h-5 text-[#688961] transition-transform ${mobileMenuOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
           </button>
 
           {/* Mobile Menu Dropdown */}
@@ -77,6 +78,7 @@ export default function ManualPage() {
                 {sections.map((section) => (
                   <li key={section.id}>
                     <button
+                      type="button"
                       onClick={() => navigateTo(section.id)}
                       className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3 ${
                         activeSection === section.id
@@ -105,6 +107,7 @@ export default function ManualPage() {
               {sections.map((section) => (
                 <li key={section.id}>
                   <button
+                    type="button"
                     onClick={() => navigateTo(section.id)}
                     className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3 ${
                       activeSection === section.id
@@ -138,10 +141,11 @@ export default function ManualPage() {
                 {/* Previous */}
                 {prevSection ? (
                   <button
+                    type="button"
                     onClick={() => navigateTo(prevSection.id)}
                     className="flex-1 flex items-center gap-3 p-4 rounded-xl border border-[#688961]/20 hover:border-[#2bb800] hover:bg-[#2bb800]/5 transition-all group text-left"
                   >
-                    <ChevronLeft className="w-5 h-5 text-[#688961] group-hover:text-[#2bb800] flex-shrink-0" />
+                    <ChevronLeft className="w-5 h-5 text-[#688961] group-hover:text-[#2bb800] flex-shrink-0" aria-hidden="true" />
                     <div className="min-w-0">
                       <p className="text-xs text-[#688961]">Previous</p>
                       <p className="font-semibold text-[#121811] truncate">{prevSection.title}</p>
@@ -155,6 +159,7 @@ export default function ManualPage() {
                 <div className="hidden md:flex items-center gap-1">
                   {sections.map((section, index) => (
                     <button
+                      type="button"
                       key={section.id}
                       onClick={() => navigateTo(section.id)}
                       className={`w-2 h-2 rounded-full transition-all ${
@@ -170,6 +175,7 @@ export default function ManualPage() {
                 {/* Next */}
                 {nextSection ? (
                   <button
+                    type="button"
                     onClick={() => navigateTo(nextSection.id)}
                     className="flex-1 flex items-center justify-end gap-3 p-4 rounded-xl border border-[#688961]/20 hover:border-[#2bb800] hover:bg-[#2bb800]/5 transition-all group text-right"
                   >
@@ -177,7 +183,7 @@ export default function ManualPage() {
                       <p className="text-xs text-[#688961]">Next</p>
                       <p className="font-semibold text-[#121811] truncate">{nextSection.title}</p>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-[#688961] group-hover:text-[#2bb800] flex-shrink-0" />
+                    <ChevronRight className="w-5 h-5 text-[#688961] group-hover:text-[#2bb800] flex-shrink-0" aria-hidden="true" />
                   </button>
                 ) : (
                   <div className="flex-1" />
@@ -202,15 +208,15 @@ function GettingStarted() {
         <h3 className="font-display text-xl font-bold text-[#121811] mb-2">What You'll Need</h3>
         <ul className="space-y-2 text-[#688961]">
           <li className="flex items-center gap-3">
-            <CheckCircle className="w-5 h-5 text-[#2bb800]" />
+            <CheckCircle className="w-5 h-5 text-[#2bb800]" aria-hidden="true" />
             <span>5 minutes of time</span>
           </li>
           <li className="flex items-center gap-3">
-            <CheckCircle className="w-5 h-5 text-[#2bb800]" />
+            <CheckCircle className="w-5 h-5 text-[#2bb800]" aria-hidden="true" />
             <span>Google or email account</span>
           </li>
           <li className="flex items-center gap-3">
-            <CheckCircle className="w-5 h-5 text-[#2bb800]" />
+            <CheckCircle className="w-5 h-5 text-[#2bb800]" aria-hidden="true" />
             <span>Your child's name and birthdate</span>
           </li>
         </ul>
@@ -220,11 +226,11 @@ function GettingStarted() {
         <p className="text-[#688961] mb-4">Three ways to create your parent account:</p>
         <ul className="space-y-2 text-[#688961]">
           <li className="flex gap-3">
-            <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
+            <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" aria-hidden="true" />
             <div><strong>Google OAuth</strong> - One-click sign up with your Google account</div>
           </li>
           <li className="flex gap-3">
-            <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
+            <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" aria-hidden="true" />
             <div><strong>Email + Password</strong> - Traditional sign up with email confirmation</div>
           </li>
         </ul>
@@ -287,7 +293,7 @@ function GettingStarted() {
 
       <div className="bg-[#0ea5e9]/10 rounded-xl p-6 mt-10">
         <h3 className="font-display text-xl font-bold text-[#121811] mb-2 flex items-center gap-2">
-          <Heart className="w-6 h-6 text-[#0ea5e9]" />
+          <Heart className="w-6 h-6 text-[#0ea5e9]" aria-hidden="true" />
           Pro Tip
         </h3>
         <p className="text-[#688961]">
@@ -1075,7 +1081,7 @@ function KindnessExample({ title, items }: any) {
       <ul className="space-y-2 text-[#688961] text-sm">
         {items.map((item: string, i: number) => (
           <li key={i} className="flex items-start gap-2">
-            <Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" />
+            <Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" aria-hidden="true" />
             <span>{item}</span>
           </li>
         ))}

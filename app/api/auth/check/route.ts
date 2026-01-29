@@ -22,7 +22,7 @@ export async function GET() {
           }
         : null,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Auth check error:', error);
     return NextResponse.json({
       authenticated: false,

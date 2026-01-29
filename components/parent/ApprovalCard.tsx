@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, Clock, MessageSquare } from 'lucide-react';
+import { Check, Clock, MessageSquare, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import FixRequestModal from './FixRequestModal';
@@ -60,7 +60,7 @@ export default function ApprovalCard({ completion, onApprove, onFixRequest }: Ap
 
       onApprove?.();
       router.refresh();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to approve:', error);
       toast.error(t('approvalFailed'), { description: t('approvalFailedDescription') });
     } finally {
@@ -126,7 +126,7 @@ export default function ApprovalCard({ completion, onApprove, onFixRequest }: Ap
             )}
 
             <div className="flex items-center gap-3 text-sm text-text-muted dark:text-gray-500">
-              <Clock className="h-4 w-4" />
+              <Clock className="h-4 w-4" aria-hidden="true" />
               <span>{t('submitted', { time: formatTime(completion.requested_at) })}</span>
             </div>
           </div>
@@ -135,19 +135,26 @@ export default function ApprovalCard({ completion, onApprove, onFixRequest }: Ap
         {/* Action Buttons */}
         <div className="flex gap-3">
           <button
+            type="button"
             onClick={handleApprove}
             disabled={loading}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 hover:shadow-xl transition-all disabled:opacity-50"
+            aria-busy={loading}
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 hover:shadow-xl transition-all disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            <Check className="h-5 w-5" />
-            {t('confirmComplete')}
+            {loading ? (
+              <Loader2 className="h-5 w-5 motion-safe:animate-spin" aria-hidden="true" />
+            ) : (
+              <Check className="h-5 w-5" aria-hidden="true" />
+            )}
+            {loading ? t('approving') : t('confirmComplete')}
           </button>
           <button
+            type="button"
             onClick={() => setShowFixRequestModal(true)}
             disabled={loading}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-semibold transition-all disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-semibold transition-all disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
           >
-            <MessageSquare className="h-5 w-5" />
+            <MessageSquare className="h-5 w-5" aria-hidden="true" />
             {t('requestFix')}
           </button>
         </div>

@@ -72,7 +72,37 @@
     "rejected": "거절됨",
     "completed": "완료됨",
     "active": "활성",
-    "inactive": "비활성"
+    "inactive": "비활성",
+    "enabled": "활성화됨",
+    "disabled": "비활성화됨"
+  },
+  "auth": {
+    "logout": "로그아웃",
+    "loggingOut": "로그아웃 중...",
+    "logoutDescription": "계정에서 로그아웃합니다"
+  },
+  "camera": {
+    "switchCamera": "카메라 전환",
+    "positionFace": "원 안에 얼굴을 맞춰주세요",
+    "cancel": "취소",
+    "takePhoto": "사진 찍기",
+    "cameraError": "카메라에 접근할 수 없습니다. 권한을 확인해주세요.",
+    "cameraPreview": "프로필 사진 촬영을 위한 카메라 미리보기"
+  },
+  "avatar": {
+    "selectImageFile": "이미지 파일을 선택해주세요",
+    "processing": "처리 중...",
+    "imageSizeLimit": "이미지 크기는 5MB 미만이어야 합니다",
+    "childIdRequired": "아이 ID가 필요합니다",
+    "avatarUpdated": "아바타가 업데이트되었습니다!",
+    "updateFailed": "아바타 업데이트에 실패했습니다",
+    "takePhoto": "사진 찍기",
+    "adjustPhoto": "사진 조정",
+    "chooseProfilePicture": "프로필 사진 선택",
+    "customPhoto": "직접 촬영",
+    "camera": "카메라",
+    "upload": "업로드",
+    "chooseAvatar": "아바타 선택"
   },
   "time": {
     "today": "오늘",

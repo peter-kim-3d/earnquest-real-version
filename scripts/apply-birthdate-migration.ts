@@ -61,8 +61,8 @@ async function applyMigration() {
     console.log('✅ Migration applied successfully!');
     console.log('✅ The children table now has a birthdate column\n');
 
-  } catch (err: any) {
-    console.error('❌ Error:', err.message);
+  } catch (err: unknown) {
+    console.error('❌ Error:', err instanceof Error ? err.message : String(err));
     console.log('\n📝 Please apply this migration manually:');
     console.log('1. Go to: Supabase Dashboard → SQL Editor');
     console.log('2. Run the SQL from: supabase/migrations/016_add_birthdate_to_children.sql\n');

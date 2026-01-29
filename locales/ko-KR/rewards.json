@@ -7,6 +7,9 @@
   "newReward": "새 보상",
   "edit": "보상 수정",
   "noRewards": "아직 보상이 없습니다",
+  "noInactiveRewards": "비활성 보상이 없습니다",
+  "emptyDescription": "아이들이 교환할 수 있는 보상을 만들어보세요",
+  "createFirstButton": "첫 보상 만들기",
   "createFirst": "첫 번째 보상을 만들어 시작하세요!",
   "clickNewReward": "위의 \"새 보상\"을 클릭해서 첫 번째 보상을 만드세요!",
   "pageStats": {
@@ -46,7 +49,8 @@
     "isActiveHelp": "비활성화된 보상은 스토어에 보이지 않습니다",
     "dollarValue": "금액",
     "parentOnly": "부모 전용",
-    "dollarValueHelp": "설정한 환율 기준: ₩1,000 = {rate} XP"
+    "dollarValueHelp": "설정한 환율 기준: ₩1,000 = {rate} XP",
+    "removeImage": "이미지 삭제"
   },
   "dialog": {
     "editTitle": "보상 수정",
@@ -130,6 +134,7 @@
   "card": {
     "inactive": "비활성",
     "edit": "수정",
+    "moreOptions": "더보기",
     "updateFailed": "보상 업데이트에 실패했습니다. 다시 시도해주세요.",
     "deleteFailed": "보상 삭제에 실패했습니다. 다시 시도해주세요."
   },
@@ -167,5 +172,9 @@
     "success": "선물 완료!",
     "successDescription": "{name}에게 {reward}을(를) 보냈어요!",
     "failed": "선물 실패"
+  },
+  "imagePicker": {
+    "title": "기본 이미지 선택",
+    "all": "전체"
   }
 }

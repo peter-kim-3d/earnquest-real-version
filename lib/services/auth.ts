@@ -17,7 +17,6 @@ function getRedirectUrl() {
 export async function signInWithGoogle() {
   const supabase = createClient();
   const redirectTo = getRedirectUrl();
-  console.log('OAuth redirectTo:', redirectTo); // Debug log
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {

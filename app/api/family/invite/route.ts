@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { randomBytes } from 'crypto';
 import { cookies } from 'next/headers';
+import { getRequiredAdminClient } from '@/lib/supabase/admin-client';
+import { INVITE_EXPIRATION_DAYS } from '@/lib/constants';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 /**
  * POST /api/family/invite
@@ -38,15 +40,12 @@ export async function POST(request: NextRequest) {
     // Generate unique token
     const token = randomBytes(32).toString('hex');
 
-    // Set expiration to 7 days from now
+    // Set expiration
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
+    expiresAt.setDate(expiresAt.getDate() + INVITE_EXPIRATION_DAYS);
 
     // Create invitation using admin client to bypass RLS
-    const adminClient = createAdminClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const adminClient = getRequiredAdminClient();
 
     const insertData = {
       family_id: userProfile.family_id,
@@ -88,12 +87,9 @@ export async function POST(request: NextRequest) {
         expiresAt: invitation.expires_at,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Invite error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }
 
@@ -144,11 +140,8 @@ export async function GET() {
     }
 
     return NextResponse.json({ invitations: invitations || [] });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Get invitations error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 // GET: Fetch timer state for a task/child combination
 export async function GET(request: NextRequest) {
@@ -34,12 +35,9 @@ export async function GET(request: NextRequest) {
       success: true,
       timerState: data,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Get timer state error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }
 
@@ -82,11 +80,8 @@ export async function POST(request: NextRequest) {
       success: true,
       timerState: data.timer_state,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Save timer state error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

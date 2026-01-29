@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { CreateTaskSchema, formatZodError } from '@/lib/validation/task';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,10 +38,10 @@ function initializeAdminClient() {
     });
 
     return adminClient;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Create Task: Admin client initialization error', {
-      error: error.message,
-      stack: error.stack,
+      error: getErrorMessage(error),
+      stack: error instanceof Error ? error.stack : undefined,
     });
     return null;
   }
@@ -83,9 +84,9 @@ export async function POST(request: Request) {
     try {
       body = await request.json();
       console.log('Create Task: Body parsed successfully');
-    } catch (parseError: any) {
+    } catch (parseError: unknown) {
       console.error('Create Task: JSON parsing failed', {
-        error: parseError.message,
+        error: getErrorMessage(parseError),
       });
       return NextResponse.json(
         {
@@ -129,17 +130,17 @@ export async function POST(request: Request) {
         category: validationResult.data.category,
         approvalType: validationResult.data.approval_type,
       });
-    } catch (validationError: any) {
+    } catch (validationError: unknown) {
       console.error('Create Task: Validation threw exception', {
-        error: validationError.message,
-        stack: validationError.stack,
+        error: getErrorMessage(validationError),
+        stack: validationError instanceof Error ? validationError.stack : undefined,
       });
       return NextResponse.json(
         {
           success: false,
           error: 'Validation Error',
           message: 'An unexpected error occurred during validation',
-          details: validationError.message,
+          details: getErrorMessage(validationError),
         },
         { status: 500 }
       );
@@ -232,17 +233,17 @@ export async function POST(request: Request) {
 
       userProfile = data;
       console.log('Create Task: Profile fetched', { familyId: data.family_id });
-    } catch (profileException: any) {
+    } catch (profileException: unknown) {
       console.error('Create Task: Profile fetch threw exception', {
-        error: profileException.message,
-        stack: profileException.stack,
+        error: getErrorMessage(profileException),
+        stack: profileException instanceof Error ? profileException.stack : undefined,
       });
       return NextResponse.json(
         {
           success: false,
           error: 'Database Error',
           message: 'An error occurred while fetching user profile',
-          details: profileException.message,
+          details: getErrorMessage(profileException),
         },
         { status: 500 }
       );
@@ -360,9 +361,9 @@ export async function POST(request: Request) {
             } else {
               console.log('Create Task: Overrides created successfully');
             }
-          } catch (overrideException: any) {
+          } catch (overrideException: unknown) {
             console.error('Create Task: Override exception (non-fatal)', {
-              error: overrideException.message,
+              error: getErrorMessage(overrideException),
             });
             // Don't fail the request
           }
@@ -379,30 +380,30 @@ export async function POST(request: Request) {
         },
         { status: 201 }
       );
-    } catch (insertException: any) {
+    } catch (insertException: unknown) {
       console.error('Create Task: Insert threw exception', {
-        error: insertException.message,
-        stack: insertException.stack,
+        error: getErrorMessage(insertException),
+        stack: insertException instanceof Error ? insertException.stack : undefined,
       });
       return NextResponse.json(
         {
           success: false,
           error: 'Database Error',
           message: 'An error occurred while creating the task',
-          details: insertException.message,
+          details: getErrorMessage(insertException),
         },
         { status: 500 }
       );
     }
-  } catch (topLevelError: any) {
+  } catch (topLevelError: unknown) {
     // =========================================================================
     // TOP-LEVEL ERROR HANDLER
     // This should catch any unexpected errors not caught by inner try/catch
     // =========================================================================
     console.error('Create Task: TOP LEVEL ERROR', {
-      error: topLevelError.message,
-      stack: topLevelError.stack,
-      name: topLevelError.name,
+      error: getErrorMessage(topLevelError),
+      stack: topLevelError instanceof Error ? topLevelError.stack : undefined,
+      name: topLevelError instanceof Error ? topLevelError.name : undefined,
     });
 
     return NextResponse.json(
@@ -410,7 +411,7 @@ export async function POST(request: Request) {
         success: false,
         error: 'Internal Server Error',
         message: 'An unexpected error occurred',
-        details: topLevelError.message,
+        details: getErrorMessage(topLevelError),
       },
       { status: 500 }
     );

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
-import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { getRequiredAdminClient } from '@/lib/supabase/admin-client';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function POST(request: Request) {
     try {
@@ -30,10 +31,7 @@ export async function POST(request: Request) {
 
         // Use Service Role to bypass potential RLS recursion issues
         // We verified the user is authenticated above via normal client.
-        const supabaseAdmin = createAdminClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+        const supabaseAdmin = getRequiredAdminClient();
 
         // Upsert into child_task_overrides
         const { error } = await supabaseAdmin
@@ -62,11 +60,8 @@ export async function POST(request: Request) {
         }
 
         return NextResponse.json({ success: true });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Internal Error in task toggle:', error);
-        return NextResponse.json(
-            { error: 'Internal server error', details: error.message },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
     }
 }

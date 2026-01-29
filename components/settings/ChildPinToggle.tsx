@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { RefreshCw, Check } from '@/components/ui/ClientIcons';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
@@ -31,11 +31,7 @@ export default function ChildPinToggle() {
   const [editingPins, setEditingPins] = useState<Record<string, string>>({});
   const [savingPin, setSavingPin] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchSettings();
-  }, []);
-
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     setFetching(true);
     try {
       const res = await fetch('/api/family/settings');
@@ -60,7 +56,11 @@ export default function ChildPinToggle() {
     } finally {
       setFetching(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
 
   const handleToggleClick = () => {
     if (requirePin) {
@@ -155,7 +155,8 @@ export default function ChildPinToggle() {
   if (fetching) {
     return (
       <div className="flex items-center justify-center py-4">
-        <RefreshCw className="h-5 w-5 animate-spin text-primary" />
+        <RefreshCw className="h-5 w-5 motion-safe:animate-spin text-primary" aria-hidden="true" />
+        <span className="sr-only">{t('loading')}</span>
       </div>
     );
   }
@@ -235,19 +236,21 @@ export default function ChildPinToggle() {
                     placeholder="0000"
                   />
                   <button
+                    type="button"
                     onClick={() => handleSavePin(child.id)}
                     disabled={savingPin === child.id || !isPinChanged(child.id) || editingPins[child.id]?.length !== 4}
-                    className={`p-2 rounded-lg transition-colors ${
+                    aria-busy={savingPin === child.id}
+                    className={`p-2 min-h-[44px] min-w-[44px] rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                       isPinChanged(child.id) && editingPins[child.id]?.length === 4
                         ? 'bg-primary hover:bg-primary/90 text-white'
                         : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                     } disabled:opacity-50`}
-                    title={isPinChanged(child.id) ? t('savePin') : t('noChanges')}
+                    aria-label={isPinChanged(child.id) ? t('savePin') : t('noChanges')}
                   >
                     {savingPin === child.id ? (
-                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <RefreshCw className="w-4 h-4 motion-safe:animate-spin" aria-hidden="true" />
                     ) : (
-                      <Check className="w-4 h-4" />
+                      <Check className="w-4 h-4" aria-hidden="true" />
                     )}
                   </button>
                 </div>
@@ -263,7 +266,7 @@ export default function ChildPinToggle() {
           ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
           : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
       }`}>
-        <span className="text-lg">{requirePin ? '🔒' : '⚠️'}</span>
+        <span className="text-lg" aria-hidden="true">{requirePin ? '🔒' : '⚠️'}</span>
         <div className="flex-1">
           <p className={`text-sm font-medium mb-1 ${
             requirePin
@@ -297,7 +300,7 @@ export default function ChildPinToggle() {
           </DialogHeader>
           <div className="py-4">
             <div className="flex items-start gap-3 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
-              <span className="text-lg">⚠️</span>
+              <span className="text-lg" aria-hidden="true">⚠️</span>
               <div className="flex-1">
                 <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-1">
                   {t('disableDialog.warningTitle')}
@@ -310,15 +313,18 @@ export default function ChildPinToggle() {
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
             <button
+              type="button"
               onClick={() => setShowDisableDialog(false)}
-              className="px-6 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold transition-all"
+              className="px-6 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               {t('cancel')}
             </button>
             <button
+              type="button"
               onClick={handleConfirmDisable}
               disabled={loading}
-              className="px-6 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-black font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-busy={loading}
+              className="px-6 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-black font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2"
             >
               {loading ? t('disabling') : t('disablePin')}
             </button>

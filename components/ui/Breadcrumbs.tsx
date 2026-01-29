@@ -51,13 +51,13 @@ export default function Breadcrumbs() {
                 href={`/${locale}`}
                 className="flex items-center text-text-muted dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors"
             >
-                <House size={16} />
+                <House size={16} aria-hidden="true" />
                 <span className="sr-only">Home</span>
             </Link>
 
             {breadcrumbs.map((crumb) => (
                 <div key={crumb.href} className="flex items-center">
-                    <CaretRight size={12} className="mx-2 text-gray-400" />
+                    <CaretRight size={12} className="mx-2 text-gray-400" aria-hidden="true" />
                     {crumb.isLast ? (
                         <span className="font-medium text-text-main dark:text-white" aria-current="page">
                             {crumb.label}

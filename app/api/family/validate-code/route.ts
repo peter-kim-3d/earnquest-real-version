@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   let body: unknown;
   try {
     body = await request.json();
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'INVALID_JSON', message: 'Invalid request body' },
       { status: 400 }

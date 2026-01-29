@@ -213,7 +213,7 @@ export const CreateTaskSchema = z
       // Only allow auto for whitelisted template keys
       if (data.approval_type === 'auto' && data.metadata?.source?.templateKey) {
         const templateKey = data.metadata.source.templateKey;
-        return AUTO_APPROVAL_WHITELIST.includes(templateKey as any);
+        return (AUTO_APPROVAL_WHITELIST as readonly string[]).includes(templateKey);
       }
       // Allow auto for manual tasks (parent can override), but warn in UI
       return true;

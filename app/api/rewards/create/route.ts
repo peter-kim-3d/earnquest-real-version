@@ -1,32 +1,16 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { getErrorMessage } from '@/lib/api/error-handler';
+import { authenticateAndGetFamily, errors } from '@/lib/api/responses';
 
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
 
-    // Check authentication
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Get user's family
-    const { data: userProfile } = await supabase
-      .from('users')
-      .select('family_id')
-      .eq('id', user.id)
-      .single();
-
-    if (!userProfile) {
-      return NextResponse.json(
-        { error: 'User profile not found' },
-        { status: 404 }
-      );
-    }
+    // Authenticate and get family
+    const authResult = await authenticateAndGetFamily(supabase);
+    if ('error' in authResult) return authResult.error;
+    const { familyId } = authResult;
 
     const body = await request.json();
     const {
@@ -44,17 +28,14 @@ export async function POST(request: Request) {
 
     // Validate required fields
     if (!name || !category || !points_cost) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+      return errors.missingFields(['name', 'category', 'points_cost']);
     }
 
     // Create reward
     const { data: reward, error: createError } = await supabase
       .from('rewards')
       .insert({
-        family_id: userProfile.family_id,
+        family_id: familyId,
         name,
         description: description || null,
         category,
@@ -71,10 +52,7 @@ export async function POST(request: Request) {
 
     if (createError) {
       console.error('Error creating reward:', createError);
-      return NextResponse.json(
-        { error: 'Failed to create reward' },
-        { status: 500 }
-      );
+      return errors.internalError('Failed to create reward');
     }
 
     return NextResponse.json({
@@ -82,11 +60,8 @@ export async function POST(request: Request) {
       reward,
       message: 'Reward created successfully!',
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in reward creation:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return errors.internalError(getErrorMessage(error));
   }
 }

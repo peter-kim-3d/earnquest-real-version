@@ -70,13 +70,21 @@ export default function ChecklistModal({
                 {t('complete', { completed: completedCount, total: totalCount })}
               </span>
             </div>
-            <div className="h-3 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+            <div
+              className="h-3 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"
+              role="progressbar"
+              aria-valuenow={completedCount}
+              aria-valuemin={0}
+              aria-valuemax={totalCount}
+              aria-label={t('progressLabel', { completed: completedCount, total: totalCount })}
+            >
               <div
                 className={`h-full transition-all duration-300 rounded-full ${allChecked
                     ? 'bg-gradient-to-r from-green-500 to-green-600'
                     : 'bg-gradient-to-r from-primary to-blue-600'
                   }`}
                 style={{ width: `${progress}%` }}
+                aria-hidden="true"
               />
             </div>
           </div>
@@ -92,14 +100,16 @@ export default function ChecklistModal({
                 return (
                   <button
                     key={index}
+                    type="button"
                     onClick={() => toggleItem(index)}
-                    className={`w-full p-4 rounded-xl border-2 transition-all text-left flex items-start gap-3 ${isChecked
+                    aria-pressed={isChecked}
+                    className={`w-full p-4 rounded-xl border-2 transition-all text-left flex items-start gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${isChecked
                         ? 'border-primary bg-primary/5 shadow-md shadow-primary/10'
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                       }`}
                   >
                     {/* Checkbox Icon */}
-                    <div className="flex-shrink-0 mt-0.5">
+                    <div className="flex-shrink-0 mt-0.5" aria-hidden="true">
                       {isChecked ? (
                         <CheckSquare className="h-6 w-6 text-primary" />
                       ) : (
@@ -121,7 +131,7 @@ export default function ChecklistModal({
 
                     {/* Checkmark Animation */}
                     {isChecked && (
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0" aria-hidden="true">
                         <div className="h-6 w-6 rounded-full bg-green-500 flex items-center justify-center">
                           <Check className="h-4 w-4 text-white" />
                         </div>
@@ -159,7 +169,7 @@ export default function ChecklistModal({
                   : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                 }`}
             >
-              <Check className="h-5 w-5 mr-2" />
+              <Check className="h-5 w-5 mr-2" aria-hidden="true" />
               {t('completeTask')}
             </Button>
           </div>

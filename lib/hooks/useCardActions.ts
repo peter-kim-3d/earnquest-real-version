@@ -85,7 +85,7 @@ export function useCardActions({
         }
 
         router.refresh();
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error toggling active:', error);
         toast.error(errorMessages.updateFailed);
       } finally {
@@ -114,7 +114,7 @@ export function useCardActions({
         }
 
         router.refresh();
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error deleting:', error);
         toast.error(errorMessages.deleteFailed);
       } finally {

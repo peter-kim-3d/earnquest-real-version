@@ -2,7 +2,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function TasksLoading() {
     return (
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="container mx-auto px-4 py-8 max-w-7xl" role="status" aria-live="polite" aria-busy="true">
+            <span className="sr-only">Loading tasks...</span>
             {/* Page Header Skeleton */}
             <div className="mb-8">
                 <Skeleton className="h-10 w-64 mb-2" />

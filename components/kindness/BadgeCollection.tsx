@@ -73,7 +73,7 @@ export function BadgeCollection({
       {/* Progress Section */}
       <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-xl">
         <div className="flex items-center gap-4 mb-4">
-          <Sparkle className="path-primary-kindness w-8 h-8 text-primary-kindness" />
+          <Sparkle className="path-primary-kindness w-8 h-8 text-primary-kindness" aria-hidden="true" />
           <div>
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               {t('yourProgress')}
@@ -87,7 +87,7 @@ export function BadgeCollection({
         </div>
 
         {cardsToNextBadge > 0 ? (
-          <div className="bg-gradient-to-r from-primary-kindness/10 to-orange-600/10 rounded-2xl p-4 border border-primary-kindness/30">
+          <div className="bg-gradient-to-r from-primary-kindness/10 to-orange-600/10 rounded-2xl p-4 border border-primary-kindness/50 dark:border-primary-kindness/40">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-900 dark:text-white">
                 {t('nextBadge', { name: badgeLevels[nextBadgeLevel - 1].name })}
@@ -96,7 +96,14 @@ export function BadgeCollection({
                 {totalCards}/{badgeLevels[nextBadgeLevel - 1].required}
               </span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+            <div
+              className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden"
+              role="progressbar"
+              aria-valuenow={totalCards}
+              aria-valuemin={0}
+              aria-valuemax={badgeLevels[nextBadgeLevel - 1].required}
+              aria-label={t('nextBadge', { name: badgeLevels[nextBadgeLevel - 1].name })}
+            >
               <div
                 className="h-full bg-gradient-to-r from-primary-kindness to-orange-600 rounded-full transition-all duration-500"
                 style={{
@@ -104,6 +111,7 @@ export function BadgeCollection({
                     100
                     }%`,
                 }}
+                aria-hidden="true"
               />
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
@@ -115,7 +123,7 @@ export function BadgeCollection({
         ) : (
           <div className="bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 rounded-2xl p-4 border border-yellow-500/30">
             <p className="text-center font-semibold text-gray-900 dark:text-white">
-              🎉 {t('maxLevel')}
+              <span aria-hidden="true">🎉 </span>{t('maxLevel')}
             </p>
           </div>
         )}
@@ -146,7 +154,7 @@ export function BadgeCollection({
               >
                 {/* Lock overlay for unearned */}
                 {!isEarned && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm rounded-3xl">
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm rounded-3xl" aria-hidden="true">
                     <Lock className="w-12 h-12 text-white" />
                   </div>
                 )}
@@ -160,6 +168,7 @@ export function BadgeCollection({
                       flex items-center justify-center text-5xl
                       ${isEarned ? 'shadow-2xl' : 'grayscale'}
                     `}
+                    aria-hidden="true"
                   >
                     {badgeLevel.icon}
                   </div>
@@ -206,7 +215,7 @@ export function BadgeCollection({
                   key={card.id}
                   className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg"
                 >
-                  <div className={`${theme.gradient} p-4 h-24 flex items-center justify-center`}>
+                  <div className={`${theme.gradient} p-4 h-24 flex items-center justify-center`} aria-hidden="true">
                     <span className="text-4xl">{theme.icon}</span>
                   </div>
                   <div className="p-4">
@@ -227,7 +236,7 @@ export function BadgeCollection({
       {/* Empty State */}
       {recentCards.length === 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-3xl p-12 text-center shadow-xl">
-          <div className="text-6xl mb-4">💌</div>
+          <div className="text-6xl mb-4" aria-hidden="true">💌</div>
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
             {t('noCardsYet')}
           </h3>

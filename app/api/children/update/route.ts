@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { PIN_REGEX } from '@/lib/api/validation';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -35,7 +37,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Validate PIN if provided
-    if (pinCode && !/^\d{4}$/.test(pinCode)) {
+    if (pinCode && !PIN_REGEX.test(pinCode)) {
       return NextResponse.json(
         { error: 'PIN must be exactly 4 digits' },
         { status: 400 }
@@ -71,7 +73,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Update child
-    const updateData: any = {};
+    const updateData: Record<string, string> = {};
 
     // Add fields if provided
     if (name) updateData.name = name;
@@ -102,11 +104,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     return NextResponse.json({ child });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Update child error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

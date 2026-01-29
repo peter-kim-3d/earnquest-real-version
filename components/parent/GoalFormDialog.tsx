@@ -9,10 +9,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Target, Info, Sparkle } from '@phosphor-icons/react/dist/ssr';
+import { Target, Info, Sparkle, CircleNotch } from '@phosphor-icons/react/dist/ssr';
 import { getTierForPoints, getTierLabel, TIER_RANGES, Tier } from '@/lib/utils/tiers';
 import { EffortBadge, TierBadge } from '@/components/ui/EffortBadge';
 import { useTranslations } from 'next-intl';
+import { getErrorMessage } from '@/lib/utils/error';
 import {
   calculatePointsFromDollars,
   calculateDollarValue,
@@ -203,10 +204,9 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList, ex
       router.refresh();
       onClose();
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Error saving goal:', error);
       toast.error(t('toast.saveFailed'), {
-        description: errorMessage || t('toast.error'),
+        description: getErrorMessage(error),
       });
     } finally {
       setLoading(false);
@@ -251,7 +251,7 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList, ex
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-2xl font-bold">
-            <Target size={24} className="text-primary" />
+            <Target size={24} className="text-primary" aria-hidden="true" />
             {goal ? t('form.editTitle') : t('form.createTitle')}
           </DialogTitle>
         </DialogHeader>
@@ -267,7 +267,8 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList, ex
                     key={child.id}
                     type="button"
                     onClick={() => setFormData({ ...formData, childId: child.id })}
-                    className={`p-3 rounded-xl border-2 transition-all text-left ${
+                    aria-pressed={formData.childId === child.id}
+                    className={`p-3 rounded-xl border-2 transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                       formData.childId === child.id
                         ? 'border-primary bg-primary/5'
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -278,7 +279,7 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList, ex
                 ))}
               </div>
               {hasSubmitted && !formData.childId && (
-                <p className="text-sm text-red-500 font-medium">{t('form.selectChild')}</p>
+                <p className="text-sm text-red-500 font-medium" role="alert">{t('form.selectChild')}</p>
               )}
             </div>
           )}
@@ -296,7 +297,7 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList, ex
               className={hasSubmitted && !formData.name.trim() ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
             {hasSubmitted && !formData.name.trim() && (
-              <p className="text-sm text-red-500 font-medium">{t('form.nameRequired')}</p>
+              <p className="text-sm text-red-500 font-medium" role="alert">{t('form.nameRequired')}</p>
             )}
           </div>
 
@@ -312,6 +313,9 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList, ex
               className="min-h-20"
               maxLength={500}
             />
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-right">
+              {formData.description.length}/500
+            </p>
           </div>
 
           {/* Dollar Value (Parent Reference) */}
@@ -364,7 +368,8 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList, ex
                   key={preset.value}
                   type="button"
                   onClick={() => setFormData({ ...formData, targetPoints: preset.value })}
-                  className={`p-3 rounded-xl border-2 transition-all text-left ${
+                  aria-pressed={formData.targetPoints === preset.value}
+                  className={`p-3 rounded-xl border-2 transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                     formData.targetPoints === preset.value
                       ? 'border-primary bg-primary/5'
                       : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -383,7 +388,7 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList, ex
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label className="flex items-center gap-2">
-                <Sparkle size={16} className="text-yellow-500" />
+                <Sparkle size={16} className="text-yellow-500" aria-hidden="true" />
                 {t('form.milestoneBonuses')}
               </Label>
               <div className="flex items-center gap-2">
@@ -485,7 +490,7 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList, ex
           {/* Info Box */}
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-sm">
             <div className="flex items-start gap-2">
-              <Info size={18} className="text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+              <Info size={18} className="text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" aria-hidden="true" />
               <div>
                 <p className="font-semibold text-blue-800 dark:text-blue-200 mb-1">
                   {t('form.howGoalsWork')}
@@ -511,8 +516,10 @@ export default function GoalFormDialog({ goal, isOpen, onClose, childrenList, ex
             <Button
               type="submit"
               disabled={loading}
+              aria-busy={loading}
               className="flex-1 bg-primary hover:bg-primary/90"
             >
+              {loading && <CircleNotch size={16} className="mr-2 motion-safe:animate-spin" aria-hidden="true" />}
               {loading ? t('form.saving') : goal ? t('actions.update') : t('actions.create')}
             </Button>
           </div>

@@ -45,13 +45,18 @@ export function EffortBadge({
   };
 
   const renderStars = () => (
-    <span className="inline-flex items-center gap-0.5">
+    <span
+      className="inline-flex items-center gap-0.5"
+      role="img"
+      aria-label={`${stars} out of 4 stars - ${label} effort`}
+    >
       {Array.from({ length: stars }).map((_, i) => (
         <Star
           key={i}
           size={starSizes[size]}
           weight="fill"
           className="text-yellow-500"
+          aria-hidden="true"
         />
       ))}
       {/* Empty stars to show max */}
@@ -61,6 +66,7 @@ export function EffortBadge({
           size={starSizes[size]}
           weight="regular"
           className="text-gray-300 dark:text-gray-600"
+          aria-hidden="true"
         />
       ))}
     </span>

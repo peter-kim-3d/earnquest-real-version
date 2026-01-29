@@ -57,8 +57,8 @@ async function addBirthdateColumn() {
 
     console.log('✅ Successfully added birthdate column!\n');
 
-  } catch (error: any) {
-    console.error('❌ Could not add column automatically:', error.message);
+  } catch (error: unknown) {
+    console.error('❌ Could not add column automatically:', error instanceof Error ? error.message : String(error));
     console.log('\n📋 Please add the column manually:\n');
     console.log('1. Go to: https://supabase.com/dashboard/project/blstphkvdrrhtdxrllvx/sql');
     console.log('2. Click "+ New query"');

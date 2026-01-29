@@ -38,7 +38,9 @@
     "deleteConfirm": "{name}을(를) 제거하시겠습니까? 모든 데이터가 삭제됩니다.",
     "avatar": "아바타",
     "viewAsChild": "아이 화면 보기",
+    "editChild": "아이 정보 수정",
     "questPoints": "퀘스트 포인트",
+    "pointsDisplay": "{points} QP",
     "memberSince": "{date}에 가입",
     "ageGroups": {
       "4-6": "4-6세",
@@ -159,9 +161,11 @@
     "shareText": "EarnQuest에서 우리 가족에 함께해 주세요! 링크를 클릭하여 시작하세요.",
     "expiresOn": "이 링크는 {date}에 만료됩니다.",
     "done": "완료",
-    "createFailed": "초대 생성에 실패했습니다"
+    "createFailed": "초대 생성에 실패했습니다",
+    "copyFailed": "복사에 실패했습니다"
   },
   "pinToggle": {
+    "loading": "설정 불러오는 중...",
     "title": "아이에게 PIN 요구",
     "descriptionEnabled": "아이들이 대시보드에 접근하려면 4자리 PIN을 입력해야 해요",
     "descriptionDisabled": "아이들이 PIN 없이 대시보드에 접근할 수 있어요",
@@ -222,6 +226,7 @@
     }
   },
   "deviceConnection": {
+    "loading": "코드 불러오는 중...",
     "copyCode": "코드 복사",
     "instructions": {
       "childDevice": "아이가 기기에서 앱을 열 때 이 코드를 입력할 수 있어요",

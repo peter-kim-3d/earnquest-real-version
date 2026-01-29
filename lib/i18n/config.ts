@@ -3,6 +3,13 @@ export type Locale = (typeof locales)[number];
 
 export const defaultLocale: Locale = 'en-US';
 
+/**
+ * Type guard to check if a string is a valid locale
+ */
+export function isValidLocale(locale: string): locale is Locale {
+  return locales.includes(locale as Locale);
+}
+
 export interface LocaleConfig {
   language: string;
   region: string;

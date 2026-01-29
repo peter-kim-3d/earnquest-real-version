@@ -43,7 +43,7 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
       router.push(`/${locale}/login`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Logout failed:', error);
     }
   };
@@ -122,7 +122,7 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                  className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-full"
                   aria-label={`Profile menu for ${parentName}`}
                 >
                   <AvatarDisplay
@@ -131,7 +131,7 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
                     size="sm"
                     editable={false}
                   />
-                  <CaretDown className="h-4 w-4 text-gray-500 hidden sm:block" />
+                  <CaretDown className="h-4 w-4 text-gray-500 hidden sm:block" aria-hidden="true" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -141,19 +141,19 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href={`/${locale}/profile`} className="flex items-center gap-2 cursor-pointer">
-                    <User size={18} />
+                    <User size={18} aria-hidden="true" />
                     {t('nav.profile')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href={`/${locale}/settings`} className="flex items-center gap-2 cursor-pointer">
-                    <Gear size={18} />
+                    <Gear size={18} aria-hidden="true" />
                     {t('nav.settings')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogoutClick} className="flex items-center gap-2 cursor-pointer text-red-600 dark:text-red-400">
-                  <SignOut size={18} />
+                  <SignOut size={18} aria-hidden="true" />
                   {t('nav.logout')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -161,12 +161,13 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
 
             {/* Mobile menu button */}
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden h-12 w-12 flex items-center justify-center text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="md:hidden h-12 w-12 flex items-center justify-center text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               aria-label={mobileMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X size={24} /> : <List size={24} />}
+              {mobileMenuOpen ? <X size={24} aria-hidden="true" /> : <List size={24} aria-hidden="true" />}
             </button>
           </div>
         </div>
@@ -209,8 +210,9 @@ export default function ParentNav({ parentName = 'Parent', avatarUrl = null }: P
                 <ModeToggle />
               </div>
               <button
+                type="button"
                 onClick={handleLogoutClick}
-                className="px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-400 rounded-lg bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors"
+                className="px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-400 rounded-lg bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
               >
                 {t('nav.signOut')}
               </button>

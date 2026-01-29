@@ -92,7 +92,7 @@ export default function ChildLoginPage() {
       setChildren(children);
       setRequireChildPin(pinRequired ?? true);
       setStep('selection');
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Validation error:', err);
       setError(t('errors.networkError'));
     } finally {
@@ -229,11 +229,12 @@ export default function ChildLoginPage() {
       <div className="w-full max-w-md">
         {/* Back Button */}
         <button
+          type="button"
           onClick={handleBack}
           disabled={step === 'logging'}
-          className="mb-6 flex items-center gap-2 text-text-muted dark:text-text-muted hover:text-primary transition-colors disabled:opacity-50"
+          className="mb-6 flex items-center gap-2 text-text-muted dark:text-text-muted hover:text-primary transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg px-2 py-1 -mx-2 -my-1"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-5 w-5" aria-hidden="true" />
           {t('back')}
         </button>
 
@@ -260,10 +261,10 @@ export default function ChildLoginPage() {
                     <button
                       type="button"
                       onClick={() => setShowInfoPopup(true)}
-                      className="text-text-muted hover:text-primary transition-colors"
-                      aria-label="How to get family code"
+                      className="text-text-muted hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-full"
+                      aria-label={t('infoPopup.title')}
                     >
-                      <HelpCircle className="h-4 w-4" />
+                      <HelpCircle className="h-4 w-4" aria-hidden="true" />
                     </button>
                   </div>
                   <input
@@ -276,18 +277,18 @@ export default function ChildLoginPage() {
                         setError('');
                       }
                     }}
-                    placeholder="ABC123"
+                    placeholder={t('codePlaceholder')}
                     maxLength={6}
                     className={`w-full text-center text-3xl tracking-widest uppercase font-mono px-4 py-4 rounded-xl border-2 bg-white dark:bg-gray-800 text-text-main dark:text-white focus:outline-none focus:ring-2 transition-all ${error
-                      ? 'border-red-500 focus:border-red-500 focus:ring-red-200 animate-shake'
+                      ? 'border-red-500 focus:border-red-500 focus:ring-red-200 motion-safe:animate-shake'
                       : 'border-gray-200 dark:border-gray-700 focus:border-primary focus:ring-primary/20'
                       }`}
                   />
                 </div>
 
                 {error && (
-                  <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
-                    <span className="text-xl">⚠️</span>
+                  <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-start gap-3 motion-safe:animate-in fade-in slide-in-from-top-2" role="alert">
+                    <span className="text-xl" aria-hidden="true">⚠️</span>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-red-700 dark:text-red-400">
                         {t('errors.connectionIssue')}
@@ -302,11 +303,12 @@ export default function ChildLoginPage() {
                 <button
                   type="submit"
                   disabled={familyCode.length !== 6 || loading}
-                  className="w-full py-4 bg-primary hover:bg-primary/90 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-semibold rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-primary hover:bg-primary/90 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white font-semibold rounded-xl transition-colors disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  aria-busy={loading}
                 >
                   {loading ? (
                     <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <Loader2 className="h-5 w-5 motion-safe:animate-spin" aria-hidden="true" />
                       {t('checking')}
                     </>
                   ) : (
@@ -336,11 +338,13 @@ export default function ChildLoginPage() {
               <div className="space-y-3">
                 {children.map((child) => (
                   <button
+                    type="button"
                     key={child.id}
                     onClick={() => handleChildSelect(child)}
-                    className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all group"
+                    className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    aria-label={t('selectChildButton', { name: child.name })}
                   >
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-green-600 flex items-center justify-center text-white text-2xl font-bold">
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-green-600 flex items-center justify-center text-white text-2xl font-bold" aria-hidden="true">
                       {getAgeGroupEmoji(child.age_group)}
                     </div>
                     <div className="flex-1 text-left">
@@ -351,7 +355,7 @@ export default function ChildLoginPage() {
                         {t('age', { ageGroup: child.age_group })}
                       </p>
                     </div>
-                    <AppIcon name="arrow_forward" size={20} className="text-gray-400 group-hover:text-primary" />
+                    <AppIcon name="arrow_forward" size={20} className="text-gray-400 group-hover:text-primary" aria-hidden="true" />
                   </button>
                 ))}
               </div>
@@ -378,7 +382,7 @@ export default function ChildLoginPage() {
               </div>
 
               {/* PIN Dots */}
-              <div className="flex justify-center gap-4 mb-8">
+              <div className="flex justify-center gap-4 mb-8" role="status" aria-live="polite" aria-label={t('pinProgress', { count: enteredPin.length })}>
                 {[0, 1, 2, 3].map((i) => (
                   <div
                     key={i}
@@ -386,13 +390,15 @@ export default function ChildLoginPage() {
                       ? 'bg-primary scale-110'
                       : 'bg-gray-200 dark:bg-gray-700'
                       }`}
+                    aria-hidden="true"
                   />
                 ))}
+                <span className="sr-only">{t('pinProgress', { count: enteredPin.length })}</span>
               </div>
 
               {/* Error Message */}
               {error && (
-                <div className="mb-4 text-center animate-shake">
+                <div className="mb-4 text-center motion-safe:animate-shake" role="alert">
                   <p className="text-red-500 text-sm font-semibold bg-red-50 dark:bg-red-900/20 py-1 px-3 rounded-full inline-block">
                     {error}
                   </p>
@@ -400,28 +406,34 @@ export default function ChildLoginPage() {
               )}
 
               {/* Numpad */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-3" role="group" aria-label={t('numpad')}>
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                   <button
+                    type="button"
                     key={num}
                     onClick={() => handlePinType(num.toString())}
-                    className="h-16 rounded-2xl bg-gray-50 dark:bg-gray-800 text-2xl font-bold text-text-main dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all shadow-sm border border-gray-200 dark:border-gray-700"
+                    className="h-16 rounded-2xl bg-gray-50 dark:bg-gray-800 text-2xl font-bold text-text-main dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all shadow-sm border border-gray-200 dark:border-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    aria-label={t('numpadDigit', { digit: num })}
                   >
                     {num}
                   </button>
                 ))}
-                <div /> {/* Spacer */}
+                <div aria-hidden="true" /> {/* Spacer */}
                 <button
+                  type="button"
                   onClick={() => handlePinType('0')}
-                  className="h-16 rounded-2xl bg-gray-50 dark:bg-gray-800 text-2xl font-bold text-text-main dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all shadow-sm border border-gray-200 dark:border-gray-700"
+                  className="h-16 rounded-2xl bg-gray-50 dark:bg-gray-800 text-2xl font-bold text-text-main dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all shadow-sm border border-gray-200 dark:border-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  aria-label={t('numpadDigit', { digit: 0 })}
                 >
                   0
                 </button>
                 <button
+                  type="button"
                   onClick={handlePinBackspace}
-                  className="h-16 rounded-2xl flex items-center justify-center text-text-muted hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all"
+                  className="h-16 rounded-2xl flex items-center justify-center text-text-muted hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  aria-label={t('backspace')}
                 >
-                  <ArrowLeft className="h-8 w-8" />
+                  <ArrowLeft className="h-8 w-8" aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -429,8 +441,8 @@ export default function ChildLoginPage() {
 
           {/* Step 4: Logging In */}
           {step === 'logging' && (
-            <div className="text-center py-12">
-              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+            <div className="text-center py-12" role="status" aria-live="polite">
+              <Loader2 className="h-12 w-12 motion-safe:animate-spin text-primary mx-auto mb-4" aria-hidden="true" />
               <p className="text-text-muted dark:text-text-muted">{t('loggingIn')}</p>
             </div>
           )}
@@ -448,17 +460,19 @@ export default function ChildLoginPage() {
       {/* Info Popup */}
       {showInfoPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-card-dark rounded-2xl shadow-xl max-w-sm w-full p-6 relative animate-in fade-in zoom-in-95">
+          <div className="bg-white dark:bg-card-dark rounded-2xl shadow-xl max-w-sm w-full p-6 relative motion-safe:animate-in fade-in zoom-in-95">
             <button
+              type="button"
               onClick={() => setShowInfoPopup(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-full p-1"
+              aria-label={t('close')}
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5" aria-hidden="true" />
             </button>
 
             <div className="text-center mb-4">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full mb-3">
-                <HelpCircle className="h-6 w-6 text-primary" />
+                <HelpCircle className="h-6 w-6 text-primary" aria-hidden="true" />
               </div>
               <h3 className="text-lg font-bold text-text-main dark:text-white">
                 {t('infoPopup.title')}
@@ -481,8 +495,9 @@ export default function ChildLoginPage() {
             </div>
 
             <button
+              type="button"
               onClick={() => setShowInfoPopup(false)}
-              className="w-full mt-6 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-colors"
+              className="w-full mt-6 py-3 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               {t('infoPopup.gotIt')}
             </button>

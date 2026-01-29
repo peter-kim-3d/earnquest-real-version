@@ -72,7 +72,37 @@
     "rejected": "Rejected",
     "completed": "Completed",
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
+  },
+  "auth": {
+    "logout": "Logout",
+    "loggingOut": "Logging out...",
+    "logoutDescription": "Sign out of your account"
+  },
+  "camera": {
+    "switchCamera": "Switch camera",
+    "positionFace": "Position your face in the circle",
+    "cancel": "Cancel",
+    "takePhoto": "Take Photo",
+    "cameraError": "Failed to access camera. Please check permissions.",
+    "cameraPreview": "Camera preview for taking your profile photo"
+  },
+  "avatar": {
+    "selectImageFile": "Please select an image file",
+    "processing": "Processing...",
+    "imageSizeLimit": "Image size must be less than 5MB",
+    "childIdRequired": "Child ID is required",
+    "avatarUpdated": "Avatar updated!",
+    "updateFailed": "Failed to update avatar",
+    "takePhoto": "Take a Photo",
+    "adjustPhoto": "Adjust Your Photo",
+    "chooseProfilePicture": "Choose Profile Picture",
+    "customPhoto": "Custom Photo",
+    "camera": "Camera",
+    "upload": "Upload",
+    "chooseAvatar": "Choose Avatar"
   },
   "time": {
     "today": "Today",

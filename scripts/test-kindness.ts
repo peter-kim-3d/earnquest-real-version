@@ -178,8 +178,8 @@ async function testKindnessSystem() {
     console.log('   1. Open http://localhost:3001/en-US/kindness/send');
     console.log('   2. Open http://localhost:3001/en-US/child/badges');
     console.log('   3. Follow KINDNESS_TESTING.md for full flow\n');
-  } catch (error: any) {
-    console.error('\n❌ Error:', error.message);
+  } catch (error: unknown) {
+    console.error('\n❌ Error:', error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }

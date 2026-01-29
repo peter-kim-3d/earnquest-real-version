@@ -63,6 +63,12 @@
       "afterSchool": "After School",
       "evening": "Evening Tasks",
       "anytime": "Anytime Tasks"
+    },
+    "submitted": "Submitted",
+    "time": {
+      "minutesAgo": "{count}m ago",
+      "hoursAgo": "{count}h ago",
+      "daysAgo": "{count}d ago"
     }
   },
   "store": {
@@ -102,7 +108,8 @@
       "locked": "Locked",
       "screenLimitReached": "Screen limit reached",
       "buyNow": "Buy Now",
-      "min": "min"
+      "min": "min",
+      "savingsProgress": "Savings progress: {percent}% of {cost} QP saved"
     },
     "wallet": {
       "title": "My Wallet",
@@ -121,7 +128,9 @@
       "starting": "Starting...",
       "startTimer": "Start Timer",
       "weeklyLimitReached": "Weekly limit reached",
-      "dailyLimitReached": "Daily limit reached"
+      "dailyLimitReached": "Daily limit reached",
+      "dailyProgress": "Daily screen time: {used} of {total} used",
+      "weeklyProgress": "Weekly screen time: {used} of {total} used"
     }
   },
   "tickets": {
@@ -165,7 +174,9 @@
       "okay": "Okay",
       "timeWellSpent": "Time well spent! 🎮",
       "failedToComplete": "Failed to complete",
-      "tapMinimize": "Tap the button above to minimize"
+      "tapMinimize": "Tap the button above to minimize",
+      "minimize": "Minimize timer",
+      "maximize": "Maximize timer"
     },
     "card": {
       "waitingForParent": "Waiting for Parent",
@@ -181,7 +192,9 @@
       "cancelTicket": "Cancel Ticket",
       "canceling": "Canceling...",
       "approveUse": "Approve Use",
+      "approving": "Approving...",
       "markAsGiven": "Mark as Given",
+      "fulfilling": "Processing...",
       "cancelDialog": {
         "title": "Cancel Ticket?",
         "description": "Are you sure you want to cancel this ticket? Your points will be refunded to your balance.",
@@ -219,6 +232,7 @@
     "dayStreak": "Day Streak",
     "keepGoing": "Keep it going!",
     "weeklyGoal": "Weekly Goal",
+    "weeklyGoalProgress": "Weekly goal progress: {current} of {goal} XP ({percent}%)",
     "xpLeftToGoal": "{points} XP left to goal",
     "goalReached": "Goal reached! 🎉",
     "proTip": "Pro Tip",

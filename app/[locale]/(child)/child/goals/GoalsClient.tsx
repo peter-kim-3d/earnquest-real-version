@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import GoalCard from '@/components/goals/GoalCard';
 import { Tier } from '@/lib/utils/tiers';
+import { getErrorMessage } from '@/lib/utils/error';
 
 interface Goal {
   id: string;
@@ -91,10 +92,9 @@ export default function GoalsClient({
         milestoneBonus: result.milestoneBonus,
       };
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Deposit failed:', error);
       toast.error(t('toast.depositFailed'), {
-        description: errorMessage || t('toast.depositFailedDescription'),
+        description: getErrorMessage(error),
       });
       throw error;
     }
@@ -113,7 +113,7 @@ export default function GoalsClient({
             <p className="text-sm font-medium opacity-80">{t('availableToDeposit')}</p>
             <p className="text-4xl font-black">{balance.toLocaleString()} XP</p>
           </div>
-          <Sparkle size={48} weight="duotone" className="opacity-50" />
+          <Sparkle size={48} weight="duotone" className="opacity-50" aria-hidden="true" />
         </div>
       </div>
 
@@ -121,7 +121,7 @@ export default function GoalsClient({
       {activeGoals.length > 0 && (
         <section>
           <div className="flex items-center gap-2 mb-4">
-            <Target size={24} className="text-primary" />
+            <Target size={24} className="text-primary" aria-hidden="true" />
             <h2 className="text-xl font-bold text-text-main dark:text-white">
               {t('activeGoals')}
             </h2>
@@ -146,7 +146,7 @@ export default function GoalsClient({
       {completedGoals.length > 0 && (
         <section>
           <div className="flex items-center gap-2 mb-4">
-            <Trophy size={24} className="text-yellow-500" />
+            <Trophy size={24} className="text-yellow-500" aria-hidden="true" />
             <h2 className="text-xl font-bold text-text-main dark:text-white">
               {t('achievedGoals')}
             </h2>
@@ -170,7 +170,7 @@ export default function GoalsClient({
       {/* Empty State */}
       {goals.length === 0 && (
         <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
-          <Target size={64} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
+          <Target size={64} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" aria-hidden="true" />
           <h3 className="text-xl font-bold text-text-main dark:text-white mb-2">
             {t('noGoalsYet')}
           </h3>

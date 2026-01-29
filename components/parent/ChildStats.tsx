@@ -29,7 +29,7 @@ export default function ChildStats({ child }: ChildStatsProps) {
       {/* Current Points */}
       <div className="rounded-xl bg-gradient-to-br from-primary to-green-600 p-6 text-black">
         <div className="flex items-center gap-2 mb-2">
-          <Trophy className="h-5 w-5" />
+          <Trophy className="h-5 w-5" aria-hidden="true" />
           <span className="text-sm font-semibold opacity-90">{t('currentBalance')}</span>
         </div>
         <p className="text-4xl font-black mb-1">{formatPoints(child.points_balance)} XP</p>
@@ -42,7 +42,7 @@ export default function ChildStats({ child }: ChildStatsProps) {
       <div className="rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <Target className="h-5 w-5 text-blue-600 dark:text-blue-400" aria-hidden="true" />
             <span className="text-sm font-semibold text-text-main dark:text-white">
               {t('weeklyGoalProgress')}
             </span>
@@ -51,10 +51,18 @@ export default function ChildStats({ child }: ChildStatsProps) {
             {formatPoints(child.points_balance)} / {formatPoints(weeklyGoal)} XP
           </span>
         </div>
-        <div className="h-3 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+        <div
+          className="h-3 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"
+          role="progressbar"
+          aria-valuenow={child.points_balance}
+          aria-valuemin={0}
+          aria-valuemax={weeklyGoal}
+          aria-label={t('progressLabel', { current: formatPoints(child.points_balance), goal: formatPoints(weeklyGoal), percent: Math.round(progressPercentage) })}
+        >
           <div
             className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-slow"
             style={{ width: `${progressPercentage}%` }}
+            aria-hidden="true"
           />
         </div>
       </div>
@@ -64,7 +72,7 @@ export default function ChildStats({ child }: ChildStatsProps) {
         {/* Lifetime Points */}
         <div className="rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+            <TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400" aria-hidden="true" />
             <span className="text-xs font-semibold text-text-muted dark:text-gray-400">
               {t('lifetimeEarned')}
             </span>
@@ -77,7 +85,7 @@ export default function ChildStats({ child }: ChildStatsProps) {
         {/* Trust Streak */}
         <div className="rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Flame className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+            <Flame className="h-4 w-4 text-orange-600 dark:text-orange-400" aria-hidden="true" />
             <span className="text-xs font-semibold text-text-muted dark:text-gray-400">
               {t('trustStreak')}
             </span>

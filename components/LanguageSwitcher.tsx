@@ -35,7 +35,7 @@ export default function LanguageSwitcher() {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg">
-                    <Globe size={20} className="text-gray-600 dark:text-gray-400" />
+                    <Globe size={20} className="text-gray-600 dark:text-gray-400" aria-hidden="true" />
                     <span className="sr-only">Switch Language</span>
                 </Button>
             </DropdownMenuTrigger>
@@ -44,10 +44,12 @@ export default function LanguageSwitcher() {
                     <DropdownMenuItem
                         key={locale.code}
                         onClick={() => handleLanguageChange(locale.code)}
+                        aria-current={currentLocale === locale.code ? 'true' : undefined}
                         className={`cursor-pointer ${currentLocale === locale.code ? 'bg-primary/10 font-medium' : ''}`}
                     >
-                        <span className="mr-2 text-lg">{locale.flag}</span>
+                        <span className="mr-2 text-lg" aria-hidden="true">{locale.flag}</span>
                         {locale.label}
+                        {currentLocale === locale.code && <span className="sr-only"> (current)</span>}
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>

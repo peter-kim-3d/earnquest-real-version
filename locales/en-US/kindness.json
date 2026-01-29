@@ -5,6 +5,10 @@
     "noChildren": "No children found",
     "noChildrenDesc": "Add children to your family to send gratitude cards."
   },
+  "recipient": {
+    "title": "Who are we thanking?",
+    "subtitle": "Choose who did something kind"
+  },
   "form": {
     "selectRecipient": "Select Recipient",
     "selectRecipientDesc": "Who would you like to send gratitude to?",
@@ -22,7 +26,13 @@
     "completeFields": "Please complete all fields",
     "sendFailed": "Failed to send gratitude card",
     "sentSuccess": "Gratitude sent!",
-    "sentSuccessDesc": "{name} will love your message!"
+    "sentSuccessDesc": "{name} will love your message!",
+    "progressSteps": "Progress steps",
+    "stepNumber": "Step {num} of {total}"
+  },
+  "themePicker": {
+    "title": "Pick a vibe",
+    "subtitle": "Choose the card theme that fits best"
   },
   "themes": {
     "thankYou": "Thank You",

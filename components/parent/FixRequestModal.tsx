@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import { FIX_TEMPLATES, type FixRequestTemplate } from '@/lib/types/task';
+import { getErrorMessage } from '@/lib/utils/error';
 
 interface FixRequestModalProps {
   completionId: string;
@@ -66,9 +68,9 @@ export default function FixRequestModal({
       onClose();
       setSelectedItems([]);
       setCustomMessage('');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error sending fix request:', error);
-      toast.error(t('toast.requestFailed'), { description: error.message || t('toast.failedToSend') });
+      toast.error(t('toast.requestFailed'), { description: getErrorMessage(error) });
     } finally {
       setLoading(false);
     }
@@ -108,7 +110,8 @@ export default function FixRequestModal({
                     type="button"
                     onClick={() => toggleItem(template.text)}
                     disabled={!isSelected && selectedItems.length >= 5}
-                    className={`w-full p-3 rounded-lg border-2 transition-all text-left flex items-start gap-3 ${isSelected
+                    aria-pressed={isSelected}
+                    className={`w-full p-3 rounded-lg border-2 transition-all text-left flex items-start gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${isSelected
                       ? 'border-primary bg-primary/5'
                       : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                       } ${!isSelected && selectedItems.length >= 5
@@ -116,14 +119,14 @@ export default function FixRequestModal({
                         : ''
                       }`}
                   >
-                    <span className="text-2xl flex-shrink-0">{template.icon}</span>
+                    <span className="text-2xl flex-shrink-0" aria-hidden="true">{template.icon}</span>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {template.text}
                       </p>
                     </div>
                     {isSelected && (
-                      <span className="text-primary text-lg flex-shrink-0">✓</span>
+                      <span className="text-primary text-lg flex-shrink-0" aria-hidden="true">✓</span>
                     )}
                   </button>
                 );
@@ -180,8 +183,10 @@ export default function FixRequestModal({
             <Button
               type="submit"
               disabled={loading || (selectedItems.length === 0 && !customMessage.trim())}
+              aria-busy={loading}
               className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
             >
+              {loading && <Loader2 className="h-4 w-4 mr-2 motion-safe:animate-spin" aria-hidden="true" />}
               {loading ? t('sending') : t('sendRequest')}
             </Button>
           </div>

@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Gift, Check } from 'lucide-react';
+import { Gift, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import { AppIcon } from '@/components/ui/AppIcon';
+import { getErrorMessage } from '@/lib/utils/error';
 
 type PendingReward = {
   id: string;
@@ -47,9 +48,9 @@ export default function PendingRewards({ pendingRewards }: PendingRewardsProps) 
       }
 
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to grant reward:', error);
-      toast.error(t('toast.grantFailed'), { description: error.message || t('toast.grantFailedDescription') });
+      toast.error(t('toast.grantFailed'), { description: getErrorMessage(error) });
     } finally {
       setLoading(null);
     }
@@ -76,7 +77,7 @@ export default function PendingRewards({ pendingRewards }: PendingRewardsProps) 
   return (
     <div className="mb-6">
       <h2 className="text-xl font-bold text-text-main dark:text-white mb-4 flex items-center gap-2">
-        <Gift className="h-6 w-6 text-purple-500" />
+        <Gift className="h-6 w-6 text-purple-500" aria-hidden="true" />
         {t('title')}
         <span className="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-sm font-bold">
           {pendingRewards.length}
@@ -87,7 +88,7 @@ export default function PendingRewards({ pendingRewards }: PendingRewardsProps) 
         {pendingRewards.map((purchase) => (
           <div
             key={purchase.id}
-            className="rounded-xl bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-800 p-4 shadow-sm"
+            className="rounded-xl bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-800 p-4 shadow-sm hover:shadow-md hover:border-purple-300 dark:hover:border-purple-700 transition-all"
           >
             <div className="flex items-start gap-4">
               {/* Icon */}
@@ -105,14 +106,14 @@ export default function PendingRewards({ pendingRewards }: PendingRewardsProps) 
                 </p>
                 <div className="flex items-center gap-3 text-sm text-text-muted dark:text-gray-500">
                   <span>{formatTime(purchase.purchased_at)}</span>
-                  <span>•</span>
-                  <span className="font-semibold text-purple-600 dark:text-purple-400">
+                  <span aria-hidden="true">•</span>
+                  <span className="font-semibold text-purple-600 dark:text-purple-400 tabular-nums">
                     {purchase.points_spent} QP
                   </span>
                   {purchase.rewards.screen_minutes && (
                     <>
-                      <span>•</span>
-                      <span>{purchase.rewards.screen_minutes} min</span>
+                      <span aria-hidden="true">•</span>
+                      <span className="tabular-nums">{purchase.rewards.screen_minutes} min</span>
                     </>
                   )}
                 </div>
@@ -121,11 +122,17 @@ export default function PendingRewards({ pendingRewards }: PendingRewardsProps) 
 
             {/* Grant Button */}
             <button
+              type="button"
               onClick={() => handleGrant(purchase.id)}
               disabled={loading === purchase.id}
-              className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-semibold transition-all disabled:opacity-50"
+              aria-busy={loading === purchase.id}
+              className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-semibold transition-all disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2"
             >
-              <Check className="h-4 w-4" />
+              {loading === purchase.id ? (
+                <Loader2 className="h-4 w-4 motion-safe:animate-spin" aria-hidden="true" />
+              ) : (
+                <Check className="h-4 w-4" aria-hidden="true" />
+              )}
               {loading === purchase.id ? t('granting') : t('grantReward')}
             </button>
           </div>

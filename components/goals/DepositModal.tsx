@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PiggyBank, Target, Sparkle } from '@phosphor-icons/react/dist/ssr';
+import { PiggyBank, Target, Sparkle, CircleNotch } from '@phosphor-icons/react/dist/ssr';
 import {
   Dialog,
   DialogContent,
@@ -103,7 +103,7 @@ export default function DepositModal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <PiggyBank size={24} className="text-primary" />
+            <PiggyBank size={24} className="text-primary" aria-hidden="true" />
             {t('title')}
           </DialogTitle>
           <DialogDescription>
@@ -122,12 +122,20 @@ export default function DepositModal({
                 {currentProgress.toLocaleString()} / {targetPoints.toLocaleString()} XP
               </span>
             </div>
-            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div
+              className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"
+              role="progressbar"
+              aria-valuenow={currentProgress}
+              aria-valuemin={0}
+              aria-valuemax={targetPoints}
+              aria-label={t('currentProgressLabel', { current: currentProgress.toLocaleString(), target: targetPoints.toLocaleString(), percent: Math.round((currentProgress / targetPoints) * 100) })}
+            >
               <div
                 className="h-full bg-primary rounded-full transition-all"
                 style={{
                   width: `${(currentProgress / targetPoints) * 100}%`,
                 }}
+                aria-hidden="true"
               />
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
@@ -157,11 +165,13 @@ export default function DepositModal({
               placeholder={t('enterAmount')}
               value={amount}
               onChange={(e) => handleAmountChange(e.target.value)}
-              className="text-lg"
+              className={`text-lg ${error ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
               disabled={isLoading}
+              aria-invalid={!!error}
+              aria-describedby={error ? 'deposit-error' : undefined}
             />
             {error && (
-              <p className="text-sm text-red-500 mt-1">{error}</p>
+              <p id="deposit-error" className="text-sm text-red-500 mt-1" role="alert">{error}</p>
             )}
           </div>
 
@@ -197,6 +207,7 @@ export default function DepositModal({
                       size={20}
                       weight="fill"
                       className="text-yellow-500"
+                      aria-hidden="true"
                     />
                     <span className="font-bold text-yellow-700 dark:text-yellow-300">
                       {t('preview.goalComplete')}
@@ -204,14 +215,21 @@ export default function DepositModal({
                   </>
                 ) : (
                   <>
-                    <Target size={20} className="text-blue-500" />
+                    <Target size={20} className="text-blue-500" aria-hidden="true" />
                     <span className="font-medium text-blue-700 dark:text-blue-300">
                       {t('preview.afterDeposit')}
                     </span>
                   </>
                 )}
               </div>
-              <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-2">
+              <div
+                className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-2"
+                role="progressbar"
+                aria-valuenow={newProgress}
+                aria-valuemin={0}
+                aria-valuemax={targetPoints}
+                aria-label={t('previewProgressLabel', { current: newProgress.toLocaleString(), target: targetPoints.toLocaleString(), percent: Math.round(newProgressPercent) })}
+              >
                 <div
                   className={`h-full rounded-full transition-all ${
                     willComplete
@@ -219,6 +237,7 @@ export default function DepositModal({
                       : 'bg-blue-500'
                   }`}
                   style={{ width: `${newProgressPercent}%` }}
+                  aria-hidden="true"
                 />
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 tabular-nums">
@@ -242,8 +261,10 @@ export default function DepositModal({
           <Button
             onClick={handleDeposit}
             disabled={isLoading || numAmount <= 0 || numAmount > maxDeposit}
-            className="flex-1 bg-primary hover:bg-primary/90"
+            aria-busy={isLoading}
+            className="flex-1 bg-primary hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
+            {isLoading && <CircleNotch size={16} className="mr-2 motion-safe:animate-spin" aria-hidden="true" />}
             {isLoading ? t('depositing') : numAmount > 0 ? t('depositXp', { amount: numAmount }) : t('deposit')}
           </Button>
         </div>

@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
-import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { UpdateTaskSchema, formatZodError } from '@/lib/validation/task';
+import { getAdminClient } from '@/lib/supabase/admin-client';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function PATCH(request: Request) {
   try {
@@ -65,7 +66,7 @@ export async function PATCH(request: Request) {
     }
 
     // Build update object with only provided fields
-    const updates: any = {};
+    const updates: Record<string, unknown> = {};
 
     if (taskData.name !== undefined) updates.name = taskData.name;
     if (taskData.description !== undefined) updates.description = taskData.description;
@@ -122,14 +123,9 @@ export async function PATCH(request: Request) {
       });
 
       try {
-        const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        const supabaseAdmin = getAdminClient();
 
-        if (url && key) {
-          const supabaseAdmin = createAdminClient(url, key, {
-            auth: { autoRefreshToken: false, persistSession: false },
-          });
-
+        if (supabaseAdmin) {
           // Delete existing overrides for this task
           console.log('Update Task: Deleting existing overrides');
           const { error: deleteError } = await supabaseAdmin
@@ -174,11 +170,8 @@ export async function PATCH(request: Request) {
       task,
       message: 'Task updated successfully!',
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in task update:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

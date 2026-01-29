@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import ApprovalCard from './ApprovalCard';
+import { getErrorMessage } from '@/lib/utils/error';
 
 type PendingCompletion = {
   id: string;
@@ -79,9 +80,9 @@ export default function ActionCenter({ pendingCompletions }: ActionCenterProps) 
       });
       setSelectedCompletions([]);
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Batch approve error:', error);
-      toast.error(t('approvalFailed'), { description: error.message || t('approvalFailedDescription') });
+      toast.error(t('approvalFailed'), { description: getErrorMessage(error) });
     } finally {
       setBatchLoading(false);
     }
@@ -97,7 +98,7 @@ export default function ActionCenter({ pendingCompletions }: ActionCenterProps) 
           </h2>
           {count > 0 && (
             <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-800">
-              <Bell size={16} weight="fill" className="text-orange-600 dark:text-orange-400" />
+              <Bell size={16} weight="fill" className="text-orange-600 dark:text-orange-400" aria-hidden="true" />
               <span className="text-sm font-bold text-orange-600 dark:text-orange-400">
                 {t('new', { count })}
               </span>
@@ -110,13 +111,16 @@ export default function ActionCenter({ pendingCompletions }: ActionCenterProps) 
           <div className="flex items-center gap-3">
             {/* Select All Checkbox */}
             <button
+              type="button"
               onClick={toggleSelectAll}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              aria-label={allSelected ? t('deselectAll') : t('selectAll')}
+              aria-pressed={allSelected}
+              className="flex items-center gap-2 px-3 py-2 min-h-[48px] rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               {allSelected ? (
-                <CheckSquare size={20} weight="fill" className="text-primary" />
+                <CheckSquare size={20} weight="fill" className="text-primary" aria-hidden="true" />
               ) : (
-                <Square size={20} className="text-gray-400" />
+                <Square size={20} className="text-gray-400" aria-hidden="true" />
               )}
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('selectAll')}
@@ -128,6 +132,7 @@ export default function ActionCenter({ pendingCompletions }: ActionCenterProps) 
               <Button
                 onClick={handleBatchApprove}
                 disabled={batchLoading}
+                aria-busy={batchLoading}
                 className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20"
               >
                 {batchLoading
@@ -148,13 +153,16 @@ export default function ActionCenter({ pendingCompletions }: ActionCenterProps) 
               <div key={completion.id} className="flex items-start gap-3">
                 {/* Checkbox */}
                 <button
+                  type="button"
                   onClick={() => toggleCompletion(completion.id)}
-                  className="mt-6 flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  aria-label={isSelected ? t('deselectTask') : t('selectTask')}
+                  aria-pressed={isSelected}
+                  className="mt-6 flex-shrink-0 p-2 min-h-[44px] min-w-[44px] rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 >
                   {isSelected ? (
-                    <CheckSquare size={24} weight="fill" className="text-primary" />
+                    <CheckSquare size={24} weight="fill" className="text-primary" aria-hidden="true" />
                   ) : (
-                    <Square size={24} className="text-gray-400" />
+                    <Square size={24} className="text-gray-400" aria-hidden="true" />
                   )}
                 </button>
 
@@ -184,7 +192,7 @@ export default function ActionCenter({ pendingCompletions }: ActionCenterProps) 
         <div className="rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-12 text-center">
           <div className="max-w-md mx-auto">
             <div className="h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-4">
-              <CheckCircle size={32} weight="fill" className="text-green-600 dark:text-green-400" />
+              <CheckCircle size={32} weight="fill" className="text-green-600 dark:text-green-400" aria-hidden="true" />
             </div>
             <h3 className="text-lg font-bold text-text-main dark:text-white mb-2">
               {t('allCaughtUp')}

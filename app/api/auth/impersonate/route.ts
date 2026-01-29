@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { IMPERSONATION_DURATION_MS } from '@/lib/constants';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function POST(request: Request) {
     try {
@@ -44,8 +46,8 @@ export async function POST(request: Request) {
         // 3. Set Child Session Cookie
         const cookieStore = await cookies();
 
-        // Calculate expiration (e.g., 24 hours) - matches login duration
-        const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        // Calculate expiration (24 hours) - matches login duration
+        const expires = new Date(Date.now() + IMPERSONATION_DURATION_MS);
 
         cookieStore.set('child_session', JSON.stringify({
             childId: child.id,
@@ -68,8 +70,8 @@ export async function POST(request: Request) {
         });
 
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('Impersonation error:', error);
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+        return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
     }
 }

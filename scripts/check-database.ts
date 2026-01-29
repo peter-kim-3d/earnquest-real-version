@@ -121,8 +121,8 @@ async function checkDatabase() {
     console.log('\n✨ Database verification complete!\n');
     console.log('🚀 Ready to test at: http://localhost:3001\n');
 
-  } catch (error: any) {
-    console.error('\n❌ Error checking database:', error.message);
+  } catch (error: unknown) {
+    console.error('\n❌ Error checking database:', error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }

@@ -20,7 +20,7 @@ export default function DashboardStats({
             {/* Active Tasks */}
             <div className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700 flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                    <Lightning className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                    <Lightning className="h-6 w-6 text-blue-600 dark:text-blue-400" aria-hidden="true" />
                 </div>
                 <div>
                     <p className="text-sm font-medium text-text-muted dark:text-gray-400">
@@ -39,9 +39,9 @@ export default function DashboardStats({
                     : 'bg-green-100 dark:bg-green-900/30'
                     }`}>
                     {pendingApprovalsCount > 0 ? (
-                        <CheckCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                        <CheckCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" aria-hidden="true" />
                     ) : (
-                        <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+                        <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" aria-hidden="true" />
                     )}
                 </div>
                 <div>
@@ -57,7 +57,7 @@ export default function DashboardStats({
             {/* Weekly XP */}
             <div className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700 flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                    <TrendUp className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                    <TrendUp className="h-6 w-6 text-purple-600 dark:text-purple-400" aria-hidden="true" />
                 </div>
                 <div>
                     <p className="text-sm font-medium text-text-muted dark:text-gray-400">

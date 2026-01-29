@@ -18,7 +18,8 @@
     "completed": "완료"
   },
   "childFilter": {
-    "all": "모든 아이"
+    "all": "모든 아이",
+    "label": "아이별 필터"
   },
   "childGoals": "{name}의 목표",
   "completedStatus": "완료!",
@@ -75,6 +76,7 @@
     "save": "목표 저장",
     "saving": "저장 중...",
     "update": "목표 수정",
+    "edit": "목표 수정",
     "delete": "목표 삭제",
     "deposit": "입금",
     "withdraw": "출금",
@@ -105,10 +107,17 @@
   },
   "card": {
     "progress": "진행률",
+    "progressLabel": "목표 진행률: {target} XP 중 {current} XP ({percent}%)",
     "saved": "저축됨",
     "remaining": "남음",
     "weeksToGo": "약 {weeks}주 남음",
-    "almostThere": "거의 다 왔어요!"
+    "almostThere": "거의 다 왔어요!",
+    "goalAchieved": "목표 달성!",
+    "depositPoints": "포인트 입금",
+    "xpAvailable": "{points} XP 사용 가능",
+    "earnMoreToDeposit": "입금하려면 더 많은 포인트를 모으세요",
+    "xpToMilestone": "{percentage}% 보너스까지 {points} XP (+{bonus} XP)",
+    "targetUpdated": "목표가 수정됨 ({count}번 변경)"
   },
   "deposit": {
     "title": "목표에 입금",
@@ -132,7 +141,9 @@
     "cancel": "취소",
     "depositing": "입금 중...",
     "depositXp": "{amount} XP 입금",
-    "deposit": "입금"
+    "deposit": "입금",
+    "currentProgressLabel": "현재 진행률: {target} XP 중 {current} XP ({percent}%)",
+    "previewProgressLabel": "입금 후: {target} XP 중 {current} XP ({percent}%)"
   },
   "client": {
     "availableToDeposit": "입금 가능",

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Scroll, CaretDown, ArrowUp, ArrowDown, Target, Gift, Repeat, Question } from '@phosphor-icons/react/dist/ssr';
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -38,11 +38,7 @@ export default function TransactionHistory({
   const [error, setError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
 
-  useEffect(() => {
-    fetchTransactions();
-  }, [childId]);
-
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -61,20 +57,24 @@ export default function TransactionHistory({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [childId, limit, t]);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
       case 'earn':
-        return <ArrowUp size={16} weight="bold" className="text-green-500" />;
+        return <ArrowUp size={16} weight="bold" className="text-green-500" aria-hidden="true" />;
       case 'spend':
-        return <ArrowDown size={16} weight="bold" className="text-red-500" />;
+        return <ArrowDown size={16} weight="bold" className="text-red-500" aria-hidden="true" />;
       case 'refund':
-        return <Repeat size={16} weight="bold" className="text-blue-500" />;
+        return <Repeat size={16} weight="bold" className="text-blue-500" aria-hidden="true" />;
       case 'deposit':
-        return <Target size={16} weight="bold" className="text-purple-500" />;
+        return <Target size={16} weight="bold" className="text-purple-500" aria-hidden="true" />;
       default:
-        return <Question size={16} className="text-gray-400" />;
+        return <Question size={16} className="text-gray-400" aria-hidden="true" />;
     }
   };
 
@@ -84,7 +84,7 @@ export default function TransactionHistory({
     return 'text-gray-600 dark:text-gray-400';
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = useCallback((dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -99,7 +99,7 @@ export default function TransactionHistory({
       month: 'short',
       day: 'numeric',
     });
-  };
+  }, [t, locale]);
 
   const formatTime = (dateString: string) => {
     return new Date(dateString).toLocaleTimeString(locale, {
@@ -116,7 +116,7 @@ export default function TransactionHistory({
       groups[date].push(tx);
       return groups;
     }, {} as Record<string, Transaction[]>);
-  }, [transactions, locale]);
+  }, [transactions, formatDate]);
 
   const visibleGroups = showAll
     ? Object.entries(groupedTransactions)
@@ -126,13 +126,14 @@ export default function TransactionHistory({
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Scroll size={20} className="text-primary" />
+          <Scroll size={20} className="text-primary" aria-hidden="true" />
           <h3 className="font-bold text-gray-900 dark:text-white">{t('title')}</h3>
         </div>
-        <div className="animate-pulse space-y-3">
+        <div className="motion-safe:animate-pulse space-y-3" role="status" aria-live="polite" aria-label={t('loading')}>
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-12 bg-gray-100 dark:bg-gray-700 rounded-lg" />
+            <div key={i} className="h-12 bg-gray-100 dark:bg-gray-700 rounded-lg" aria-hidden="true" />
           ))}
+          <span className="sr-only">{t('loading')}</span>
         </div>
       </div>
     );
@@ -142,10 +143,10 @@ export default function TransactionHistory({
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Scroll size={20} className="text-primary" />
+          <Scroll size={20} className="text-primary" aria-hidden="true" />
           <h3 className="font-bold text-gray-900 dark:text-white">{t('title')}</h3>
         </div>
-        <p className="text-red-500 text-sm">{error}</p>
+        <p className="text-red-500 text-sm" role="alert">{error}</p>
       </div>
     );
   }
@@ -155,7 +156,7 @@ export default function TransactionHistory({
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center gap-2">
-          <Scroll size={20} className="text-primary" />
+          <Scroll size={20} className="text-primary" aria-hidden="true" />
           <h3 className="font-bold text-gray-900 dark:text-white">
             {childName ? t('titleWithChild', { name: childName }) : t('title')}
           </h3>
@@ -171,7 +172,7 @@ export default function TransactionHistory({
       <div className="divide-y divide-gray-100 dark:divide-gray-700">
         {transactions.length === 0 ? (
           <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-            <Gift size={40} className="mx-auto mb-2 opacity-50" />
+            <Gift size={40} className="mx-auto mb-2 opacity-50" aria-hidden="true" />
             <p>{t('noTransactions')}</p>
           </div>
         ) : (
@@ -210,10 +211,10 @@ export default function TransactionHistory({
 
                   {/* Amount */}
                   <div className="flex-shrink-0 text-right">
-                    <p className={`font-bold ${getTransactionColor(tx.type, tx.amount)}`}>
+                    <p className={`font-bold tabular-nums ${getTransactionColor(tx.type, tx.amount)}`}>
                       {tx.amount > 0 ? '+' : ''}{tx.amount} XP
                     </p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
                       {t('balanceShort')} {tx.balance_after}
                     </p>
                   </div>
@@ -227,10 +228,11 @@ export default function TransactionHistory({
       {/* Show More Button */}
       {Object.keys(groupedTransactions).length > 3 && !showAll && (
         <button
+          type="button"
           onClick={() => setShowAll(true)}
-          className="w-full px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium text-primary hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-t border-gray-100 dark:border-gray-700"
+          className="w-full px-4 py-3 flex items-center justify-center gap-2 text-sm font-medium text-primary hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-t border-gray-100 dark:border-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
         >
-          <CaretDown size={16} />
+          <CaretDown size={16} aria-hidden="true" />
           {t('showMore')}
         </button>
       )}

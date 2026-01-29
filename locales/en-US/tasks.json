@@ -58,9 +58,12 @@
     "autoWarning": "⚠️ Auto-approval should only be used for simple, trust-based tasks.",
     "timerLabel": "Set Timer Duration",
     "timerMinutes": "minutes",
+    "decreasePoints": "Decrease points",
+    "increasePoints": "Increase points",
     "checklistLabel": "Checklist Items *",
     "checklistPlaceholder": "Step {index}",
     "addChecklistItem": "+ Add Checklist Item",
+    "removeChecklistItem": "Remove checklist item",
     "checklistHelp": "Child must check off all items to complete this task. Perfect for routines with multiple steps (e.g., brush teeth AM/PM, make bed).",
     "autoAssignLabel": "Auto-assign daily (Recommended)",
     "autoAssignHelp": "Task automatically appears in child's todo list each day/week. Uncheck for manual template mode where child can complete whenever they want.",
@@ -177,7 +180,11 @@
     "cancel": "Cancel",
     "confirmArchive": "Are you sure you want to {action} {count} tasks?",
     "confirmDelete": "Are you sure you want to DELETE {count} tasks? This cannot be undone.",
-    "bulkFailed": "Some tasks failed to update."
+    "bulkFailed": "Some tasks failed to update.",
+    "noTasks": "No tasks yet",
+    "noArchivedTasks": "No archived tasks",
+    "emptyDescription": "Create tasks for your children to complete and earn points",
+    "createFirstButton": "Create First Task"
   },
   "bulk": {
     "selected": "{count} selected",
@@ -188,6 +195,7 @@
     "disableSelected": "Disable Selected"
   },
   "card": {
+    "moreOptions": "More options",
     "shared": "Shared",
     "inactive": "Inactive",
     "points": "Points:",
@@ -218,11 +226,13 @@
     "finishClaim": "Finish & Claim Points",
     "doMore": "Do {minutes} More Minutes (+ {points} XP)",
     "close": "Close",
-    "closeSaveProgress": "Close & Save Progress"
+    "closeSaveProgress": "Close & Save Progress",
+    "timerProgress": "Timer: {minutes}:{seconds} remaining"
   },
   "checklist": {
     "progress": "Progress",
     "complete": "{completed} / {total} Complete",
+    "progressLabel": "{completed} of {total} items completed",
     "completeAllSteps": "Complete all steps:",
     "allCompleted": "Great job! All items completed!",
     "cancel": "Cancel",
@@ -260,5 +270,13 @@
     "iDidIt": "I Did It!",
     "minutesLeft": "{minutes}m left",
     "minutes": "{minutes}m"
+  },
+  "imagePicker": {
+    "title": "Choose a Default Image",
+    "all": "All"
+  },
+  "iconPicker": {
+    "title": "Choose an Icon",
+    "all": "All"
   }
 }

@@ -69,6 +69,67 @@ export default function TimerModal({
     }
   }, []);
 
+  // Sound functions (defined before useEffects that use them)
+  const playBeepSound = useCallback(() => {
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+      // Create oscillator for beep sound - 3 beeps
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = 800;
+      gainNode.gain.value = 0.3;
+
+      oscillator.start(audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      oscillator.stop(audioContext.currentTime + 0.3);
+
+      // Second beep
+      const osc2 = audioContext.createOscillator();
+      const gain2 = audioContext.createGain();
+      osc2.connect(gain2);
+      gain2.connect(audioContext.destination);
+      osc2.frequency.value = 800;
+      gain2.gain.value = 0.3;
+      osc2.start(audioContext.currentTime + 0.4);
+      gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.7);
+      osc2.stop(audioContext.currentTime + 0.7);
+
+      // Third beep (higher pitch)
+      const osc3 = audioContext.createOscillator();
+      const gain3 = audioContext.createGain();
+      osc3.connect(gain3);
+      gain3.connect(audioContext.destination);
+      osc3.frequency.value = 1000;
+      gain3.gain.value = 0.3;
+      osc3.start(audioContext.currentTime + 0.8);
+      gain3.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.2);
+      osc3.stop(audioContext.currentTime + 1.2);
+    } catch (err) {
+      console.log('Could not play beep sound:', err);
+    }
+  }, []);
+
+  const playAlarmSound = useCallback(() => {
+    try {
+      // Try to play notification sound from public folder
+      if (!audioRef.current) {
+        audioRef.current = new Audio('/sounds/timer-complete.mp3');
+      }
+      audioRef.current.play().catch(() => {
+        // If file doesn't exist, generate beep sound with Web Audio API
+        playBeepSound();
+      });
+    } catch {
+      // Fallback to beep sound
+      playBeepSound();
+    }
+  }, [playBeepSound]);
+
   // Wake Lock management
   useEffect(() => {
     if (isRunning && isOpen) {
@@ -114,7 +175,7 @@ export default function TimerModal({
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isRunning]);
+  }, [isRunning, playAlarmSound]);
 
   // Timer countdown logic using real time
   useEffect(() => {
@@ -150,68 +211,7 @@ export default function TimerModal({
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning]);
-
-  // Play alarm sound when timer completes
-  const playAlarmSound = () => {
-    try {
-      // Try to play notification sound from public folder
-      if (!audioRef.current) {
-        audioRef.current = new Audio('/sounds/timer-complete.mp3');
-      }
-      audioRef.current.play().catch(() => {
-        // If file doesn't exist, generate beep sound with Web Audio API
-        playBeepSound();
-      });
-    } catch {
-      // Fallback to beep sound
-      playBeepSound();
-    }
-  };
-
-  const playBeepSound = () => {
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-
-      // Create oscillator for beep sound - 3 beeps
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.frequency.value = 800;
-      gainNode.gain.value = 0.3;
-
-      oscillator.start(audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-      oscillator.stop(audioContext.currentTime + 0.3);
-
-      // Second beep
-      const osc2 = audioContext.createOscillator();
-      const gain2 = audioContext.createGain();
-      osc2.connect(gain2);
-      gain2.connect(audioContext.destination);
-      osc2.frequency.value = 800;
-      gain2.gain.value = 0.3;
-      osc2.start(audioContext.currentTime + 0.4);
-      gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.7);
-      osc2.stop(audioContext.currentTime + 0.7);
-
-      // Third beep (higher pitch)
-      const osc3 = audioContext.createOscillator();
-      const gain3 = audioContext.createGain();
-      osc3.connect(gain3);
-      gain3.connect(audioContext.destination);
-      osc3.frequency.value = 1000;
-      gain3.gain.value = 0.3;
-      osc3.start(audioContext.currentTime + 0.8);
-      gain3.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.2);
-      osc3.stop(audioContext.currentTime + 1.2);
-    } catch (err) {
-      console.log('Could not play beep sound:', err);
-    }
-  };
+  }, [isRunning, playAlarmSound, timeLeft]);
 
   // Reset when modal opens
   useEffect(() => {
@@ -291,8 +291,15 @@ export default function TimerModal({
 
         <div className="py-6">
           {/* Circular Progress Timer */}
-          <div className="relative w-48 h-48 mx-auto mb-8">
-            <svg className="transform -rotate-90 w-48 h-48">
+          <div
+            className="relative w-48 h-48 mx-auto mb-8"
+            role="progressbar"
+            aria-valuenow={Math.round(progress)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={t('timerProgress', { minutes: String(minutes).padStart(2, '0'), seconds: String(seconds).padStart(2, '0') })}
+          >
+            <svg className="transform -rotate-90 w-48 h-48" aria-hidden="true">
               {/* Background circle */}
               <circle
                 cx="96"
@@ -330,7 +337,7 @@ export default function TimerModal({
               </div>
               <div className="text-sm text-text-muted dark:text-gray-400 mt-2">
                 {isCompleted
-                  ? `🎉 ${t('complete')}`
+                  ? <><span aria-hidden="true">🎉 </span>{t('complete')}</>
                   : isRunning
                     ? t('running')
                     : t('ready')}
@@ -345,7 +352,7 @@ export default function TimerModal({
                 onClick={handleStart}
                 className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg font-bold shadow-lg"
               >
-                <Play className="h-5 w-5 mr-2" />
+                <Play className="h-5 w-5 mr-2" aria-hidden="true" />
                 {t('startTimer')}
               </Button>
             )}
@@ -356,7 +363,7 @@ export default function TimerModal({
                 variant="outline"
                 className="px-6 py-6 text-lg"
               >
-                <Pause className="h-5 w-5 mr-2" />
+                <Pause className="h-5 w-5 mr-2" aria-hidden="true" />
                 {t('pause')}
               </Button>
             )}
@@ -367,7 +374,7 @@ export default function TimerModal({
                   onClick={handleStart}
                   className="bg-primary hover:bg-primary/90 text-white px-6 py-6 text-lg"
                 >
-                  <Play className="h-5 w-5 mr-2" />
+                  <Play className="h-5 w-5 mr-2" aria-hidden="true" />
                   {t('resume')}
                 </Button>
               </>
@@ -379,7 +386,7 @@ export default function TimerModal({
                   onClick={handleComplete}
                   className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 text-lg font-bold shadow-lg shadow-green-600/20 w-full"
                 >
-                  <Check className="h-5 w-5 mr-2" />
+                  <Check className="h-5 w-5 mr-2" aria-hidden="true" />
                   {t('finishClaim')}
                 </Button>
 
@@ -395,7 +402,7 @@ export default function TimerModal({
                   variant="outline"
                   className="w-full"
                 >
-                  <RotateCcw className="h-4 w-4 mr-2" />
+                  <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
                   {t('doMore', { minutes: 5, points: Math.round(5 * 1.5) })}
                 </Button>
               </div>

@@ -550,8 +550,8 @@ async function seedSampleData() {
     console.log(`   - Total rewards: ${(existingRewards?.length || 0) + (insertedRewards?.length || 0)}`);
     console.log('\n🚀 You can now test the complete flow at http://localhost:3001\n');
 
-  } catch (error: any) {
-    console.error('\n❌ Error seeding data:', error.message);
+  } catch (error: unknown) {
+    console.error('\n❌ Error seeding data:', error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }

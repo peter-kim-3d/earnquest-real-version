@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import {
+  DEFAULT_TIMEZONE,
+  DEFAULT_AUTO_APPROVAL_HOURS,
+  DEFAULT_SCREEN_BUDGET_WEEKLY_MINUTES,
+  VALID_EXCHANGE_RATES,
+} from '@/lib/constants';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 interface FamilySettings {
   timezone?: string;
@@ -56,10 +63,10 @@ export async function GET() {
 
     // Return settings with defaults
     const settings: FamilySettings = {
-      timezone: 'America/New_York',
+      timezone: DEFAULT_TIMEZONE,
       language: 'en-US',
-      autoApprovalHours: 24,
-      screenBudgetWeeklyMinutes: 300,
+      autoApprovalHours: DEFAULT_AUTO_APPROVAL_HOURS,
+      screenBudgetWeeklyMinutes: DEFAULT_SCREEN_BUDGET_WEEKLY_MINUTES,
       requireChildPin: true,
       pointExchangeRate: family?.point_exchange_rate ?? 100,
       ...family?.settings,
@@ -74,10 +81,9 @@ export async function GET() {
 
     return NextResponse.json({ settings, children: children || [] });
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     console.error('Error getting family settings:', error);
     return NextResponse.json(
-      { error: errorMessage },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }
@@ -134,9 +140,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Handle exchange rate update (stored in separate column)
-    const validExchangeRates = [10, 20, 50, 100, 200];
     let exchangeRateUpdate: number | undefined;
-    if (typeof body.pointExchangeRate === 'number' && validExchangeRates.includes(body.pointExchangeRate)) {
+    if (typeof body.pointExchangeRate === 'number' && (VALID_EXCHANGE_RATES as readonly number[]).includes(body.pointExchangeRate)) {
       exchangeRateUpdate = body.pointExchangeRate;
     }
 
@@ -190,10 +195,9 @@ export async function PATCH(request: NextRequest) {
       },
     });
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     console.error('Error updating family settings:', error);
     return NextResponse.json(
-      { error: errorMessage },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }

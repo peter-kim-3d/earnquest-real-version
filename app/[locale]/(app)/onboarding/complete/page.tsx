@@ -93,8 +93,8 @@ export default function OnboardingCompletePage() {
 
       <div className="relative z-10 w-full max-w-2xl text-center">
         {/* Hero Illustration / Icon */}
-        <div className="mb-8 inline-flex items-center justify-center p-6 bg-white dark:bg-card-dark rounded-full shadow-xl shadow-primary/10 border-4 border-primary/20 animate-bounce-slow">
-          <AppIcon name="emoji_events" size={64} weight="duotone" className="text-primary" />
+        <div className="mb-8 inline-flex items-center justify-center p-6 bg-white dark:bg-card-dark rounded-full shadow-xl shadow-primary/10 border-4 border-primary/20 motion-safe:animate-bounce-slow">
+          <AppIcon name="emoji_events" size={64} weight="duotone" className="text-primary" aria-hidden="true" />
         </div>
 
         {/* Header Text */}
@@ -113,7 +113,7 @@ export default function OnboardingCompletePage() {
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                <User className="h-5 w-5" />
+                <User className="h-5 w-5" aria-hidden="true" />
               </div>
               <div className="flex-1">
                 <p className="text-sm text-text-muted dark:text-text-muted">
@@ -127,14 +127,14 @@ export default function OnboardingCompletePage() {
                   ) : t('childAdded')}
                 </p>
               </div>
-              <CheckCircle2 className="h-5 w-5 text-primary" />
+              <CheckCircle2 className="h-5 w-5 text-primary" aria-hidden="true" />
             </div>
 
             <div className="w-full h-px bg-gray-100 dark:bg-gray-700" />
 
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                <ListChecks className="h-5 w-5" />
+                <ListChecks className="h-5 w-5" aria-hidden="true" />
               </div>
               <div className="flex-1">
                 <p className="text-sm text-text-muted dark:text-text-muted">
@@ -144,14 +144,14 @@ export default function OnboardingCompletePage() {
                   {t('tasksSet', { count: 3 })}
                 </p>
               </div>
-              <CheckCircle2 className="h-5 w-5 text-primary" />
+              <CheckCircle2 className="h-5 w-5 text-primary" aria-hidden="true" />
             </div>
 
             <div className="w-full h-px bg-gray-100 dark:bg-gray-700" />
 
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400">
-                <Star className="h-5 w-5" />
+                <Star className="h-5 w-5" aria-hidden="true" />
               </div>
               <div className="flex-1">
                 <p className="text-sm text-text-muted dark:text-text-muted">
@@ -161,7 +161,7 @@ export default function OnboardingCompletePage() {
                   {t('pointsGoal', { points: 500 })}
                 </p>
               </div>
-              <CheckCircle2 className="h-5 w-5 text-primary" />
+              <CheckCircle2 className="h-5 w-5 text-primary" aria-hidden="true" />
             </div>
           </div>
         </div>
@@ -169,15 +169,17 @@ export default function OnboardingCompletePage() {
         {/* Action Buttons */}
         <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
           <button
+            type="button"
             onClick={handleStartNow}
-            className="w-full md:w-auto px-8 py-4 bg-primary text-black font-bold text-lg rounded-lg shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2"
+            className="w-full md:w-auto px-8 py-4 bg-primary text-black font-bold text-lg rounded-lg shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            <Rocket className="h-5 w-5" />
+            <Rocket className="h-5 w-5" aria-hidden="true" />
             {t('startNow')}
           </button>
           <button
+            type="button"
             onClick={handleAdjustSettings}
-            className="w-full md:w-auto px-8 py-4 bg-transparent border-2 border-gray-200 dark:border-gray-700 text-text-muted dark:text-text-muted font-semibold text-lg rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+            className="w-full md:w-auto px-8 py-4 bg-transparent border-2 border-gray-200 dark:border-gray-700 text-text-muted dark:text-text-muted font-semibold text-lg rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             {t('adjustTasksRewards')}
           </button>

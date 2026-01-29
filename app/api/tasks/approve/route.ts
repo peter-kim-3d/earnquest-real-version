@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function POST(request: Request) {
   try {
@@ -86,10 +87,10 @@ export async function POST(request: Request) {
       message: 'Task approved successfully',
       pointsAwarded: completion.tasks.points,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in task approval:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }

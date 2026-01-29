@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function POST(request: NextRequest) {
   try {
@@ -92,11 +93,8 @@ export async function POST(request: NextRequest) {
       success: true,
       card,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Send gratitude error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

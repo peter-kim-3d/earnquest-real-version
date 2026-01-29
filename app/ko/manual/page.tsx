@@ -37,7 +37,7 @@ export default function ManualPageKo() {
           </div>
           <div className="flex items-center gap-4">
             <a href="/ko/pamphlet" className="text-[#688961] hover:text-[#121811] font-medium flex items-center gap-2 transition-colors">
-              <Home className="w-4 h-4" />
+              <Home className="w-4 h-4" aria-hidden="true" />
               홈
             </a>
             <Link href="/ko-KR/login" className="bg-[#2bb800] hover:bg-[#229900] px-5 py-2 rounded-full text-white font-semibold transition-all">
@@ -51,6 +51,7 @@ export default function ManualPageKo() {
         {/* Mobile Contents Toggle */}
         <div className="md:hidden fixed bottom-4 left-4 right-4 z-40">
           <button
+            type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="w-full bg-white rounded-2xl shadow-lg border border-[#2bb800]/20 p-4 flex items-center justify-between"
           >
@@ -63,7 +64,7 @@ export default function ManualPageKo() {
                 <p className="font-semibold text-[#121811]">{currentSection?.title}</p>
               </div>
             </div>
-            <ChevronDown className={`w-5 h-5 text-[#688961] transition-transform ${mobileMenuOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-5 h-5 text-[#688961] transition-transform ${mobileMenuOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
           </button>
 
           {/* Mobile Menu Dropdown */}
@@ -77,6 +78,7 @@ export default function ManualPageKo() {
                 {sections.map((section) => (
                   <li key={section.id}>
                     <button
+                      type="button"
                       onClick={() => navigateTo(section.id)}
                       className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3 ${
                         activeSection === section.id
@@ -105,6 +107,7 @@ export default function ManualPageKo() {
               {sections.map((section) => (
                 <li key={section.id}>
                   <button
+                    type="button"
                     onClick={() => navigateTo(section.id)}
                     className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3 ${
                       activeSection === section.id
@@ -138,10 +141,11 @@ export default function ManualPageKo() {
                 {/* Previous */}
                 {prevSection ? (
                   <button
+                    type="button"
                     onClick={() => navigateTo(prevSection.id)}
                     className="flex-1 flex items-center gap-3 p-4 rounded-xl border border-[#688961]/20 hover:border-[#2bb800] hover:bg-[#2bb800]/5 transition-all group text-left"
                   >
-                    <ChevronLeft className="w-5 h-5 text-[#688961] group-hover:text-[#2bb800] flex-shrink-0" />
+                    <ChevronLeft className="w-5 h-5 text-[#688961] group-hover:text-[#2bb800] flex-shrink-0" aria-hidden="true" />
                     <div className="min-w-0">
                       <p className="text-xs text-[#688961]">이전</p>
                       <p className="font-semibold text-[#121811] truncate">{prevSection.title}</p>
@@ -155,6 +159,7 @@ export default function ManualPageKo() {
                 <div className="hidden md:flex items-center gap-1">
                   {sections.map((section, index) => (
                     <button
+                      type="button"
                       key={section.id}
                       onClick={() => navigateTo(section.id)}
                       className={`w-2 h-2 rounded-full transition-all ${
@@ -170,6 +175,7 @@ export default function ManualPageKo() {
                 {/* Next */}
                 {nextSection ? (
                   <button
+                    type="button"
                     onClick={() => navigateTo(nextSection.id)}
                     className="flex-1 flex items-center justify-end gap-3 p-4 rounded-xl border border-[#688961]/20 hover:border-[#2bb800] hover:bg-[#2bb800]/5 transition-all group text-right"
                   >
@@ -177,7 +183,7 @@ export default function ManualPageKo() {
                       <p className="text-xs text-[#688961]">다음</p>
                       <p className="font-semibold text-[#121811] truncate">{nextSection.title}</p>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-[#688961] group-hover:text-[#2bb800] flex-shrink-0" />
+                    <ChevronRight className="w-5 h-5 text-[#688961] group-hover:text-[#2bb800] flex-shrink-0" aria-hidden="true" />
                   </button>
                 ) : (
                   <div className="flex-1" />
@@ -202,15 +208,15 @@ function GettingStarted() {
         <h3 className="font-display text-xl font-bold text-[#121811] mb-2">필요한 것</h3>
         <ul className="space-y-2 text-[#688961]">
           <li className="flex items-center gap-3">
-            <CheckCircle className="w-5 h-5 text-[#2bb800]" />
+            <CheckCircle className="w-5 h-5 text-[#2bb800]" aria-hidden="true" />
             <span>5분의 시간</span>
           </li>
           <li className="flex items-center gap-3">
-            <CheckCircle className="w-5 h-5 text-[#2bb800]" />
+            <CheckCircle className="w-5 h-5 text-[#2bb800]" aria-hidden="true" />
             <span>Google 또는 이메일 계정</span>
           </li>
           <li className="flex items-center gap-3">
-            <CheckCircle className="w-5 h-5 text-[#2bb800]" />
+            <CheckCircle className="w-5 h-5 text-[#2bb800]" aria-hidden="true" />
             <span>자녀의 이름과 생년월일</span>
           </li>
         </ul>
@@ -220,11 +226,11 @@ function GettingStarted() {
         <p className="text-[#688961] mb-4">세 가지 방법으로 부모 계정을 만들 수 있습니다:</p>
         <ul className="space-y-2 text-[#688961]">
           <li className="flex gap-3">
-            <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
+            <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" aria-hidden="true" />
             <div><strong>Google OAuth</strong> - Google 계정으로 원클릭 가입</div>
           </li>
           <li className="flex gap-3">
-            <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" />
+            <CheckCircle className="w-5 h-5 text-[#2bb800] flex-shrink-0 mt-1" aria-hidden="true" />
             <div><strong>이메일 + 비밀번호</strong> - 이메일 확인이 필요한 일반 가입</div>
           </li>
         </ul>
@@ -287,7 +293,7 @@ function GettingStarted() {
 
       <div className="bg-[#0ea5e9]/10 rounded-xl p-6 mt-10">
         <h3 className="font-display text-xl font-bold text-[#121811] mb-2 flex items-center gap-2">
-          <Heart className="w-6 h-6 text-[#0ea5e9]" />
+          <Heart className="w-6 h-6 text-[#0ea5e9]" aria-hidden="true" />
           프로 팁
         </h3>
         <p className="text-[#688961]">
@@ -838,17 +844,17 @@ function KindnessGuide() {
           <div className="bg-white rounded-xl p-4 border border-[#2bb800]/20">
             <h4 className="font-display font-bold text-[#121811] mb-3">가족 돕기</h4>
             <ul className="space-y-2 text-[#688961] text-sm">
-              <li className="flex items-start gap-2"><Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" /><span>형제자매 숙제 도와주기</span></li>
-              <li className="flex items-start gap-2"><Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" /><span>부모님을 위해 아침 만들기</span></li>
-              <li className="flex items-start gap-2"><Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" /><span>부탁 없이 동생과 놀아주기</span></li>
+              <li className="flex items-start gap-2"><Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" aria-hidden="true" /><span>형제자매 숙제 도와주기</span></li>
+              <li className="flex items-start gap-2"><Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" aria-hidden="true" /><span>부모님을 위해 아침 만들기</span></li>
+              <li className="flex items-start gap-2"><Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" aria-hidden="true" /><span>부탁 없이 동생과 놀아주기</span></li>
             </ul>
           </div>
           <div className="bg-white rounded-xl p-4 border border-[#2bb800]/20">
             <h4 className="font-display font-bold text-[#121811] mb-3">공감 보여주기</h4>
             <ul className="space-y-2 text-[#688961] text-sm">
-              <li className="flex items-start gap-2"><Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" /><span>슬픈 친구 위로하기</span></li>
-              <li className="flex items-start gap-2"><Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" /><span>속상한 형제자매에게 장난감 나눠주기</span></li>
-              <li className="flex items-start gap-2"><Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" /><span>선생님께 감사 편지 쓰기</span></li>
+              <li className="flex items-start gap-2"><Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" aria-hidden="true" /><span>슬픈 친구 위로하기</span></li>
+              <li className="flex items-start gap-2"><Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" aria-hidden="true" /><span>속상한 형제자매에게 장난감 나눠주기</span></li>
+              <li className="flex items-start gap-2"><Heart className="w-4 h-4 text-[#f49d25] flex-shrink-0 mt-0.5" aria-hidden="true" /><span>선생님께 감사 편지 쓰기</span></li>
             </ul>
           </div>
         </div>

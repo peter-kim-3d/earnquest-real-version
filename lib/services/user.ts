@@ -1,27 +1,14 @@
 import { createClient } from '@/lib/supabase/server';
+import type {
+  UserProfile,
+  CreateUserParams,
+  UpdateUserParams,
+  AuthUser,
+} from '@/lib/types/user';
+import { DEFAULT_NOTIFICATION_SETTINGS } from '@/lib/types/user';
 
-export interface UserProfile {
-  id: string;
-  family_id: string;
-  email: string;
-  full_name: string | null;
-  avatar_url: string | null;
-  role: 'parent' | 'child';
-  notification_settings: any;
-  passcode: string | null;
-  passcode_verified_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface CreateUserParams {
-  id: string; // From auth.users
-  familyId: string;
-  email: string;
-  fullName?: string;
-  avatarUrl?: string;
-  role?: 'parent' | 'child';
-}
+// Re-export types for backward compatibility
+export type { UserProfile, CreateUserParams, UpdateUserParams } from '@/lib/types/user';
 
 /**
  * Creates a user profile in the users table
@@ -38,13 +25,7 @@ export async function createUser(params: CreateUserParams) {
       full_name: params.fullName || null,
       avatar_url: params.avatarUrl || null,
       role: params.role || 'parent',
-      notification_settings: {
-        email: true,
-        push: false,
-        taskApprovals: true,
-        rewardPurchases: true,
-        weeklyReport: true,
-      },
+      notification_settings: DEFAULT_NOTIFICATION_SETTINGS,
     })
     .select()
     .single();
@@ -80,7 +61,7 @@ export async function getUser(userId: string): Promise<UserProfile | null> {
 /**
  * Gets or creates a user profile for OAuth users
  */
-export async function getOrCreateUserProfile(authUser: any): Promise<UserProfile | null> {
+export async function getOrCreateUserProfile(authUser: AuthUser): Promise<UserProfile | null> {
   // Check if user profile already exists
   const existingUser = await getUser(authUser.id);
   if (existingUser) {
@@ -111,7 +92,7 @@ export async function getOrCreateUserProfile(authUser: any): Promise<UserProfile
  */
 export async function updateUser(
   userId: string,
-  updates: Partial<CreateUserParams>
+  updates: UpdateUserParams
 ) {
   const supabase = await createClient();
 

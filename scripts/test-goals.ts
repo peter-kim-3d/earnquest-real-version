@@ -207,8 +207,8 @@ async function testGoals() {
     console.log('   Parent: http://localhost:3001/en-US/goals');
     console.log('   Child: http://localhost:3001/en-US/child/goals\n');
 
-  } catch (error: any) {
-    console.error('\n❌ Test failed with error:', error.message);
+  } catch (error: unknown) {
+    console.error('\n❌ Test failed with error:', error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }

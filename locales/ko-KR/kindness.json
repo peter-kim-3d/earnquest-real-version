@@ -5,6 +5,10 @@
     "noChildren": "아이를 찾을 수 없습니다",
     "noChildrenDesc": "감사 카드를 보내려면 가족에 아이를 추가하세요."
   },
+  "recipient": {
+    "title": "누구에게 감사하나요?",
+    "subtitle": "친절한 일을 한 사람을 선택하세요"
+  },
   "form": {
     "selectRecipient": "받는 사람 선택",
     "selectRecipientDesc": "누구에게 감사를 보내시겠습니까?",
@@ -22,7 +26,13 @@
     "completeFields": "모든 항목을 완료해주세요",
     "sendFailed": "감사 카드 전송에 실패했습니다",
     "sentSuccess": "감사가 전달되었어요!",
-    "sentSuccessDesc": "{name}이(가) 메시지를 좋아할 거예요!"
+    "sentSuccessDesc": "{name}이(가) 메시지를 좋아할 거예요!",
+    "progressSteps": "진행 단계",
+    "stepNumber": "{total}단계 중 {num}단계"
+  },
+  "themePicker": {
+    "title": "분위기 선택",
+    "subtitle": "가장 어울리는 카드 테마를 선택하세요"
   },
   "themes": {
     "thankYou": "고마워요",

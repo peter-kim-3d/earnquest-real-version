@@ -25,6 +25,7 @@
     "yearsOld": "{age}세",
     "childNumber": "아이 #{number}",
     "addAnother": "다른 아이 추가",
+    "removeChild": "아이 제거",
     "saveAndContinue": "{count}명 저장 후 계속하기",
     "mustHaveOneChild": "최소 1명의 아이가 필요합니다",
     "fillAllFields": "모든 이름과 생년월일을 입력해주세요",

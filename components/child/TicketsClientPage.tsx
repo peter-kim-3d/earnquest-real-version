@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import TicketCard from '@/components/store/TicketCard';
 import ScreenTimeTimer from '@/components/child/ScreenTimeTimer';
+import { getErrorMessage } from '@/lib/utils/error';
 
 type TicketStatus = 'active' | 'use_requested' | 'in_use' | 'used';
 
@@ -88,11 +89,9 @@ export default function TicketsClientPage({
 
       // Refresh server data in background
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Request use error:', error);
-      toast.error(t('requestFailed'), {
-        description: error.message || 'Please try again.',
-      });
+      toast.error(t('requestFailed'), { description: getErrorMessage(error) });
     } finally {
       setRequestingUse(null);
     }
@@ -168,17 +167,22 @@ export default function TicketsClientPage({
 
       {/* Custom Tabs */}
       <div className="mb-6">
-        <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
+        <div role="tablist" className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
+                type="button"
+                role="tab"
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
+                aria-selected={isActive}
+                aria-controls={`tabpanel-${tab.id}`}
                 className={`
                   flex items-center gap-2 px-4 py-3 font-semibold text-sm transition-all
-                  border-b-2 -mb-px
+                  border-b-2 -mb-px rounded-t-lg
+                  focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
                   ${
                     isActive
                       ? 'border-primary text-primary'
@@ -186,7 +190,7 @@ export default function TicketsClientPage({
                   }
                 `}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-4 w-4" aria-hidden="true" />
                 <span>{tab.label}</span>
                 <span
                   className={`
@@ -209,7 +213,7 @@ export default function TicketsClientPage({
       {/* Tab Content */}
       <div>
         {activeTab === 'active' && (
-          <div>
+          <div role="tabpanel" id="tabpanel-active" aria-label={t('active')}>
             {tickets.active.length === 0 ? (
               <EmptyState
                 icon="🎟️"
@@ -234,7 +238,7 @@ export default function TicketsClientPage({
         )}
 
         {activeTab === 'use_requested' && (
-          <div>
+          <div role="tabpanel" id="tabpanel-use_requested" aria-label={t('waiting')}>
             {tickets.use_requested.length === 0 ? (
               <EmptyState
                 icon="⏳"
@@ -256,7 +260,7 @@ export default function TicketsClientPage({
         )}
 
         {activeTab === 'in_use' && (
-          <div>
+          <div role="tabpanel" id="tabpanel-in_use" aria-label={t('playing')}>
             {tickets.in_use.length === 0 ? (
               <EmptyState
                 icon="🎮"
@@ -285,7 +289,7 @@ export default function TicketsClientPage({
         )}
 
         {activeTab === 'used' && (
-          <div>
+          <div role="tabpanel" id="tabpanel-used" aria-label={t('used')}>
             {tickets.used.length === 0 ? (
               <EmptyState
                 icon="✅"
@@ -318,7 +322,7 @@ function EmptyState({
   return (
     <div className="rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-12 text-center">
       <div className="max-w-md mx-auto">
-        <div className="text-6xl mb-4">{icon}</div>
+        <div className="text-6xl mb-4" aria-hidden="true">{icon}</div>
         <h3 className="text-lg font-bold text-text-main dark:text-white mb-2">
           {message}
         </h3>

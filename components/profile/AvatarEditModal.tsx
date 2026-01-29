@@ -10,6 +10,8 @@ import CameraCapture from './CameraCapture';
 import { getCroppedImg } from '@/lib/cropImage';
 import { Area } from 'react-easy-crop';
 import { PARENT_AVATARS, CHILD_AVATARS } from '@/lib/avatars';
+import { getErrorMessage } from '@/lib/utils/error';
+import { useTranslations } from 'next-intl';
 
 interface AvatarEditModalProps {
   open: boolean;
@@ -28,6 +30,7 @@ export default function AvatarEditModal({
   mode = 'parent',
   childId,
 }: AvatarEditModalProps) {
+  const t = useTranslations('common.avatar');
   // Select avatar pool based on mode
   const PRESET_AVATARS = mode === 'child' ? CHILD_AVATARS : PARENT_AVATARS;
   const [uploading, setUploading] = useState(false);
@@ -39,13 +42,13 @@ export default function AvatarEditModal({
 
   const handleFileSelect = async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+      toast.error(t('selectImageFile'));
       return;
     }
 
     // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size must be less than 5MB');
+      toast.error(t('imageSizeLimit'));
       return;
     }
 
@@ -63,7 +66,7 @@ export default function AvatarEditModal({
 
     // Validate childId for child mode
     if (mode === 'child' && !childId) {
-      toast.error('Child ID is required');
+      toast.error(t('childIdRequired'));
       return;
     }
 
@@ -102,14 +105,14 @@ export default function AvatarEditModal({
 
       const { avatarUrl } = await response.json();
 
-      toast.success('Avatar updated successfully!');
+      toast.success(t('avatarUpdated'));
       onAvatarUpdate(avatarUrl);
       setShowCropEditor(false);
       setImageSrc(null);
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Upload error:', error);
-      toast.error(error.message || 'Failed to upload avatar');
+      toast.error(getErrorMessage(error));
     } finally {
       setUploading(false);
     }
@@ -133,7 +136,7 @@ export default function AvatarEditModal({
   const handlePresetSelect = async (presetId: string) => {
     // Validate childId for child mode
     if (mode === 'child' && !childId) {
-      toast.error('Child ID is required');
+      toast.error(t('childIdRequired'));
       return;
     }
 
@@ -159,12 +162,12 @@ export default function AvatarEditModal({
         throw new Error('Update failed');
       }
 
-      toast.success('Avatar updated!');
+      toast.success(t('avatarUpdated'));
       onAvatarUpdate(presetId);
       setTimeout(() => onClose(), 500);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Preset update error:', error);
-      toast.error('Failed to update avatar');
+      toast.error(t('updateFailed'));
     }
   };
 
@@ -182,10 +185,10 @@ export default function AvatarEditModal({
         <DialogHeader>
           <DialogTitle>
             {showCameraCapture
-              ? 'Take a Photo'
+              ? t('takePhoto')
               : showCropEditor
-                ? 'Adjust Your Photo'
-                : 'Choose Profile Picture'}
+                ? t('adjustPhoto')
+                : t('chooseProfilePicture')}
           </DialogTitle>
         </DialogHeader>
 
@@ -213,24 +216,26 @@ export default function AvatarEditModal({
             {/* Custom Photo Section */}
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
-                Custom Photo
+                {t('customPhoto')}
               </h3>
               <div className="grid grid-cols-2 gap-3">
                 <button
+                  type="button"
                   onClick={handleCameraClick}
                   disabled={uploading}
-                  className="flex flex-col items-center justify-center p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all disabled:opacity-50"
+                  className="flex flex-col items-center justify-center p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 >
-                  <Camera className="h-6 w-6 text-primary mb-2" />
-                  <span className="text-sm font-semibold text-text-main dark:text-white">Camera</span>
+                  <Camera className="h-6 w-6 text-primary mb-2" aria-hidden="true" />
+                  <span className="text-sm font-semibold text-text-main dark:text-white">{t('camera')}</span>
                 </button>
                 <button
+                  type="button"
                   onClick={handleUploadClick}
                   disabled={uploading}
-                  className="flex flex-col items-center justify-center p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all disabled:opacity-50"
+                  className="flex flex-col items-center justify-center p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 >
-                  <Upload className="h-6 w-6 text-primary mb-2" />
-                  <span className="text-sm font-semibold text-text-main dark:text-white">Upload</span>
+                  <Upload className="h-6 w-6 text-primary mb-2" aria-hidden="true" />
+                  <span className="text-sm font-semibold text-text-main dark:text-white">{t('upload')}</span>
                 </button>
               </div>
 
@@ -250,18 +255,20 @@ export default function AvatarEditModal({
             {/* Presets Gallery */}
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
-                Choose Avatar
+                {t('chooseAvatar')}
               </h3>
               <div className="grid grid-cols-5 gap-3">
                 {PRESET_AVATARS.map((avatar) => (
                   <button
+                    type="button"
                     key={avatar.id}
                     onClick={() => handlePresetSelect(avatar.id)}
+                    aria-label={`Select ${avatar.id} avatar`}
+                    aria-pressed={selectedPreset === avatar.id || currentAvatar === avatar.id}
                     className={`relative aspect-square rounded-full bg-gradient-to-br ${avatar.color} hover:scale-110 transition-transform flex items-center justify-center overflow-hidden ring-offset-2 dark:ring-offset-gray-900 ${(selectedPreset === avatar.id || currentAvatar === avatar.id)
                       ? 'ring-4 ring-primary'
                       : 'hover:ring-2 hover:ring-primary/50'
                       }`}
-                    title={avatar.id}
                   >
                     {avatar.image ? (
                       <Image
@@ -276,7 +283,7 @@ export default function AvatarEditModal({
                       <span className="text-3xl">{avatar.icon}</span>
                     )}
                     {(selectedPreset === avatar.id || currentAvatar === avatar.id) && (
-                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center" aria-hidden="true">
                         <Check className="h-6 w-6 text-white drop-shadow-md" />
                       </div>
                     )}
@@ -286,9 +293,9 @@ export default function AvatarEditModal({
             </div>
 
             {uploading && (
-              <div className="flex items-center justify-center py-2 text-primary animate-pulse">
-                <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-                <span className="text-sm font-medium">Processing...</span>
+              <div className="flex items-center justify-center py-2 text-primary motion-safe:animate-pulse" role="status" aria-live="polite">
+                <div className="inline-block motion-safe:animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" aria-hidden="true"></div>
+                <span className="text-sm font-medium">{t('processing')}</span>
               </div>
             )}
           </div>

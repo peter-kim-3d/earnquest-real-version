@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getTierForPoints } from '@/lib/utils/tiers';
+import { getErrorMessage } from '@/lib/api/error-handler';
+import { authenticateAndGetFamily, errors } from '@/lib/api/responses';
 
 /**
  * GET /api/goals
@@ -12,31 +14,16 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const childId = searchParams.get('childId');
 
-    // Check authentication
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Get user's family
-    const { data: userProfile } = await supabase
-      .from('users')
-      .select('family_id')
-      .eq('id', user.id)
-      .single();
-
-    if (!userProfile?.family_id) {
-      return NextResponse.json({ error: 'No family found' }, { status: 404 });
-    }
+    // Authenticate and get family
+    const authResult = await authenticateAndGetFamily(supabase);
+    if ('error' in authResult) return authResult.error;
+    const { familyId } = authResult;
 
     // Build query
     let query = supabase
       .from('goals')
       .select('*')
-      .eq('family_id', userProfile.family_id)
+      .eq('family_id', familyId)
       .is('deleted_at', null)
       .order('is_completed', { ascending: true })
       .order('created_at', { ascending: false });
@@ -49,19 +36,13 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Error fetching goals:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch goals' },
-        { status: 500 }
-      );
+      return errors.internalError('Failed to fetch goals');
     }
 
     return NextResponse.json({ goals });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Goals GET error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return errors.internalError(getErrorMessage(error));
   }
 }
 
@@ -73,42 +54,21 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
 
-    // Check authentication
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // Authenticate and get family
+    const authResult = await authenticateAndGetFamily(supabase);
+    if ('error' in authResult) return authResult.error;
+    const { familyId } = authResult;
 
     const body = await request.json();
     const { childId, name, description, targetPoints, icon, realValueCents, milestoneBonuses } = body;
 
     // Validate required fields
     if (!childId || !name || !targetPoints) {
-      return NextResponse.json(
-        { error: 'Missing required fields: childId, name, targetPoints' },
-        { status: 400 }
-      );
+      return errors.missingFields(['childId', 'name', 'targetPoints']);
     }
 
     if (targetPoints <= 0) {
-      return NextResponse.json(
-        { error: 'Target points must be positive' },
-        { status: 400 }
-      );
-    }
-
-    // Get user's family and verify child belongs to family
-    const { data: userProfile } = await supabase
-      .from('users')
-      .select('family_id')
-      .eq('id', user.id)
-      .single();
-
-    if (!userProfile?.family_id) {
-      return NextResponse.json({ error: 'No family found' }, { status: 404 });
+      return errors.badRequest('Target points must be positive');
     }
 
     // Verify child belongs to this family
@@ -116,14 +76,11 @@ export async function POST(request: NextRequest) {
       .from('children')
       .select('id, family_id')
       .eq('id', childId)
-      .eq('family_id', userProfile.family_id)
+      .eq('family_id', familyId)
       .single();
 
     if (!child) {
-      return NextResponse.json(
-        { error: 'Child not found in your family' },
-        { status: 404 }
-      );
+      return errors.notFound('Child in your family');
     }
 
     // Calculate tier
@@ -149,7 +106,7 @@ export async function POST(request: NextRequest) {
       .from('goals')
       .insert({
         child_id: childId,
-        family_id: userProfile.family_id,
+        family_id: familyId,
         name,
         description: description || null,
         icon: icon || 'target',
@@ -167,19 +124,13 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Error creating goal:', error);
-      return NextResponse.json(
-        { error: 'Failed to create goal' },
-        { status: 500 }
-      );
+      return errors.internalError('Failed to create goal');
     }
 
     return NextResponse.json({ goal }, { status: 201 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Goals POST error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return errors.internalError(getErrorMessage(error));
   }
 }
 
@@ -191,34 +142,16 @@ export async function PATCH(request: NextRequest) {
   try {
     const supabase = await createClient();
 
-    // Check authentication
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // Authenticate and get family
+    const authResult = await authenticateAndGetFamily(supabase);
+    if ('error' in authResult) return authResult.error;
+    const { familyId } = authResult;
 
     const body = await request.json();
     const { goalId, name, description, targetPoints, reason } = body;
 
     if (!goalId) {
-      return NextResponse.json(
-        { error: 'Missing goalId' },
-        { status: 400 }
-      );
-    }
-
-    // Get user's family
-    const { data: userProfile } = await supabase
-      .from('users')
-      .select('family_id')
-      .eq('id', user.id)
-      .single();
-
-    if (!userProfile?.family_id) {
-      return NextResponse.json({ error: 'No family found' }, { status: 404 });
+      return errors.missingFields(['goalId']);
     }
 
     // Get existing goal
@@ -226,11 +159,11 @@ export async function PATCH(request: NextRequest) {
       .from('goals')
       .select('*')
       .eq('id', goalId)
-      .eq('family_id', userProfile.family_id)
+      .eq('family_id', familyId)
       .single();
 
     if (!existingGoal) {
-      return NextResponse.json({ error: 'Goal not found' }, { status: 404 });
+      return errors.notFound('Goal');
     }
 
     // Build update object
@@ -244,10 +177,7 @@ export async function PATCH(request: NextRequest) {
     // If target is changing, require reason and update tier
     if (targetPoints !== undefined && targetPoints !== existingGoal.target_points) {
       if (!reason) {
-        return NextResponse.json(
-          { error: 'Reason is required when changing target points' },
-          { status: 400 }
-        );
+        return errors.badRequest('Reason is required when changing target points');
       }
 
       updates.target_points = targetPoints;
@@ -280,19 +210,13 @@ export async function PATCH(request: NextRequest) {
 
     if (error) {
       console.error('Error updating goal:', error);
-      return NextResponse.json(
-        { error: 'Failed to update goal' },
-        { status: 500 }
-      );
+      return errors.internalError('Failed to update goal');
     }
 
     return NextResponse.json({ goal });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Goals PATCH error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return errors.internalError(getErrorMessage(error));
   }
 }
 
@@ -307,53 +231,29 @@ export async function DELETE(request: NextRequest) {
     const goalId = searchParams.get('goalId');
 
     if (!goalId) {
-      return NextResponse.json(
-        { error: 'Missing goalId' },
-        { status: 400 }
-      );
+      return errors.missingFields(['goalId']);
     }
 
-    // Check authentication
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Get user's family
-    const { data: userProfile } = await supabase
-      .from('users')
-      .select('family_id')
-      .eq('id', user.id)
-      .single();
-
-    if (!userProfile?.family_id) {
-      return NextResponse.json({ error: 'No family found' }, { status: 404 });
-    }
+    // Authenticate and get family
+    const authResult = await authenticateAndGetFamily(supabase);
+    if ('error' in authResult) return authResult.error;
+    const { familyId } = authResult;
 
     // Soft delete
     const { error } = await supabase
       .from('goals')
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', goalId)
-      .eq('family_id', userProfile.family_id);
+      .eq('family_id', familyId);
 
     if (error) {
       console.error('Error deleting goal:', error);
-      return NextResponse.json(
-        { error: 'Failed to delete goal' },
-        { status: 500 }
-      );
+      return errors.internalError('Failed to delete goal');
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Goals DELETE error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return errors.internalError(getErrorMessage(error));
   }
 }

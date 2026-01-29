@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LogOut, Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface LogoutButtonProps {
   locale: string;
@@ -12,6 +13,7 @@ interface LogoutButtonProps {
 
 export default function LogoutButton({ locale, variant = 'parent', className }: LogoutButtonProps) {
   const router = useRouter();
+  const t = useTranslations('common.auth');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = async () => {
@@ -28,7 +30,7 @@ export default function LogoutButton({ locale, variant = 'parent', className }: 
         const fallbackUrl = variant === 'child' ? `/${locale}/child-login` : `/${locale}/login`;
         router.push(fallbackUrl);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Logout failed:', error);
       // Fallback redirect on error
       const fallbackUrl = variant === 'child' ? `/${locale}/child-login` : `/${locale}/login`;
@@ -40,17 +42,19 @@ export default function LogoutButton({ locale, variant = 'parent', className }: 
     // Child variant with custom className - simple centered layout
     return (
       <button
+        type="button"
         onClick={handleLogout}
         disabled={isLoading}
+        aria-busy={isLoading}
         className={className}
       >
         {isLoading ? (
-          <Loader2 className="h-5 w-5 text-red-500 animate-spin" />
+          <Loader2 className="h-5 w-5 text-red-500 motion-safe:animate-spin" aria-hidden="true" />
         ) : (
-          <LogOut className="h-5 w-5 text-red-500" />
+          <LogOut className="h-5 w-5 text-red-500" aria-hidden="true" />
         )}
         <span className="font-semibold text-red-500">
-          {isLoading ? 'Logging out...' : 'Logout'}
+          {isLoading ? t('loggingOut') : t('logout')}
         </span>
       </button>
     );
@@ -58,21 +62,23 @@ export default function LogoutButton({ locale, variant = 'parent', className }: 
 
   return (
     <button
+      type="button"
       onClick={handleLogout}
       disabled={isLoading}
-      className={className || "flex items-center gap-3 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all group text-left w-full disabled:opacity-50"}
+      aria-busy={isLoading}
+      className={className || "flex items-center gap-3 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all group text-left w-full disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"}
     >
       {isLoading ? (
-        <Loader2 className="h-6 w-6 text-red-500 animate-spin" />
+        <Loader2 className="h-6 w-6 text-red-500 motion-safe:animate-spin" aria-hidden="true" />
       ) : (
-        <LogOut className="h-6 w-6 text-gray-600 dark:text-gray-400 group-hover:text-red-500 transition-colors" />
+        <LogOut className="h-6 w-6 text-gray-600 dark:text-gray-400 group-hover:text-red-500 transition-colors" aria-hidden="true" />
       )}
       <div className="flex-1">
         <h3 className="font-semibold text-text-main dark:text-white group-hover:text-red-500 transition-colors">
-          Logout
+          {t('logout')}
         </h3>
         <p className="text-sm text-text-muted dark:text-text-muted">
-          Sign out of your account
+          {t('logoutDescription')}
         </p>
       </div>
     </button>

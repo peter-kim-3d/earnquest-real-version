@@ -19,7 +19,7 @@ export default function ModuleSelector({ enabledModules, onToggle }: ModuleSelec
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2 text-sm text-text-muted dark:text-text-muted">
-        <Info className="h-4 w-4" />
+        <Info className="h-4 w-4" aria-hidden="true" />
         <span>{t('subtitle')}</span>
       </div>
 
@@ -36,7 +36,9 @@ export default function ModuleSelector({ enabledModules, onToggle }: ModuleSelec
               key={key}
               type="button"
               onClick={() => onToggle(key)}
-              className={`relative flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left ${
+              aria-pressed={isEnabled}
+              aria-label={`${t(`${key}.name`)}: ${isEnabled ? tCommon('status.enabled') : tCommon('status.disabled')}`}
+              className={`relative flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                 isEnabled
                   ? 'border-primary bg-primary/5 dark:bg-primary/10'
                   : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-card-dark hover:border-gray-300 dark:hover:border-gray-600'
@@ -47,6 +49,7 @@ export default function ModuleSelector({ enabledModules, onToggle }: ModuleSelec
                 className={`flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center transition-colors ${
                   isEnabled ? 'bg-primary text-black' : 'border-2 border-gray-300 dark:border-gray-600'
                 }`}
+                aria-hidden="true"
               >
                 {isEnabled && <Check className="h-4 w-4" />}
               </div>
@@ -54,7 +57,7 @@ export default function ModuleSelector({ enabledModules, onToggle }: ModuleSelec
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xl">{taskModule.icon}</span>
+                  <span className="text-xl" aria-hidden="true">{taskModule.icon}</span>
                   <h3 className="font-bold text-text-main dark:text-white">{t(`${key}.name`)}</h3>
                 </div>
                 <p className="text-sm text-text-muted dark:text-text-muted mb-2">{t(`${key}.description`)}</p>

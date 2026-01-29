@@ -39,8 +39,10 @@ export default function RewardIconPicker({
         {/* Category Tabs */}
         <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
           <button
+            type="button"
             onClick={() => setActiveCategory('all')}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+            aria-pressed={activeCategory === 'all'}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
               activeCategory === 'all'
                 ? 'bg-primary text-white'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -50,9 +52,11 @@ export default function RewardIconPicker({
           </button>
           {REWARD_ICON_CATEGORIES.map((category) => (
             <button
+              type="button"
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+              aria-pressed={activeCategory === category.id}
+              className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                 activeCategory === category.id
                   ? 'bg-primary text-white'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -71,21 +75,24 @@ export default function RewardIconPicker({
 
             return (
               <button
+                type="button"
                 key={icon.id}
                 onClick={() => handleSelect(icon)}
-                className={`aspect-square flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all ${
+                aria-label={icon.name}
+                aria-pressed={isSelected}
+                className={`aspect-square flex flex-col items-center justify-center p-2 rounded-xl border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                   isSelected
                     ? 'border-primary bg-primary/10'
                     : 'border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
-                title={icon.name}
               >
                 <IconComponent
                   size={28}
                   weight={isSelected ? 'fill' : 'regular'}
                   className={isSelected ? 'text-primary' : 'text-gray-600 dark:text-gray-400'}
+                  aria-hidden="true"
                 />
-                <span className="text-[10px] mt-1 text-gray-500 dark:text-gray-400 truncate w-full text-center">
+                <span className="text-[10px] mt-1 text-gray-500 dark:text-gray-400 truncate w-full text-center" aria-hidden="true">
                   {icon.name}
                 </span>
               </button>

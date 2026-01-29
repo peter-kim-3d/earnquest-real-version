@@ -77,7 +77,7 @@ export default function AvatarDisplay({
               />
             ) : preset ? (
               // Preset emoji (fallback)
-              <span className={sizeClasses.icon}>{preset.icon}</span>
+              <span className={sizeClasses.icon} aria-hidden="true">{preset.icon}</span>
             ) : (
               // Default: First letter
               <span className={`${sizeClasses.text} font-bold text-primary`}>
@@ -90,10 +90,12 @@ export default function AvatarDisplay({
         {/* Edit Button */}
         {editable && (
           <button
+            type="button"
             onClick={() => setShowEditModal(true)}
-            className={`absolute -bottom-1 -right-1 ${sizeClasses.edit} rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110`}
+            aria-label={`Edit ${userName}'s avatar`}
+            className={`absolute -bottom-1 -right-1 ${sizeClasses.edit} rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2`}
           >
-            <Pencil className="h-3 w-3" />
+            <Pencil className="h-3 w-3" aria-hidden="true" />
           </button>
         )}
       </div>

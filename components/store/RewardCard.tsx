@@ -4,12 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Sparkle, Lock } from '@phosphor-icons/react/dist/ssr';
+import { Sparkle, Lock, CircleNotch } from '@phosphor-icons/react/dist/ssr';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';
 import { EffortBadge, TierBadge } from '@/components/ui/EffortBadge';
 import { getTierForPoints, Tier } from '@/lib/utils/tiers';
 import { getRewardIconById } from '@/lib/reward-icons';
+import { getErrorMessage } from '@/lib/utils/error';
 
 type Reward = {
   id: string;
@@ -97,11 +98,9 @@ export default function RewardCard({
       });
       router.refresh();
       router.push(`/${locale}/child/tickets`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to purchase:', error);
-      toast.error(t('purchaseFailed'), {
-        description: error.message || t('tryAgain'),
-      });
+      toast.error(t('purchaseFailed'), { description: getErrorMessage(error) });
     } finally {
       setLoading(false);
     }
@@ -110,7 +109,7 @@ export default function RewardCard({
   return (
     <div
       className={`
-        group rounded-xl bg-white dark:bg-gray-800 border shadow-card hover:shadow-card-hover transition-all duration-normal
+        group rounded-xl bg-white dark:bg-gray-800 border shadow-card hover:shadow-card-hover transition-all duration-normal focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2
         ${canPurchase ? 'border-gray-200 dark:border-gray-700 hover:border-primary/50' : 'border-gray-300 dark:border-gray-600 opacity-60'}
       `}
     >
@@ -132,7 +131,7 @@ export default function RewardCard({
             className="object-cover"
           />
         ) : (
-          <div className="flex justify-center text-white">
+          <div className="flex justify-center text-white" aria-hidden="true">
             {(() => {
               const rewardIcon = getRewardIconById(reward.icon || 'gift');
               if (rewardIcon) {
@@ -156,12 +155,12 @@ export default function RewardCard({
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="text-lg font-bold text-text-main dark:text-white mb-1 line-clamp-2">
+        <h3 className="text-lg font-bold text-text-main dark:text-white mb-1 line-clamp-2" title={reward.name}>
           {reward.name}
         </h3>
 
         {reward.description && (
-          <p className="text-sm text-text-muted dark:text-gray-400 mb-3 line-clamp-2">
+          <p className="text-sm text-text-muted dark:text-gray-400 mb-3 line-clamp-2" title={reward.description}>
             {reward.description}
           </p>
         )}
@@ -175,7 +174,7 @@ export default function RewardCard({
         {/* Price */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-1">
-            <Sparkle size={16} weight="fill" className="text-primary" />
+            <Sparkle size={16} weight="fill" className="text-primary" aria-hidden="true" />
             <span className="text-xl font-black text-text-main dark:text-white tabular-nums">
               {reward.points_cost}
             </span>
@@ -202,12 +201,20 @@ export default function RewardCard({
                 {t('qpToGo', { points: reward.points_cost - currentBalance })}
               </span>
             </div>
-            <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
+            <div
+              className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden"
+              role="progressbar"
+              aria-valuenow={currentBalance}
+              aria-valuemin={0}
+              aria-valuemax={reward.points_cost}
+              aria-label={t('savingsProgress', { percent: Math.floor((currentBalance / reward.points_cost) * 100), cost: reward.points_cost })}
+            >
               <div
                 className="h-full rounded-full bg-primary transition-all duration-slow"
                 style={{
                   width: `${Math.min((currentBalance / reward.points_cost) * 100, 100)}%`,
                 }}
+                aria-hidden="true"
               />
             </div>
           </div>
@@ -215,10 +222,12 @@ export default function RewardCard({
 
         {/* Purchase Button */}
         <button
+          type="button"
           onClick={handlePurchase}
           disabled={!canPurchase || loading}
+          aria-busy={loading}
           className={`
-            w-full px-4 py-3 rounded-xl font-bold text-sm transition-all
+            w-full px-4 py-3 rounded-xl font-bold text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
             ${canPurchase
               ? 'bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30'
               : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
@@ -226,15 +235,18 @@ export default function RewardCard({
           `}
         >
           {loading ? (
-            t('purchasing')
+            <span className="flex items-center justify-center gap-2">
+              <CircleNotch size={16} className="motion-safe:animate-spin" aria-hidden="true" />
+              {t('purchasing')}
+            </span>
           ) : !canAfford ? (
             <span className="flex items-center justify-center gap-2">
-              <Lock size={16} />
+              <Lock size={16} aria-hidden="true" />
               {t('locked')}
             </span>
           ) : !hasScreenBudget ? (
             <span className="flex items-center justify-center gap-2">
-              <Lock size={16} />
+              <Lock size={16} aria-hidden="true" />
               {t('screenLimitReached')}
             </span>
           ) : (

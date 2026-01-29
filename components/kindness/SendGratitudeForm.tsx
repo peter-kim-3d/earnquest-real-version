@@ -9,6 +9,7 @@ import { ThemePicker, CardTheme } from './ThemePicker';
 import { CardPreview } from './CardPreview';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { getErrorMessage } from '@/lib/utils/error';
 
 interface Child {
   id: string;
@@ -89,9 +90,9 @@ export function SendGratitudeForm({
       setTimeout(() => {
         router.refresh();
       }, 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Send gratitude error:', error);
-      toast.error(error.message || t('sendFailed'));
+      toast.error(getErrorMessage(error));
     } finally {
       setIsSending(false);
     }
@@ -100,34 +101,39 @@ export function SendGratitudeForm({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-6 md:p-8">
       {/* Progress Steps */}
-      <div className="flex items-center justify-between mb-8">
-        {[1, 2, 3].map((num) => (
-          <div key={num} className="flex items-center flex-1">
-            <div
-              className={`
-                w-10 h-10 rounded-full flex items-center justify-center font-semibold
-                ${num <= step
-                  ? 'bg-primary-kindness text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
-                }
-              `}
-            >
-              {num}
-            </div>
-            {num < 3 && (
+      <nav aria-label={t('progressSteps')} className="flex items-center justify-between mb-8">
+        <ol role="list" className="flex items-center flex-1">
+          {[1, 2, 3].map((num) => (
+            <li key={num} className="flex items-center flex-1">
               <div
+                aria-current={num === step ? 'step' : undefined}
+                aria-label={t('stepNumber', { num, total: 3 })}
                 className={`
-                  flex-1 h-1 mx-2
-                  ${num < step
-                    ? 'bg-primary-kindness'
-                    : 'bg-gray-200 dark:bg-gray-700'
+                  w-10 h-10 rounded-full flex items-center justify-center font-semibold
+                  ${num <= step
+                    ? 'bg-primary-kindness text-white'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
                   }
                 `}
-              />
-            )}
-          </div>
-        ))}
-      </div>
+              >
+                <span aria-hidden="true">{num}</span>
+              </div>
+              {num < 3 && (
+                <div
+                  aria-hidden="true"
+                  className={`
+                    flex-1 h-1 mx-2
+                    ${num < step
+                      ? 'bg-primary-kindness'
+                      : 'bg-gray-200 dark:bg-gray-700'
+                    }
+                  `}
+                />
+              )}
+            </li>
+          ))}
+        </ol>
+      </nav>
 
       {/* Step Content */}
       <div className="min-h-96">
@@ -165,7 +171,7 @@ export function SendGratitudeForm({
               className="flex-1"
               disabled={isSending}
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="w-4 h-4 mr-2" aria-hidden="true" />
               {t('back')}
             </Button>
           )}
@@ -175,7 +181,7 @@ export function SendGratitudeForm({
             disabled={step === 1 && !selectedChildId}
           >
             {t('next')}
-            <ArrowRight className="w-4 h-4 ml-2" />
+            <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
           </Button>
         </div>
       )}

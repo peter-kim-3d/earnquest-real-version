@@ -1,22 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
-import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
-import { cookies } from 'next/headers';
 import WalletCard from '@/components/store/WalletCard';
 import RewardCard from '@/components/store/RewardCard';
 import CategoryFilters from '@/components/store/CategoryFilters';
 import ScreenTimeBudgetCard from '@/components/store/ScreenTimeBudgetCard';
 import { getTranslations } from 'next-intl/server';
-
-// Create admin client for child session (bypasses RLS)
-function getAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return createAdminClient(url, key, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-}
+import { getChildSession, getDbClientForChildPage } from '@/lib/api/child-auth';
 
 export default async function StorePage({
   params,
@@ -31,33 +20,16 @@ export default async function StorePage({
   const categoryFilter = queryParams.category || 'all';
 
   // Get child session from cookie
-  const cookieStore = await cookies();
-  const childSessionCookie = cookieStore.get('child_session');
+  const childSession = await getChildSession();
 
-  if (!childSessionCookie) {
-    redirect(`/${locale}/child-login`);
-  }
-
-  let childSession;
-  try {
-    childSession = JSON.parse(childSessionCookie.value);
-  } catch (error) {
-    console.error('Invalid child session cookie:', error);
+  if (!childSession) {
     redirect(`/${locale}/child-login`);
   }
 
   const { childId, familyId } = childSession;
 
-  if (!childId || !familyId) {
-    redirect(`/${locale}/child-login`);
-  }
-
-  // Check if parent is logged in (for RLS)
-  const { data: { user } } = await supabase.auth.getUser();
-
-  // Use admin client if no parent auth (child direct login)
-  // This bypasses RLS for verified child sessions
-  const dbClient = user ? supabase : (getAdminClient() || supabase);
+  // Get appropriate DB client (admin for child sessions, regular for parent)
+  const dbClient = await getDbClientForChildPage(supabase);
 
   // Get the specific child from session
   const { data: child } = await dbClient

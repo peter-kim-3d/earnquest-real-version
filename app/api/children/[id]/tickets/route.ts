@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function GET(
   request: NextRequest,
@@ -32,10 +33,7 @@ export async function GET(
 
     if (error) {
       console.error('Fetch tickets error:', error);
-      return NextResponse.json(
-        { error: error.message || 'Failed to fetch tickets' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 });
     }
 
     // Group tickets by status
@@ -47,11 +45,8 @@ export async function GET(
     };
 
     return NextResponse.json(grouped);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Fetch tickets error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

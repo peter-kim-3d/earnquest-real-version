@@ -6,6 +6,7 @@ import { Check, Bell, Package, Ticket } from '@phosphor-icons/react/dist/ssr';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 import TicketCard from '@/components/store/TicketCard';
+import { getErrorMessage } from '@/lib/utils/error';
 
 type Purchase = {
   id: string;
@@ -60,11 +61,9 @@ export default function PendingTicketsSection({
       });
 
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Approve error:', error);
-      toast.error(t('approvalFailed'), {
-        description: error.message || t('pleaseTryAgain'),
-      });
+      toast.error(t('approvalFailed'), { description: getErrorMessage(error) });
     } finally {
       setApproving(null);
     }
@@ -87,11 +86,9 @@ export default function PendingTicketsSection({
       });
 
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Fulfill error:', error);
-      toast.error(t('fulfillmentFailed'), {
-        description: error.message || t('pleaseTryAgain'),
-      });
+      toast.error(t('fulfillmentFailed'), { description: getErrorMessage(error) });
     } finally {
       setFulfilling(null);
     }
@@ -108,11 +105,11 @@ export default function PendingTicketsSection({
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-          <Ticket size={24} className="text-primary" />
+          <Ticket size={24} className="text-primary" aria-hidden="true" />
         </div>
         <div>
           <h2 className="text-xl font-bold text-text-main dark:text-white">
-            🎫 {t('ticketsTitle')}
+            <span aria-hidden="true">🎫 </span>{t('ticketsTitle')}
           </h2>
           <p className="text-sm text-text-muted dark:text-gray-400">
             {t('ticketsNeedAttention', { count: pendingTickets.length + activeTickets.length })}
@@ -124,7 +121,7 @@ export default function PendingTicketsSection({
       {pendingTickets.length > 0 && (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-4">
-            <Bell size={20} weight="fill" className="text-yellow-600 dark:text-yellow-400" />
+            <Bell size={20} weight="fill" className="text-yellow-600 dark:text-yellow-400" aria-hidden="true" />
             <h3 className="font-bold text-yellow-700 dark:text-yellow-300">
               {t('useRequests', { count: pendingTickets.length })}
             </h3>
@@ -137,6 +134,7 @@ export default function PendingTicketsSection({
                     purchase={ticket}
                     viewMode="parent"
                     onApprove={handleApprove}
+                    isApproving={approving === ticket.id}
                   />
                 </div>
               </div>
@@ -149,7 +147,7 @@ export default function PendingTicketsSection({
       {activeTickets.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <Package size={20} weight="fill" className="text-blue-600 dark:text-blue-400" />
+            <Package size={20} weight="fill" className="text-blue-600 dark:text-blue-400" aria-hidden="true" />
             <h3 className="font-bold text-blue-700 dark:text-blue-300">
               {t('readyToGive', { count: activeTickets.length })}
             </h3>
@@ -162,6 +160,7 @@ export default function PendingTicketsSection({
                     purchase={ticket}
                     viewMode="parent"
                     onFulfill={handleFulfill}
+                    isFulfilling={fulfilling === ticket.id}
                   />
                 </div>
               </div>

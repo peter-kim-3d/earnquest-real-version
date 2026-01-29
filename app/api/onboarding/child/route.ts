@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { createChild } from '@/lib/services/child';
 import { NextResponse } from 'next/server';
+import { PIN_REGEX } from '@/lib/api/validation';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function POST(request: Request) {
   try {
@@ -47,9 +49,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Passcode is now optional (backward compatibility)
-    // Validate format if provided
-    if (passcode && !/^\d{4}$/.test(passcode)) {
+    // Passcode is optional - validate format if provided
+    if (passcode && !PIN_REGEX.test(passcode)) {
       return NextResponse.json(
         { error: 'Passcode must be exactly 4 digits' },
         { status: 400 }
@@ -69,11 +70,8 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ child }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating child:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to create child' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

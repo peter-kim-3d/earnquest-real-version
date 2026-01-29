@@ -49,7 +49,7 @@ export default function ActivityFeed({ completions }: ActivityFeedProps) {
           {completions.map((completion, index) => (
             <div key={completion.id} className="flex gap-4">
               {/* Timeline */}
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center" aria-hidden="true">
                 <div className={`h-2 w-2 rounded-full ${
                   completion.status === 'approved' || completion.status === 'auto_approved'
                     ? 'bg-green-500'
@@ -72,7 +72,7 @@ export default function ActivityFeed({ completions }: ActivityFeedProps) {
                     {formatTime(completion.completed_at)}
                   </span>
                   {completion.points_awarded && (
-                    <span className="text-xs font-semibold text-green-600 dark:text-green-400">
+                    <span className="text-xs font-semibold text-green-600 dark:text-green-400 tabular-nums">
                       +{completion.points_awarded} XP
                     </span>
                   )}

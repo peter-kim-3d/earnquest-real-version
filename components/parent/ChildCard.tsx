@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Fire, TrendUp, Trash, Plus, Checks, Eye } from '@phosphor-icons/react/dist/ssr';
+import { Fire, TrendUp, Trash, Plus, Checks, Eye, CircleNotch } from '@phosphor-icons/react/dist/ssr';
 import { AppIcon } from '@/components/ui/AppIcon';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
@@ -56,6 +56,7 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const [isImpersonating, setIsImpersonating] = useState(false);
   const weeklyGoal = child.settings?.weeklyGoal || 500;
   const progressPercentage = Math.min((child.points_balance / weeklyGoal) * 100, 100);
 
@@ -91,7 +92,7 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
       if (!response.ok) throw new Error('Failed to remove task');
       toast.success(t('taskRemoved'));
       router.refresh();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error removing task:', error);
       toast.error(t('taskRemoveFailed'));
     }
@@ -112,7 +113,7 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
       if (!response.ok) throw new Error('Failed to toggle task');
       toast.success(isEnabled ? t('taskEnabled') : t('taskDisabled'));
       router.refresh(); // Refresh to update UI state
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error toggling task:', error);
       toast.error(t('taskUpdateFailed'));
     }
@@ -140,42 +141,41 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={async () => {
-                  try {
-                    const response = await fetch('/api/auth/impersonate', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ childId: child.id }),
-                    });
+            <button
+              type="button"
+              onClick={async () => {
+                if (isImpersonating) return;
+                setIsImpersonating(true);
+                try {
+                  const response = await fetch('/api/auth/impersonate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ childId: child.id }),
+                  });
 
-                    if (!response.ok) throw new Error('Failed to switch view');
+                  if (!response.ok) throw new Error('Failed to switch view');
 
-                    window.location.href = `/${locale}/child/dashboard`;
-                  } catch (error) {
-                    console.error(error);
-                  }
-                }}
-                className="p-2 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-                title={t('viewAsChild')}
-              >
-                <Eye size={20} />
-              </button>
-              <button
-                onClick={() => {
-                  // Navigate to settings page with child selected is tricky.
-                  // For now, link to child profile in settings?
-                  // Or just keep it as is (no edit button here usually? Wait, let's see original code)
-                }}
-              /* The original code had a dropdown or edit button? Let's check the File Content */
-              >
-                {/* Original code didn't have buttons in the header actually... */}
-              </button>
-            </div>
+                  window.location.href = `/${locale}/child/dashboard`;
+                } catch (error: unknown) {
+                  console.error(error);
+                  toast.error(t('impersonateFailed'));
+                  setIsImpersonating(false);
+                }
+              }}
+              disabled={isImpersonating}
+              aria-busy={isImpersonating}
+              className="p-2 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              aria-label={t('viewAsChild')}
+            >
+              {isImpersonating ? (
+                <CircleNotch size={20} className="motion-safe:animate-spin" aria-hidden="true" />
+              ) : (
+                <Eye size={20} aria-hidden="true" />
+              )}
+            </button>
           </div>
           <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400">
-            <Fire size={20} weight="fill" />
+            <Fire size={20} weight="fill" aria-hidden="true" />
             <span className="text-sm font-bold">0</span>
           </div>
 
@@ -189,10 +189,18 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
                 / {weeklyGoal} XP
               </span>
             </div>
-            <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+            <div
+              className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"
+              role="progressbar"
+              aria-valuenow={child.points_balance}
+              aria-valuemin={0}
+              aria-valuemax={weeklyGoal}
+              aria-label={t('progressLabel', { current: child.points_balance, goal: weeklyGoal, percent: Math.round(progressPercentage) })}
+            >
               <div
                 className="h-full rounded-full bg-gradient-to-r from-primary to-green-400 transition-all duration-500"
                 style={{ width: `${progressPercentage}%` }}
+                aria-hidden="true"
               />
             </div>
           </div>
@@ -201,7 +209,7 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
           <div className="grid grid-cols-2 gap-3 mb-4">
             <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20">
               <div className="flex items-center gap-2 mb-1">
-                <TrendUp size={16} weight="bold" className="text-blue-600 dark:text-blue-400" />
+                <TrendUp size={16} weight="bold" className="text-blue-600 dark:text-blue-400" aria-hidden="true" />
                 <span className="text-xs font-semibold text-blue-900 dark:text-blue-100">
                   {t('thisWeek')}
                 </span>
@@ -212,7 +220,7 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
             </div>
             <div className="p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20">
               <div className="flex items-center gap-2 mb-1">
-                <Checks size={16} weight="bold" className="text-purple-600 dark:text-purple-400" />
+                <Checks size={16} weight="bold" className="text-purple-600 dark:text-purple-400" aria-hidden="true" />
                 <span className="text-xs font-semibold text-purple-900 dark:text-purple-100">
                   {t('assigned')}
                 </span>
@@ -230,7 +238,7 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
                 {t('assignedTasks')}
               </h4>
               <DialogTrigger asChild>
-                <button className="text-xs font-bold text-primary hover:text-primary/80 transition-colors">
+                <button type="button" className="text-xs font-bold text-primary hover:text-primary/80 transition-colors focus:outline-none focus-visible:underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded px-1">
                   {t('manage')}
                 </button>
               </DialogTrigger>
@@ -244,9 +252,9 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
                         <Image src={task.image_url} alt={task.name} fill className="object-cover" />
                       </div>
                     ) : (
-                      <AppIcon name={task.icon} size={18} className="text-gray-500" />
+                      <AppIcon name={task.icon} size={18} className="text-gray-500" aria-hidden="true" />
                     )}
-                    <span className="text-sm font-medium text-text-main dark:text-white truncate flex-1">
+                    <span className="text-sm font-medium text-text-main dark:text-white truncate flex-1" title={task.name}>
                       {task.name}
                     </span>
                     <span className="text-xs font-bold text-primary">
@@ -256,7 +264,7 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
                 ))}
                 {tasks.length > 3 && (
                   <DialogTrigger asChild>
-                    <button className="w-full text-xs text-center text-text-muted dark:text-gray-500 mt-1 hover:text-primary transition-colors">
+                    <button type="button" className="w-full text-xs text-center text-text-muted dark:text-gray-500 mt-1 hover:text-primary transition-colors focus:outline-none focus-visible:underline focus-visible:text-primary">
                       {t('moreTasks', { count: tasks.length - 3 })}
                     </button>
                   </DialogTrigger>
@@ -267,7 +275,7 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
                 <p className="text-xs text-text-muted dark:text-gray-500 mb-2">{t('noTasks')}</p>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm" className="h-7 text-xs">
-                    <Plus size={12} className="mr-1" />
+                    <Plus size={12} className="mr-1" aria-hidden="true" />
                     {t('assignTask')}
                   </Button>
                 </DialogTrigger>
@@ -277,8 +285,9 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
 
           {/* View Profile Button */}
           <button
+            type="button"
             onClick={handleViewProfile}
-            className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm font-semibold transition-all"
+            className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             {t('viewProfile')}
           </button>
@@ -296,11 +305,11 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
                       {task.image_url ? (
                         <Image src={task.image_url} alt={task.name} width={40} height={40} className="object-cover" />
                       ) : (
-                        <AppIcon name={task.icon} size={24} className="text-primary" />
+                        <AppIcon name={task.icon} size={24} className="text-primary" aria-hidden="true" />
                       )}
                     </div>
                     <div className={`flex-1 min-w-0 ${task.isDisabled ? 'opacity-50' : ''}`}>
-                      <h4 className="font-semibold text-text-main dark:text-white truncate">
+                      <h4 className="font-semibold text-text-main dark:text-white truncate" title={task.name}>
                         {task.name} {task.isDisabled && <span className="text-xs font-normal text-text-muted ml-2">{t('off')}</span>}
                       </h4>
                       <p className="text-xs text-text-muted dark:text-gray-400 uppercase tracking-wider">
@@ -313,17 +322,19 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
 
                     {task.frequency === 'one_time' ? (
                       <button
+                        type="button"
                         onClick={() => handleTaskDelete(task)}
-                        className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                        title={t('removeTask')}
+                        className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                        aria-label={t('removeTask')}
                       >
-                        <Trash size={16} />
+                        <Trash size={16} aria-hidden="true" />
                       </button>
                     ) : (
-                      <div className="flex items-center" title={task.isDisabled ? t('enableTask') : t('disableTask')}>
+                      <div className="flex items-center">
                         <Switch
                           checked={!task.isDisabled}
                           onCheckedChange={(checked) => handleTaskToggle(task, checked)}
+                          aria-label={task.isDisabled ? t('enableTask') : t('disableTask')}
                         />
                       </div>
                     )}
@@ -336,7 +347,7 @@ export default function ChildCard({ child, tasks = [] }: ChildCardProps) {
                 onClick={handleCreateTask}
                 className="w-full bg-primary hover:bg-primary/90 text-white font-bold"
               >
-                <Plus size={16} className="mr-2" />
+                <Plus size={16} className="mr-2" aria-hidden="true" />
                 {t('addNewTask')}
               </Button>
             </div>

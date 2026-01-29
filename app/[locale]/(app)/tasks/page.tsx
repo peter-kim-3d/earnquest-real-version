@@ -4,24 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import TaskList from '@/components/parent/TaskList';
 import { Checks, CheckCircle, TrendUp, ListChecks } from '@/components/ui/ClientIcons';
 import { getAuthUserWithProfile } from '@/lib/supabase/cached-queries';
-
-type Task = {
-  id: string;
-  created_at: string;
-  name: string;
-  description: string | null;
-  points: number;
-  category: string;
-  icon: string | null;
-  image_url: string | null;
-  frequency: string;
-  is_active: boolean;
-  family_id: string;
-  deleted_at: string | null;
-  approval_type: string;
-  archived_at: string | null;
-  child_id: string | null;
-};
+import { HISTORY_LOOKBACK_DAYS, TIME_MS } from '@/lib/constants';
 
 export default async function TaskManagementPage({
   params,
@@ -65,11 +48,11 @@ export default async function TaskManagementPage({
       .select('task_id, status')
       .eq('family_id', userProfile.family_id)
       .in('status', ['approved', 'auto_approved', 'pending_approval'])
-      .gte('completed_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+      .gte('completed_at', new Date(Date.now() - HISTORY_LOOKBACK_DAYS * TIME_MS.DAY).toISOString()),
   ]);
 
-  const tasks = tasksResult.data as Task[] | null;
-  const children = childrenResult.data as any[] | null;
+  const tasks = tasksResult.data;
+  const children = childrenResult.data;
   const completionStats = completionStatsResult.data as { task_id: string; status: string }[] | null;
 
   // Calculate completion count per task (approved/auto_approved)
@@ -104,7 +87,7 @@ export default async function TaskManagementPage({
         <div className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3 mb-2">
             <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Checks size={24} className="text-primary" />
+              <Checks size={24} className="text-primary" aria-hidden="true" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
               {t('stats.totalTasks')}
@@ -118,7 +101,7 @@ export default async function TaskManagementPage({
         <div className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3 mb-2">
             <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-              <CheckCircle size={24} weight="fill" className="text-green-600 dark:text-green-400" />
+              <CheckCircle size={24} weight="fill" className="text-green-600 dark:text-green-400" aria-hidden="true" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
               {t('stats.activeTasks')}
@@ -132,7 +115,7 @@ export default async function TaskManagementPage({
         <div className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3 mb-2">
             <div className="h-10 w-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <TrendUp size={24} className="text-purple-600 dark:text-purple-400" />
+              <TrendUp size={24} className="text-purple-600 dark:text-purple-400" aria-hidden="true" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
               {t('stats.completions30d')}
@@ -157,7 +140,7 @@ export default async function TaskManagementPage({
       {tasks?.length === 0 && (
         <div className="text-center py-12 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
           <div className="h-24 w-24 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4">
-            <ListChecks size={48} className="text-gray-400 dark:text-gray-600" />
+            <ListChecks size={48} className="text-gray-400 dark:text-gray-600" aria-hidden="true" />
           </div>
           <p className="text-lg font-semibold text-text-muted dark:text-gray-400 mb-2">
             {t('noTasks')}

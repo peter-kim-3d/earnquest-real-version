@@ -25,7 +25,7 @@ export default function Error({
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
             <div className="h-24 w-24 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-6">
-                <WarningCircle size={48} weight="fill" className="text-red-500 dark:text-red-400" />
+                <WarningCircle size={48} weight="fill" className="text-red-500 dark:text-red-400" aria-hidden="true" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 {t('title')}

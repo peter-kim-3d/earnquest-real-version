@@ -82,7 +82,7 @@ export default function SelectStylePage() {
       // Navigate to next step
       const firstChildId = firstChild.id;
       router.push(`/${locale}/onboarding/family-values?childId=${firstChildId}&preset=${selectedPreset}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to save style:', error);
       toast.error(t('saveFailed'), {
         description: tCommon('errors.generic'),
@@ -102,7 +102,7 @@ export default function SelectStylePage() {
         <div className="flex gap-6 justify-between">
           <p className="text-text-main dark:text-white text-base font-medium leading-normal">{tProgress('step', { current: 2, total: 4 })}</p>
         </div>
-        <div className="rounded bg-gray-200 dark:bg-gray-700">
+        <div className="rounded bg-gray-200 dark:bg-gray-700" role="progressbar" aria-valuenow={50} aria-valuemin={0} aria-valuemax={100} aria-label={tProgress('step', { current: 2, total: 4 })}>
           <div className="h-2 rounded bg-primary shadow-[0_0_10px_rgba(55,236,19,0.5)]" style={{ width: '50%' }} />
         </div>
         <p className="text-text-muted dark:text-text-muted text-sm font-normal leading-normal">{t('stepTitle')}</p>
@@ -145,9 +145,9 @@ export default function SelectStylePage() {
 
       {/* Meta / Help Text */}
       <div className="px-4 py-2">
-        <button className="w-full text-center group">
+        <button type="button" className="w-full text-center group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg">
           <p className="text-text-muted dark:text-text-muted text-sm font-normal leading-normal underline decoration-dashed underline-offset-4 group-hover:text-primary transition-colors flex items-center justify-center gap-2">
-            <HelpCircle className="h-4 w-4" />
+            <HelpCircle className="h-4 w-4" aria-hidden="true" />
             {t('helpMeChoose')}
           </p>
         </button>
@@ -156,19 +156,22 @@ export default function SelectStylePage() {
       {/* Navigation Footer */}
       <div className="mt-8 px-4 py-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
         <button
+          type="button"
           onClick={handleBack}
-          className="flex items-center gap-2 px-6 py-3 rounded-full text-text-muted dark:text-text-muted font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="flex items-center gap-2 px-6 py-3 rounded-full text-text-muted dark:text-text-muted font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-5 w-5" aria-hidden="true" />
           {tCommon('buttons.back')}
         </button>
         <button
+          type="button"
           onClick={handleNext}
           disabled={loading}
-          className="flex items-center gap-2 px-10 py-4 rounded-full bg-primary hover:bg-primary/90 text-black font-bold text-lg shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-busy={loading}
+          className="flex items-center gap-2 px-10 py-4 rounded-full bg-primary hover:bg-primary/90 text-black font-bold text-lg shadow-lg hover:shadow-xl hover:translate-y-[-2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           {loading ? tCommon('status.saving') : t('nextSetValues')}
-          <ArrowRight className="h-5 w-5" />
+          <ArrowRight className="h-5 w-5" aria-hidden="true" />
         </button>
       </div>
     </div>

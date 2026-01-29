@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Check, Clock, X, Sparkle, Gift } from '@phosphor-icons/react/dist/ssr';
+import { Check, Clock, X, Sparkle, Gift, CircleNotch } from '@phosphor-icons/react/dist/ssr';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';
 import { useLocale, useTranslations } from 'next-intl';
+import { getErrorMessage } from '@/lib/utils/error';
 import {
   Dialog,
   DialogContent,
@@ -45,6 +46,8 @@ interface TicketCardProps {
   onFulfill?: (ticketId: string) => void;
   onCancel?: (ticketId: string) => void;
   hasPendingRequest?: boolean;
+  isApproving?: boolean;
+  isFulfilling?: boolean;
 }
 
 export default function TicketCard({
@@ -55,6 +58,8 @@ export default function TicketCard({
   onFulfill,
   onCancel,
   hasPendingRequest = false,
+  isApproving = false,
+  isFulfilling = false,
 }: TicketCardProps) {
   const router = useRouter();
   const locale = useLocale();
@@ -110,11 +115,9 @@ export default function TicketCard({
       // Call onCancel callback to update parent state immediately
       onCancel?.(purchase.id);
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Cancel error:', error);
-      toast.error(t('toast.cancelFailed'), {
-        description: error.message || t('toast.tryAgain'),
-      });
+      toast.error(t('toast.cancelFailed'), { description: getErrorMessage(error) });
     } finally {
       setCanceling(false);
     }
@@ -176,30 +179,30 @@ export default function TicketCard({
         <div className="flex items-center gap-2">
           {isGift && (
             <>
-              <Gift size={16} weight="fill" className="text-pink-500" />
+              <Gift size={16} weight="fill" className="text-pink-500" aria-hidden="true" />
               <span className="text-sm font-semibold text-pink-600 dark:text-pink-400">
                 {t('gift')}
               </span>
-              <span className="text-text-muted dark:text-gray-500">·</span>
+              <span className="text-text-muted dark:text-gray-500" aria-hidden="true">·</span>
             </>
           )}
           {isPending ? (
             <>
-              <Clock size={16} className="text-yellow-600 dark:text-yellow-400" />
+              <Clock size={16} className="text-yellow-600 dark:text-yellow-400" aria-hidden="true" />
               <span className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">
                 {t('waitingForParent')}
               </span>
             </>
           ) : isUsed ? (
             <>
-              <Check size={16} weight="bold" className="text-green-600 dark:text-green-400" />
+              <Check size={16} weight="bold" className="text-green-600 dark:text-green-400" aria-hidden="true" />
               <span className="text-sm font-semibold text-green-700 dark:text-green-300">
                 {t('used')}
               </span>
             </>
           ) : (
             <>
-              <Sparkle size={16} weight="fill" className="text-primary" />
+              <Sparkle size={16} weight="fill" className="text-primary" aria-hidden="true" />
               <span className="text-sm font-semibold text-text-main dark:text-white">
                 {t('active')}
               </span>
@@ -228,9 +231,9 @@ export default function TicketCard({
           const rewardIcon = getRewardIconById(purchase.reward.icon || 'gift');
           if (rewardIcon) {
             const IconComponent = rewardIcon.component;
-            return <IconComponent size={48} weight="fill" className="text-white" />;
+            return <IconComponent size={48} weight="fill" className="text-white" aria-hidden="true" />;
           }
-          return <AppIcon name={purchase.reward.icon} size={48} className="text-white" />;
+          return <AppIcon name={purchase.reward.icon} size={48} className="text-white" aria-hidden="true" />;
         })()}
       </div>
 
@@ -241,7 +244,7 @@ export default function TicketCard({
         </h3>
 
         {purchase.reward.description && (
-          <p className="text-sm text-text-muted dark:text-gray-400 mb-3 line-clamp-2">
+          <p className="text-sm text-text-muted dark:text-gray-400 mb-3 line-clamp-2" title={purchase.reward.description}>
             {purchase.reward.description}
           </p>
         )}
@@ -283,18 +286,19 @@ export default function TicketCard({
           <>
             {showUseButton && (
               <button
+                type="button"
                 onClick={() => onRequestUse?.(purchase.id)}
                 disabled={hasPendingRequest}
-                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary hover:bg-primary/90 text-black font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary"
+                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary hover:bg-primary/90 text-black font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 {hasPendingRequest ? (
                   <>
-                    <Clock size={20} />
+                    <Clock size={20} aria-hidden="true" />
                     {t('screenTimeRunning')}
                   </>
                 ) : (
                   <>
-                    <Sparkle size={20} weight="fill" />
+                    <Sparkle size={20} weight="fill" aria-hidden="true" />
                     {t('useNow')}
                   </>
                 )}
@@ -311,11 +315,13 @@ export default function TicketCard({
 
             {showCancelButton && (
               <button
+                type="button"
                 onClick={handleCancelClick}
                 disabled={canceling}
-                className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-busy={canceling}
+                className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
               >
-                <X size={16} />
+                <X size={16} aria-hidden="true" />
                 {canceling ? t('canceling') : t('cancelTicket')}
               </button>
             )}
@@ -327,21 +333,35 @@ export default function TicketCard({
           <>
             {showApproveButton && (
               <button
+                type="button"
                 onClick={() => onApprove?.(purchase.id)}
-                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary hover:bg-primary/90 text-black font-bold transition-all"
+                disabled={isApproving}
+                aria-busy={isApproving}
+                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-primary hover:bg-primary/90 text-black font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
-                <Check size={20} weight="bold" />
-                {t('approveUse')}
+                {isApproving ? (
+                  <CircleNotch size={20} className="motion-safe:animate-spin" aria-hidden="true" />
+                ) : (
+                  <Check size={20} weight="bold" aria-hidden="true" />
+                )}
+                {isApproving ? t('approving') : t('approveUse')}
               </button>
             )}
 
             {showFulfillButton && (
               <button
+                type="button"
                 onClick={() => onFulfill?.(purchase.id)}
-                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-primary text-primary hover:bg-primary/10 font-bold transition-all"
+                disabled={isFulfilling}
+                aria-busy={isFulfilling}
+                className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-primary text-primary hover:bg-primary/10 font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
-                <Check size={20} weight="bold" />
-                {t('markAsGiven')}
+                {isFulfilling ? (
+                  <CircleNotch size={20} className="motion-safe:animate-spin" aria-hidden="true" />
+                ) : (
+                  <Check size={20} weight="bold" aria-hidden="true" />
+                )}
+                {isFulfilling ? t('fulfilling') : t('markAsGiven')}
               </button>
             )}
           </>
@@ -371,16 +391,20 @@ export default function TicketCard({
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
             <button
+              type="button"
               onClick={() => setShowConfirmDialog(false)}
-              className="px-6 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold transition-all"
+              className="px-6 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2"
             >
               {t('cancelDialog.goBack')}
             </button>
             <button
+              type="button"
               onClick={handleConfirmCancel}
               disabled={canceling}
-              className="px-6 py-3 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-busy={canceling}
+              className="px-6 py-3 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
             >
+              {canceling && <CircleNotch size={16} className="motion-safe:animate-spin" aria-hidden="true" />}
               {canceling ? t('canceling') : t('cancelDialog.confirm')}
             </button>
           </DialogFooter>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { DeviceTabletSpeaker, Play, Pause, Timer } from '@phosphor-icons/react/dist/ssr';
+import { DeviceTabletSpeaker, Play, Pause, Timer, CircleNotch } from '@phosphor-icons/react/dist/ssr';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 
@@ -70,7 +70,7 @@ export default function ScreenTimeBudgetCard({
           <h3 className="text-sm font-semibold text-white/90 uppercase tracking-wider">
             {t('title')}
           </h3>
-          <DeviceTabletSpeaker size={24} weight="duotone" className="text-white/80" />
+          <DeviceTabletSpeaker size={24} weight="duotone" className="text-white/80" aria-hidden="true" />
         </div>
 
         {/* Available Now */}
@@ -89,7 +89,14 @@ export default function ScreenTimeBudgetCard({
               {formatTime(usedTodayMinutes)} / {formatTime(dailyLimitMinutes)}
             </span>
           </div>
-          <div className="h-2.5 bg-white/20 rounded-full overflow-hidden">
+          <div
+            className="h-2.5 bg-white/20 rounded-full overflow-hidden"
+            role="progressbar"
+            aria-valuenow={usedTodayMinutes}
+            aria-valuemin={0}
+            aria-valuemax={dailyLimitMinutes}
+            aria-label={t('dailyProgress', { used: formatTime(usedTodayMinutes), total: formatTime(dailyLimitMinutes) })}
+          >
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 dailyPercent >= 100
@@ -99,6 +106,7 @@ export default function ScreenTimeBudgetCard({
                   : 'bg-white'
               }`}
               style={{ width: `${dailyPercent}%` }}
+              aria-hidden="true"
             />
           </div>
         </div>
@@ -111,7 +119,14 @@ export default function ScreenTimeBudgetCard({
               {formatTime(usedMinutes)} / {formatTime(totalWeeklyMinutes)}
             </span>
           </div>
-          <div className="h-2.5 bg-white/20 rounded-full overflow-hidden">
+          <div
+            className="h-2.5 bg-white/20 rounded-full overflow-hidden"
+            role="progressbar"
+            aria-valuenow={usedMinutes}
+            aria-valuemin={0}
+            aria-valuemax={totalWeeklyMinutes}
+            aria-label={t('weeklyProgress', { used: formatTime(usedMinutes), total: formatTime(totalWeeklyMinutes) })}
+          >
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 weeklyPercent >= 100
@@ -121,6 +136,7 @@ export default function ScreenTimeBudgetCard({
                   : 'bg-green-400'
               }`}
               style={{ width: `${weeklyPercent}%` }}
+              aria-hidden="true"
             />
           </div>
         </div>
@@ -139,15 +155,20 @@ export default function ScreenTimeBudgetCard({
           isSessionActive ? (
             <div className="space-y-3">
               <div className="flex items-center justify-center gap-2 py-3 bg-white/20 rounded-lg">
-                <Timer size={20} weight="fill" className="text-white animate-pulse" />
+                <Timer size={20} weight="fill" className="text-white motion-safe:animate-pulse" aria-hidden="true" />
                 <span className="font-bold text-white">{t('sessionActive')}</span>
               </div>
               <Button
                 onClick={handleEndSession}
                 disabled={isLoading}
+                aria-busy={isLoading}
                 className="w-full bg-white text-purple-600 hover:bg-white/90"
               >
-                <Pause size={18} weight="bold" className="mr-2" />
+                {isLoading ? (
+                  <CircleNotch size={18} className="mr-2 motion-safe:animate-spin" aria-hidden="true" />
+                ) : (
+                  <Pause size={18} weight="bold" className="mr-2" aria-hidden="true" />
+                )}
                 {isLoading ? t('ending') : t('endSession')}
               </Button>
             </div>
@@ -155,9 +176,14 @@ export default function ScreenTimeBudgetCard({
             <Button
               onClick={onStartSession}
               disabled={isLoading}
+              aria-busy={isLoading}
               className="w-full bg-white text-purple-600 hover:bg-white/90"
             >
-              <Play size={18} weight="fill" className="mr-2" />
+              {isLoading ? (
+                <CircleNotch size={18} className="mr-2 motion-safe:animate-spin" aria-hidden="true" />
+              ) : (
+                <Play size={18} weight="fill" className="mr-2" aria-hidden="true" />
+              )}
               {isLoading ? t('starting') : t('startTimer')}
             </Button>
           )

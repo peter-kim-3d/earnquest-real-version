@@ -5,7 +5,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { signInWithGoogle, signInWithApple, signUp } from '@/lib/services/auth';
-import { CheckCircle2, ArrowRight } from 'lucide-react';
+import { CheckCircle2, ArrowRight, Loader2 } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -36,8 +36,9 @@ export default function SignupPage() {
       setLoading(true);
       setError(null);
       await signInWithGoogle();
-    } catch (err: any) {
-      setError(err.message || t('errors.signupFailed'));
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : null;
+      setError(message || t('errors.signupFailed'));
     } finally {
       setLoading(false);
     }
@@ -48,8 +49,9 @@ export default function SignupPage() {
       setLoading(true);
       setError(null);
       await signInWithApple();
-    } catch (err: any) {
-      setError(err.message || t('errors.signupFailed'));
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : null;
+      setError(message || t('errors.signupFailed'));
     } finally {
       setLoading(false);
     }
@@ -91,8 +93,9 @@ export default function SignupPage() {
       } else {
         router.push(`/${locale}/onboarding/add-child`);
       }
-    } catch (err: any) {
-      setError(err.message || t('errors.signupFailed'));
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : null;
+      setError(message || t('errors.signupFailed'));
     } finally {
       setLoading(false);
     }
@@ -112,9 +115,11 @@ export default function SignupPage() {
       {/* Social Login Section */}
       <div className="flex flex-col gap-3">
         <button
+          type="button"
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="group relative flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-primary/20 hover:bg-gray-50 dark:hover:bg-primary/10 hover:border-gray-300 dark:hover:border-primary/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-busy={loading}
+          className="group relative flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-primary/20 hover:bg-gray-50 dark:hover:bg-primary/10 hover:border-gray-300 dark:hover:border-primary/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24">
             <path
@@ -141,11 +146,14 @@ export default function SignupPage() {
 
         {enableAppleLogin && (
           <button
+            type="button"
             onClick={handleAppleSignIn}
             disabled={loading}
-            className="group relative flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-primary/20 hover:bg-gray-50 dark:hover:bg-primary/10 hover:border-gray-300 dark:hover:border-primary/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-busy={loading}
+            className="group relative flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-white dark:bg-card-dark border border-gray-200 dark:border-primary/20 hover:bg-gray-50 dark:hover:bg-primary/10 hover:border-gray-300 dark:hover:border-primary/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <svg
+              aria-hidden="true"
               className="h-5 w-5 text-black dark:text-white"
               fill="currentColor"
               viewBox="0 0 24 24"
@@ -173,14 +181,14 @@ export default function SignupPage() {
 
       {/* Success Message */}
       {success && (
-        <div className="mb-4 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+        <div className="mb-4 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800" role="status" aria-live="polite">
           <p className="text-sm text-green-600 dark:text-green-400">{success}</p>
         </div>
       )}
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+        <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800" role="alert">
           <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
@@ -200,12 +208,13 @@ export default function SignupPage() {
               id="email"
               placeholder={t('emailPlaceholder')}
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
             />
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 opacity-0 peer-valid:opacity-100 transition-opacity">
-              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              <CheckCircle2 className="h-5 w-5 text-green-600" aria-hidden="true" />
             </div>
           </div>
         </div>
@@ -223,6 +232,7 @@ export default function SignupPage() {
               id="password"
               placeholder={t('passwordPlaceholder')}
               type="password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
@@ -235,9 +245,11 @@ export default function SignupPage() {
             className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary h-12 px-8 text-sm font-bold text-black shadow-lg shadow-primary/25 hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             type="submit"
             disabled={loading}
+            aria-busy={loading}
           >
+            {loading && <Loader2 className="h-5 w-5 motion-safe:animate-spin" aria-hidden="true" />}
             {loading ? t('submitting') : t('submit')}
-            {!loading && <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />}
+            {!loading && <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" aria-hidden="true" />}
           </button>
           <p className="mt-4 text-center text-xs text-gray-500 dark:text-gray-400">
             {t('agreeToTerms')}{' '}

@@ -53,7 +53,7 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
                         />
                         <span>{selectedColor.name}</span>
                     </div>
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" aria-hidden="true" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-64 p-3">
@@ -68,7 +68,7 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
                             )}
                             style={{ backgroundColor: color.value }}
                         >
-                            {value === color.value && <Check className="h-4 w-4 text-white drop-shadow-md" />}
+                            {value === color.value && <Check className="h-4 w-4 text-white drop-shadow-md" aria-hidden="true" />}
                         </DropdownMenuItem>
                     ))}
                 </div>

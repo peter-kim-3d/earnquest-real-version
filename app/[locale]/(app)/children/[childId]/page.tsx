@@ -5,6 +5,8 @@ import ChildStats from '@/components/parent/ChildStats';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import ChildProfileTasks from '@/components/parent/ChildProfileTasks';
+import { HISTORY_LOOKBACK_DAYS, TIME_MS } from '@/lib/constants';
+import type { PostgrestError } from '@supabase/supabase-js';
 
 export default async function ChildProfilePage({
   params,
@@ -36,7 +38,7 @@ export default async function ChildProfilePage({
     .from('children')
     .select('*')
     .eq('id', childId)
-    .single() as { data: { id: string; name: string; avatar_url: string | null; points_balance: number; points_lifetime_earned: number; age_group: string; trust_level: number; trust_streak_days: number; settings: { weeklyGoal?: number } } | null; error: any };
+    .single() as { data: { id: string; name: string; avatar_url: string | null; points_balance: number; points_lifetime_earned: number; age_group: string; trust_level: number; trust_streak_days: number; settings: { weeklyGoal?: number } } | null; error: PostgrestError | null };
 
   if (!child) {
     notFound();
@@ -83,7 +85,7 @@ export default async function ChildProfilePage({
     .select('task_id')
     .eq('child_id', childId)
     .in('status', ['approved', 'auto_approved'])
-    .gte('completed_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()) as { data: { task_id: string }[] | null };
+    .gte('completed_at', new Date(Date.now() - HISTORY_LOOKBACK_DAYS * TIME_MS.DAY).toISOString()) as { data: { task_id: string }[] | null };
 
   const taskCompletions = new Map<string, number>();
   completionStats?.forEach((c) => {

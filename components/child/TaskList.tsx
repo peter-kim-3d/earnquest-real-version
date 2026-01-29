@@ -145,7 +145,7 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
       // Note: We don't remove from optimistic set here because refresh might take a moment.
       // The refresh will eventually re-render the component with the task in 'pending' or 'completed' list,
       // and checking pendingTaskIds/completedTaskIds will hide it from 'todo' anyway.
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Task completion failed:', error);
       // Revert optimistic update on error
       setOptimisticCompletedIds((prev) => {
@@ -167,13 +167,18 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
   return (
     <div className="space-y-6">
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700" role="tablist">
         {tabs.map((tab) => (
           <button
+            type="button"
             key={tab.id}
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            aria-controls={`tabpanel-${tab.id}`}
             onClick={() => setActiveTab(tab.id)}
             className={`
               px-4 py-3 font-semibold text-sm border-b-2 transition-all
+              focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-t-lg
               ${
                 activeTab === tab.id
                   ? 'border-primary text-primary'
@@ -184,7 +189,7 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
             {tab.label}
             {tab.count > 0 && (
               <span
-                className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold ${
+                className={`ml-2 px-2 py-0.5 rounded-full text-xs font-bold tabular-nums ${
                   activeTab === tab.id
                     ? 'bg-primary/10 text-primary'
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
@@ -201,12 +206,12 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
       <div className="space-y-4">
         {/* To Do Tab */}
         {activeTab === 'todo' && (
-          <>
+          <div role="tabpanel" id="tabpanel-todo" aria-label={t('toDo')}>
             {/* Fix Requested Tasks - always show at top */}
             {fixRequestedTasks.length > 0 && (
               <div className="space-y-4 mb-6">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">⚠️</span>
+                  <span className="text-lg" aria-hidden="true">⚠️</span>
                   <h3 className="text-sm font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wide">
                     {t('needsAttention')}
                   </h3>
@@ -236,7 +241,7 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
                 <div key={context} className="space-y-3">
                   {/* Section Header */}
                   <div className="flex items-center gap-2 pt-2">
-                    <span className="text-lg">{contextInfo.icon}</span>
+                    <span className="text-lg" aria-hidden="true">{contextInfo.icon}</span>
                     <h3 className="text-sm font-bold text-text-muted dark:text-gray-400 uppercase tracking-wide">
                       {contextInfo.label}
                     </h3>
@@ -263,12 +268,12 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
                 </p>
               </div>
             )}
-          </>
+          </div>
         )}
 
         {/* Pending Tab */}
         {activeTab === 'pending' && (
-          <>
+          <div role="tabpanel" id="tabpanel-pending" aria-label={t('parentChecking')}>
             {pendingTasks.map((task) => {
               const completion = pendingCompletions.find((c) => c.task_id === task.id)!;
               return <TaskCardPending key={task.id} task={task} completion={completion} />;
@@ -281,12 +286,12 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
                 </p>
               </div>
             )}
-          </>
+          </div>
         )}
 
         {/* Completed Tab */}
         {activeTab === 'completed' && (
-          <>
+          <div role="tabpanel" id="tabpanel-completed" aria-label={t('completed')}>
             {completedTasks.map((task) => {
               const completion = completedCompletions.find((c) => c.task_id === task.id)!;
               return (
@@ -301,13 +306,14 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
                         size={24}
                         weight="duotone"
                         className="text-green-600 dark:text-green-400"
+                        aria-hidden="true"
                       />
                       <div>
                         <h3 className="font-bold text-text-main dark:text-white">{task.name}</h3>
                         <p className="text-sm text-text-muted dark:text-gray-400">{t('completedToday')}</p>
                       </div>
                     </div>
-                    <span className="text-sm font-bold text-green-600 dark:text-green-400">
+                    <span className="text-sm font-bold text-green-600 dark:text-green-400 tabular-nums">
                       +{task.points} XP
                     </span>
                   </div>
@@ -325,7 +331,7 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
                 </p>
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>

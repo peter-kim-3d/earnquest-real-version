@@ -17,6 +17,11 @@ import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { getRewardIconById } from '@/lib/reward-icons';
 
+/** Reward settings stored in JSONB column */
+interface RewardSettings {
+  color?: string;
+}
+
 type Reward = {
   id: string;
   name: string;
@@ -28,6 +33,7 @@ type Reward = {
   is_active: boolean;
   icon: string | null;
   image_url: string | null;
+  settings?: RewardSettings;
 };
 
 interface RewardCardProps {
@@ -61,7 +67,7 @@ export default function RewardCard({ reward, purchaseCount, onEdit, onGift }: Re
       }
 
       router.refresh();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error toggling reward:', error);
       toast.error(t('card.updateFailed'));
     } finally {
@@ -87,7 +93,7 @@ export default function RewardCard({ reward, purchaseCount, onEdit, onGift }: Re
       }
 
       router.refresh();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error deleting reward:', error);
       toast.error(t('card.deleteFailed'));
     } finally {
@@ -110,7 +116,7 @@ export default function RewardCard({ reward, purchaseCount, onEdit, onGift }: Re
     }
   };
 
-  const customColor = (reward as any).settings?.color;
+  const customColor = reward.settings?.color;
 
   return (
     <div
@@ -120,10 +126,12 @@ export default function RewardCard({ reward, purchaseCount, onEdit, onGift }: Re
         }`}
     >
       {/* Icon/Image Header */}
-      <div
-        className={`aspect-video bg-gradient-to-br ${!customColor && !reward.image_url ? getCategoryColor(reward.category) : ''} flex items-center justify-center relative overflow-hidden cursor-pointer`}
-        style={customColor && !reward.image_url ? { background: customColor } : {}}
+      <button
+        type="button"
         onClick={onEdit}
+        className={`aspect-video w-full bg-gradient-to-br ${!customColor && !reward.image_url ? getCategoryColor(reward.category) : ''} flex items-center justify-center relative overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset`}
+        style={customColor && !reward.image_url ? { background: customColor } : {}}
+        aria-label={t('card.edit')}
       >
         {reward.image_url ? (
           <Image
@@ -136,9 +144,9 @@ export default function RewardCard({ reward, purchaseCount, onEdit, onGift }: Re
           const rewardIcon = getRewardIconById(reward.icon || 'gift');
           if (rewardIcon) {
             const IconComponent = rewardIcon.component;
-            return <IconComponent size={48} weight="duotone" className="text-white" />;
+            return <IconComponent size={48} weight="duotone" className="text-white" aria-hidden="true" />;
           }
-          return <AppIcon name={reward.icon || 'redeem'} className="text-white" size={48} weight="duotone" />;
+          return <AppIcon name={reward.icon || 'redeem'} className="text-white" size={48} weight="duotone" aria-hidden="true" />;
         })()}
 
         {/* Status Badge */}
@@ -147,34 +155,38 @@ export default function RewardCard({ reward, purchaseCount, onEdit, onGift }: Re
             <span className="text-xs font-semibold text-white">{t('card.inactive')}</span>
           </div>
         )}
-      </div>
+      </button>
 
       {/* Content */}
       <div className="p-4">
         <div className="flex items-start justify-between mb-2">
-          <h3
-            className="text-lg font-bold text-text-main dark:text-white flex-1 line-clamp-2 cursor-pointer hover:text-primary transition-colors"
+          <button
+            type="button"
             onClick={onEdit}
+            className="text-lg font-bold text-text-main dark:text-white flex-1 line-clamp-2 cursor-pointer hover:text-primary transition-colors text-left focus:outline-none focus-visible:text-primary focus-visible:underline"
+            title={reward.name}
           >
             {reward.name}
-          </h3>
+          </button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
+                type="button"
                 disabled={loading}
-                className="h-8 w-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center transition-colors disabled:opacity-50"
+                aria-label={t('card.moreOptions')}
+                className="min-h-[44px] min-w-[44px] rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
-                <MoreVertical className="h-4 w-4 text-text-muted dark:text-gray-400" />
+                <MoreVertical className="h-4 w-4 text-text-muted dark:text-gray-400" aria-hidden="true" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={onEdit}>
-                <Edit className="h-4 w-4 mr-2" />
+                <Edit className="h-4 w-4 mr-2" aria-hidden="true" />
                 {t('card.edit')}
               </DropdownMenuItem>
               {onGift && reward.is_active && (
                 <DropdownMenuItem onClick={onGift}>
-                  <Gift className="h-4 w-4 mr-2" />
+                  <Gift className="h-4 w-4 mr-2" aria-hidden="true" />
                   {t('gift.menuItem')}
                 </DropdownMenuItem>
               )}
@@ -183,7 +195,7 @@ export default function RewardCard({ reward, purchaseCount, onEdit, onGift }: Re
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleDelete} className="text-red-600 dark:text-red-400">
-                <Trash2 className="h-4 w-4 mr-2" />
+                <Trash2 className="h-4 w-4 mr-2" aria-hidden="true" />
                 {t('actions.delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -191,7 +203,7 @@ export default function RewardCard({ reward, purchaseCount, onEdit, onGift }: Re
         </div>
 
         {reward.description && (
-          <p className="text-sm text-text-muted dark:text-gray-400 mb-3 line-clamp-2">
+          <p className="text-sm text-text-muted dark:text-gray-400 mb-3 line-clamp-2" title={reward.description}>
             {reward.description}
           </p>
         )}

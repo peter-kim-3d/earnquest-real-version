@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DEFAULT_TASK_IMAGES, DEFAULT_TASK_IMAGE_CATEGORIES, DefaultTaskImage } from '@/lib/default-task-images';
+import { useTranslations } from 'next-intl';
 
 interface DefaultTaskImagePickerProps {
   open: boolean;
@@ -18,6 +19,7 @@ export default function DefaultTaskImagePicker({
   onSelect,
   selectedImageUrl,
 }: DefaultTaskImagePickerProps) {
+  const t = useTranslations('tasks.imagePicker');
   const [activeCategory, setActiveCategory] = useState<string>('all');
 
   const filteredImages =
@@ -34,26 +36,30 @@ export default function DefaultTaskImagePicker({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Choose a Default Image</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
         </DialogHeader>
 
         {/* Category Tabs */}
         <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
           <button
+            type="button"
             onClick={() => setActiveCategory('all')}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+            aria-pressed={activeCategory === 'all'}
+            className={`px-3 py-2 min-h-[44px] rounded-full text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
               activeCategory === 'all'
                 ? 'bg-primary text-white'
                 : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
-            All
+            {t('all')}
           </button>
           {DEFAULT_TASK_IMAGE_CATEGORIES.map((category) => (
             <button
+              type="button"
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+              aria-pressed={activeCategory === category.id}
+              className={`px-3 py-2 min-h-[44px] rounded-full text-sm font-medium whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                 activeCategory === category.id
                   ? 'bg-primary text-white'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -71,14 +77,16 @@ export default function DefaultTaskImagePicker({
 
             return (
               <button
+                type="button"
                 key={image.id}
                 onClick={() => handleSelect(image)}
-                className={`aspect-square rounded-xl border-2 overflow-hidden transition-all ${
+                aria-label={image.name}
+                aria-pressed={isSelected}
+                className={`aspect-square min-w-[60px] min-h-[60px] rounded-xl border-2 overflow-hidden transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                   isSelected
                     ? 'border-primary ring-2 ring-primary/30'
                     : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
                 }`}
-                title={image.name}
               >
                 <Image
                   src={image.url}

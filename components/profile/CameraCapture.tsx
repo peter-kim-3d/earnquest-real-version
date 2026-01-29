@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Camera, X, RotateCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface CameraCaptureProps {
   onCapture: (imageDataUrl: string) => void;
@@ -11,31 +12,30 @@ interface CameraCaptureProps {
 }
 
 export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
+  const t = useTranslations('common.camera');
   const videoRef = useRef<HTMLVideoElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
-
-  useEffect(() => {
-    startCamera();
-    checkMultipleCameras();
-
-    return () => {
-      stopCamera();
-    };
-  }, [facingMode]);
 
   const checkMultipleCameras = async () => {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter(device => device.kind === 'videoinput');
       setHasMultipleCameras(videoDevices.length > 1);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to enumerate devices:', error);
     }
   };
 
-  const startCamera = async () => {
+  const stopCamera = useCallback(() => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+  }, [stream]);
+
+  const startCamera = useCallback(async () => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -51,18 +51,20 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Camera access error:', error);
-      toast.error('Failed to access camera. Please check permissions.');
+      toast.error(t('cameraError'));
     }
-  };
+  }, [facingMode, t]);
 
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
-    }
-  };
+  useEffect(() => {
+    startCamera();
+    checkMultipleCameras();
+
+    return () => {
+      stopCamera();
+    };
+  }, [facingMode, startCamera, stopCamera]);
 
   const capturePhoto = () => {
     if (!videoRef.current) return;
@@ -104,6 +106,7 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
           autoPlay
           playsInline
           muted
+          aria-label={t('cameraPreview')}
           className="w-full h-full object-cover"
         />
 
@@ -127,17 +130,19 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
         {/* Switch Camera Button (only show if multiple cameras) */}
         {hasMultipleCameras && (
           <button
+            type="button"
             onClick={switchCamera}
-            className="absolute top-4 right-4 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
+            className="absolute top-4 right-4 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            aria-label={t('switchCamera')}
           >
-            <RotateCw className="h-5 w-5" />
+            <RotateCw className="h-5 w-5" aria-hidden="true" />
           </button>
         )}
       </div>
 
       {/* Instructions */}
       <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-4">
-        Position your face in the circle
+        {t('positionFace')}
       </p>
 
       {/* Action Buttons */}
@@ -148,16 +153,16 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
           onClick={handleCancel}
           className="flex-1"
         >
-          <X className="h-4 w-4 mr-2" />
-          Cancel
+          <X className="h-4 w-4 mr-2" aria-hidden="true" />
+          {t('cancel')}
         </Button>
         <Button
           type="button"
           onClick={capturePhoto}
           className="flex-1 bg-primary hover:bg-primary/90"
         >
-          <Camera className="h-4 w-4 mr-2" />
-          Take Photo
+          <Camera className="h-4 w-4 mr-2" aria-hidden="true" />
+          {t('takePhoto')}
         </Button>
       </div>
     </div>

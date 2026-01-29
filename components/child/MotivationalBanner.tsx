@@ -50,14 +50,14 @@ export default function MotivationalBanner({ child }: MotivationalBannerProps) {
   const { title, subtitle, Icon } = getMessage();
 
   return (
-    <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-green-500/20 to-blue-500/20 dark:from-primary/10 dark:via-green-500/10 dark:to-blue-500/10 border border-primary/30 dark:border-primary/20 shadow-lg">
+    <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-green-500/20 to-blue-500/20 dark:from-primary/10 dark:via-green-500/10 dark:to-blue-500/10 border border-primary/30 dark:border-primary/40 shadow-lg">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
 
       <div className="relative p-6 md:p-8">
         <div className="flex items-center gap-4">
           {/* Icon */}
-          <div className="shrink-0">
+          <div className="shrink-0" aria-hidden="true">
             <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-primary to-green-600 flex items-center justify-center shadow-lg shadow-primary/30">
               <Icon size={32} weight="fill" className="text-white" />
             </div>
@@ -74,7 +74,7 @@ export default function MotivationalBanner({ child }: MotivationalBannerProps) {
           </div>
 
           {/* Trophy Icon (Desktop) */}
-          <div className="hidden md:block shrink-0">
+          <div className="hidden md:block shrink-0" aria-hidden="true">
             <Trophy className="h-12 w-12 text-primary/30 dark:text-primary/20" weight="duotone" />
           </div>
         </div>

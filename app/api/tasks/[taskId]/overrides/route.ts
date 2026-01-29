@@ -6,6 +6,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function GET(
   request: Request,
@@ -43,11 +44,8 @@ export async function GET(
       success: true,
       overrides: overrides || [],
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching task overrides:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

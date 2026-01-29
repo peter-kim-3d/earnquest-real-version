@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { FixRequestSchema, formatZodError } from '@/lib/validation/task';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function POST(request: Request) {
   try {
@@ -101,10 +102,10 @@ export async function POST(request: Request) {
       completion: updatedCompletion,
       message: 'Fix request sent successfully!',
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in fix request:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }

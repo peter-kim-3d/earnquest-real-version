@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Sparkle, Timer, ListChecks, Checks } from '@phosphor-icons/react/dist/ssr';
+import { Sparkle, Timer, ListChecks, Checks, CircleNotch } from '@phosphor-icons/react/dist/ssr';
 import { AppIcon } from '@/components/ui/AppIcon';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
@@ -86,7 +86,7 @@ export default function TaskCard({ task, childId, onComplete }: TaskCardProps) {
     setLoading(true);
     try {
       await onComplete(task.id, undefined, task.instance_id || undefined);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to complete task:', error);
       toast.error(t('submitFailed'), { description: t('failedToSubmit') });
     } finally {
@@ -114,13 +114,13 @@ export default function TaskCard({ task, childId, onComplete }: TaskCardProps) {
               totalSeconds: 0
             })
           });
-        } catch (err) {
+        } catch (err: unknown) {
           console.error("Failed to clear timer state", err);
         }
       } else {
         setLocalMetadata({ ...localMetadata, timer_state: null });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to complete task:', error);
       toast.error(t('submitFailed'), { description: t('failedToSubmit') });
     } finally {
@@ -133,7 +133,7 @@ export default function TaskCard({ task, childId, onComplete }: TaskCardProps) {
     setLoading(true);
     try {
       await onComplete(task.id, { checklistState }, task.instance_id || undefined);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to complete task:', error);
       toast.error(t('submitFailed'), { description: t('failedToSubmit') });
     } finally {
@@ -173,8 +173,9 @@ export default function TaskCard({ task, childId, onComplete }: TaskCardProps) {
   };
 
   const getButtonIcon = () => {
-    if (task.approval_type === 'timer') return <Timer size={20} className="mr-2" />;
-    if (task.approval_type === 'checklist') return <ListChecks size={20} className="mr-2" />;
+    if (loading) return <CircleNotch size={20} className="mr-2 motion-safe:animate-spin" aria-hidden="true" />;
+    if (task.approval_type === 'timer') return <Timer size={20} className="mr-2" aria-hidden="true" />;
+    if (task.approval_type === 'checklist') return <ListChecks size={20} className="mr-2" aria-hidden="true" />;
     return null;
   };
 
@@ -195,7 +196,7 @@ export default function TaskCard({ task, childId, onComplete }: TaskCardProps) {
                 />
               </div>
             ) : (
-              <div className={`${getCategoryColor(task.category)} rounded-xl p-3 shrink-0`}>
+              <div className={`${getCategoryColor(task.category)} rounded-xl p-3 shrink-0`} aria-hidden="true">
                 <AppIcon name={task.icon} size={24} className="text-black/60 dark:text-white/80" />
               </div>
             )}
@@ -226,7 +227,7 @@ export default function TaskCard({ task, childId, onComplete }: TaskCardProps) {
                       ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
                       : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
                       }`}>
-                      <Timer className="w-3 h-3 mr-1" />
+                      <Timer className="w-3 h-3 mr-1" aria-hidden="true" />
                       {hasProgress
                         ? t('minutesLeft', { minutes: Math.ceil(currentTimerState.remainingSeconds / 60) })
                         : t('minutes', { minutes: task.timer_minutes })
@@ -246,7 +247,7 @@ export default function TaskCard({ task, childId, onComplete }: TaskCardProps) {
           {/* Points Badge */}
           <div className="shrink-0">
             <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
-              <Sparkle size={16} weight="fill" className="text-primary" />
+              <Sparkle size={16} weight="fill" className="text-primary" aria-hidden="true" />
               <span className="text-sm font-bold text-primary tabular-nums">
                 +{task.points} XP
               </span>
@@ -256,9 +257,11 @@ export default function TaskCard({ task, childId, onComplete }: TaskCardProps) {
 
         {/* Action Button */}
         <button
+          type="button"
           onClick={handleComplete}
           disabled={loading}
-          className="mt-4 w-full px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-base shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          aria-busy={loading}
+          className="mt-4 w-full px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-base shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           {getButtonIcon()}
           {getButtonText()}

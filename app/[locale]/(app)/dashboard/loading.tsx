@@ -2,7 +2,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function DashboardLoading() {
     return (
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="container mx-auto px-4 py-8 max-w-7xl" role="status" aria-live="polite" aria-busy="true">
+            <span className="sr-only">Loading dashboard...</span>
             {/* Welcome Section Skeleton */}
             <div className="mb-8">
                 <Skeleton className="h-10 w-64 mb-2" />
@@ -41,7 +42,7 @@ export default function DashboardLoading() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {[1, 2].map((i) => (
                                 <div key={i} className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
-                                    <div className="h-24 bg-muted animate-pulse" />
+                                    <div className="h-24 bg-muted motion-safe:animate-pulse" aria-hidden="true" />
                                     <div className="p-6">
                                         <div className="flex justify-between items-start mb-6">
                                             <div className="space-y-2">

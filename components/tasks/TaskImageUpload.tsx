@@ -114,7 +114,7 @@ export default function TaskImageUpload({
             />
             {isUploading && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 text-white animate-spin" />
+                <Loader2 className="w-8 h-8 text-white motion-safe:animate-spin" aria-hidden="true" />
               </div>
             )}
           </div>
@@ -122,9 +122,10 @@ export default function TaskImageUpload({
             type="button"
             onClick={handleRemove}
             disabled={isUploading}
-            className="absolute top-2 right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-md transition-colors disabled:opacity-50"
+            aria-label="Remove image"
+            className="absolute top-2 right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-md transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       ) : (
@@ -137,15 +138,15 @@ export default function TaskImageUpload({
           }`}
         >
           {isUploading ? (
-            <Loader2 className={`text-gray-400 animate-spin ${compact ? 'w-6 h-6' : 'w-10 h-10'}`} />
+            <Loader2 className={`text-gray-400 motion-safe:animate-spin ${compact ? 'w-6 h-6' : 'w-10 h-10'}`} aria-hidden="true" />
           ) : (
             <>
               {!compact && (
                 <div className="p-3 rounded-full bg-gray-100 dark:bg-gray-700">
-                  <ImageIcon className="w-8 h-8 text-gray-400" />
+                  <ImageIcon className="w-8 h-8 text-gray-400" aria-hidden="true" />
                 </div>
               )}
-              {compact && <Upload className="w-6 h-6 text-gray-400" />}
+              {compact && <Upload className="w-6 h-6 text-gray-400" aria-hidden="true" />}
               <div className="text-center">
                 <p className={`font-medium text-gray-600 dark:text-gray-300 ${compact ? 'text-xs' : 'text-sm'}`}>
                   {compact ? 'Upload Custom' : 'Upload Image'}
@@ -162,7 +163,7 @@ export default function TaskImageUpload({
       )}
 
       {error && (
-        <p className="text-sm text-red-500 text-center">{error}</p>
+        <p className="text-sm text-red-500 text-center" role="alert">{error}</p>
       )}
 
       {previewUrl && !isUploading && (
@@ -172,7 +173,7 @@ export default function TaskImageUpload({
           onClick={triggerFileSelect}
           className="w-full max-w-[200px] mx-auto flex items-center gap-2"
         >
-          <Upload className="w-4 h-4" />
+          <Upload className="w-4 h-4" aria-hidden="true" />
           Change Image
         </Button>
       )}

@@ -6,6 +6,7 @@ import { Users, Check, X, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { getErrorMessage } from '@/lib/utils/error';
 
 interface InvitationData {
   id: string;
@@ -65,7 +66,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
         setError(t('loadFailed'));
         setLoading(false);
       });
-  }, [token]);
+  }, [token, t]);
 
   const handleAccept = async () => {
     if (!token) return;
@@ -87,9 +88,9 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
       toast.success(t('toast.welcomeToFamily'));
       router.refresh(); // Clear cache before navigation
       router.push(`/${locale}/dashboard`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Accept error:', error);
-      toast.error(error.message || t('toast.acceptFailed'));
+      toast.error(getErrorMessage(error) || t('toast.acceptFailed'));
     } finally {
       setAccepting(false);
     }
@@ -99,7 +100,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
     return (
       <div className="flex min-h-screen items-center justify-center bg-background-light dark:bg-background-dark">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+          <Loader2 className="h-12 w-12 motion-safe:animate-spin text-primary mx-auto mb-4" aria-hidden="true" />
           <p className="text-text-muted dark:text-text-muted">{t('loading')}</p>
         </div>
       </div>
@@ -112,7 +113,7 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
         <div className="w-full max-w-md">
           <div className="bg-white dark:bg-card-dark rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
             <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
-              <X className="h-8 w-8 text-red-600 dark:text-red-400" />
+              <X className="h-8 w-8 text-red-600 dark:text-red-400" aria-hidden="true" />
             </div>
             <h1 className="text-2xl font-bold text-text-main dark:text-white mb-2">
               {t('invalidTitle')}
@@ -187,18 +188,20 @@ export default function InvitePage({ params }: { params: Promise<{ token: string
           {/* Actions */}
           {isAuthenticated ? (
             <button
+              type="button"
               onClick={handleAccept}
               disabled={accepting}
+              aria-busy={accepting}
               className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-primary hover:bg-primary/90 text-black font-bold rounded-lg transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {accepting ? (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <Loader2 className="h-5 w-5 motion-safe:animate-spin" aria-hidden="true" />
                   {t('accepting')}
                 </>
               ) : (
                 <>
-                  <Check className="h-5 w-5" />
+                  <Check className="h-5 w-5" aria-hidden="true" />
                   {t('acceptInvitation')}
                 </>
               )}

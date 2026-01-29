@@ -6,6 +6,7 @@ import RewardList from '@/components/parent/RewardList';
 import { CheckCircle, Ticket, Package } from '@/components/ui/ClientIcons';
 import { getAuthUserWithProfile } from '@/lib/supabase/cached-queries';
 import { DEFAULT_EXCHANGE_RATE, ExchangeRate } from '@/lib/utils/exchange-rate';
+import { HISTORY_LOOKBACK_DAYS, TIME_MS } from '@/lib/constants';
 
 // Force dynamic rendering to ensure fresh data
 export const dynamic = 'force-dynamic';
@@ -45,7 +46,7 @@ export default async function RewardManagementPage({
       .from('reward_purchases')
       .select('reward_id, status')
       .eq('family_id', userProfile.family_id)
-      .gte('purchased_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+      .gte('purchased_at', new Date(Date.now() - HISTORY_LOOKBACK_DAYS * TIME_MS.DAY).toISOString()),
 
     // Get family settings for exchange rate
     supabase
@@ -62,11 +63,11 @@ export default async function RewardManagementPage({
       .order('name'),
   ]);
 
-  const rewards = (rewardsResult.data || []) as any[];
+  const rewards = rewardsResult.data || [];
   const purchaseStats = (purchaseStatsResult.data || []) as { reward_id: string; status: string }[];
   const exchangeRate = (familyResult.data?.point_exchange_rate || DEFAULT_EXCHANGE_RATE) as ExchangeRate;
 
-  const children = (childrenResult.data || []) as { id: string; name: string; avatar_url: string | null }[];
+  const children = childrenResult.data || [];
 
   // Calculate purchase count per reward
   const rewardPurchases = new Map<string, number>();
@@ -92,7 +93,7 @@ export default async function RewardManagementPage({
         <div className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3 mb-2">
             <div className="h-10 w-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <Gift size={24} className="text-purple-600 dark:text-purple-400" />
+              <Gift size={24} className="text-purple-600 dark:text-purple-400" aria-hidden="true" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
               {t('pageStats.totalRewards')}
@@ -106,7 +107,7 @@ export default async function RewardManagementPage({
         <div className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3 mb-2">
             <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-              <CheckCircle size={24} weight="fill" className="text-green-600 dark:text-green-400" />
+              <CheckCircle size={24} weight="fill" className="text-green-600 dark:text-green-400" aria-hidden="true" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
               {t('pageStats.activeRewards')}
@@ -120,7 +121,7 @@ export default async function RewardManagementPage({
         <div className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3 mb-2">
             <div className="h-10 w-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
-              <Ticket size={24} className="text-orange-600 dark:text-orange-400" />
+              <Ticket size={24} className="text-orange-600 dark:text-orange-400" aria-hidden="true" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
               {t('pageStats.purchases30d')}
@@ -139,7 +140,7 @@ export default async function RewardManagementPage({
       {rewards?.length === 0 && (
         <div className="text-center py-12 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
           <div className="h-24 w-24 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4">
-            <Package size={48} className="text-gray-400 dark:text-gray-600" />
+            <Package size={48} className="text-gray-400 dark:text-gray-600" aria-hidden="true" />
           </div>
           <p className="text-lg font-semibold text-text-muted dark:text-gray-400 mb-2">
             {t('noRewards')}

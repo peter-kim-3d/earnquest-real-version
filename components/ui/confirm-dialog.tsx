@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -36,7 +36,7 @@ export default function ConfirmDialog({
 }: ConfirmDialogProps) {
   const handleConfirm = () => {
     onConfirm();
-    onClose();
+    // Don't call onClose() here - let the parent handle closing after async operation completes
   };
 
   return (
@@ -45,12 +45,12 @@ export default function ConfirmDialog({
         <DialogHeader>
           <div className="flex items-center gap-3">
             {variant === 'danger' && (
-              <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+              <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0" aria-hidden="true">
                 <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
               </div>
             )}
             {variant === 'warning' && (
-              <div className="h-10 w-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center flex-shrink-0">
+              <div className="h-10 w-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center flex-shrink-0" aria-hidden="true">
                 <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
             )}
@@ -75,6 +75,7 @@ export default function ConfirmDialog({
             type="button"
             onClick={handleConfirm}
             disabled={isLoading}
+            aria-busy={isLoading}
             className={`flex-1 sm:flex-1 ${variant === 'danger'
                 ? 'bg-red-600 hover:bg-red-700 text-white'
                 : variant === 'warning'
@@ -82,7 +83,8 @@ export default function ConfirmDialog({
                   : 'bg-primary hover:bg-primary/90 text-white'
               }`}
           >
-            {isLoading ? 'Processing...' : confirmLabel}
+            {isLoading && <Loader2 className="h-4 w-4 mr-2 motion-safe:animate-spin" aria-hidden="true" />}
+            {confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

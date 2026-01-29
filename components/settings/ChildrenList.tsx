@@ -57,7 +57,7 @@ export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
         onClick={handleAddChild}
         className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white"
       >
-        <Plus className="w-4 h-4 mr-2" />
+        <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
         {t('addChild')}
       </Button>
 
@@ -94,7 +94,7 @@ export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
                 <div className="flex items-center gap-1">
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon"
                     onClick={async () => {
                       try {
                         const response = await fetch('/api/auth/impersonate', {
@@ -106,22 +106,23 @@ export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
                         if (!response.ok) throw new Error('Failed to switch view');
 
                         window.location.href = `/${locale}/child/dashboard`;
-                      } catch (error) {
+                      } catch (error: unknown) {
                         console.error(error);
                       }
                     }}
-                    className="hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                    title={t('viewAsChild')}
+                    className="h-10 w-10 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400 focus-visible:ring-2 focus-visible:ring-blue-500"
+                    aria-label={t('viewAsChild')}
                   >
-                    <Eye className="w-4 h-4" />
+                    <Eye className="w-4 h-4" aria-hidden="true" />
                   </Button>
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon"
                     onClick={() => handleEditChild(child)}
-                    className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-700 focus-visible:ring-2 focus-visible:ring-primary"
+                    aria-label={t('editChild')}
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Edit2 className="w-4 h-4" aria-hidden="true" />
                   </Button>
                 </div>
               </div>
@@ -129,13 +130,13 @@ export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
               {/* Points */}
               <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 border border-yellow-200 dark:border-yellow-800">
                 <div className="flex items-center gap-2 mb-1">
-                  <Trophy className="w-5 h-5 text-yellow-600 dark:text-yellow-500" />
+                  <Trophy className="w-5 h-5 text-yellow-600 dark:text-yellow-500" aria-hidden="true" />
                   <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                     {t('questPoints')}
                   </span>
                 </div>
                 <p className="text-2xl font-black text-yellow-900 dark:text-yellow-100">
-                  {child.points_balance} QP
+                  {t('pointsDisplay', { points: child.points_balance })}
                 </p>
               </div>
 

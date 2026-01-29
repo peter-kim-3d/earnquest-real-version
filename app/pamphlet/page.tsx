@@ -196,7 +196,7 @@ function FeatureCard({ icon: Icon, title, description, color }: any) {
   return (
     <div className="bg-white rounded-2xl p-8 shadow-card hover:shadow-card-hover transition-all duration-300 group">
       <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-        <Icon size={32} className="text-white" />
+        <Icon size={32} className="text-white" aria-hidden="true" />
       </div>
       <h3 className="font-display text-2xl font-bold text-[#121811] mb-4">
         {title}
@@ -231,7 +231,7 @@ function BenefitItem({ icon: Icon, title, description }: any) {
     <div className="flex gap-5">
       <div className="flex-shrink-0">
         <div className="w-12 h-12 rounded-xl bg-[#2bb800]/10 flex items-center justify-center">
-          <Icon size={28} className="text-[#2bb800]" />
+          <Icon size={28} className="text-[#2bb800]" aria-hidden="true" />
         </div>
       </div>
       <div>

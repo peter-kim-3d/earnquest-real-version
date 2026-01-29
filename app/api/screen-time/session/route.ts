@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 /**
  * POST /api/screen-time/session
@@ -145,10 +146,10 @@ export async function POST(request: NextRequest) {
         remainingWeek: sessionResult.remaining_week,
       });
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Screen time session error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }
@@ -225,10 +226,10 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ session });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Screen time session GET error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }

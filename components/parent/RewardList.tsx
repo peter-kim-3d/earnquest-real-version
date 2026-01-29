@@ -104,49 +104,74 @@ export default function RewardList({ rewards, rewardPurchases, exchangeRate = DE
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
           <button
+            type="button"
             onClick={() => setFilter('all')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all ${filter === 'all'
+            aria-pressed={filter === 'all'}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${filter === 'all'
               ? 'bg-primary text-white shadow-md'
               : 'bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
           >
-            <Sparkle size={16} weight="bold" />
+            <Sparkle size={16} weight="bold" aria-hidden="true" />
             {t('filter.all')}
           </button>
           <button
+            type="button"
             onClick={() => setFilter('active')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all ${filter === 'active'
+            aria-pressed={filter === 'active'}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${filter === 'active'
               ? 'bg-primary text-white shadow-md'
               : 'bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
           >
-            <Sparkle size={16} weight="fill" />
+            <Sparkle size={16} weight="fill" aria-hidden="true" />
             {t('filter.active')}
           </button>
           <button
+            type="button"
             onClick={() => setFilter('inactive')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all ${filter === 'inactive'
+            aria-pressed={filter === 'inactive'}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${filter === 'inactive'
               ? 'bg-primary text-white shadow-md'
               : 'bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
           >
-            <Pause size={16} weight="bold" />
+            <Pause size={16} weight="bold" aria-hidden="true" />
             {t('filter.inactive')}
           </button>
         </div>
 
         {/* New Reward Button */}
         <button
+          type="button"
           onClick={handleNew}
-          className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all flex items-center gap-2"
+          className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
-          <Plus size={18} weight="bold" />
+          <Plus size={18} weight="bold" aria-hidden="true" />
           {t('newReward')}
         </button>
       </div>
 
       {/* Reward Groups */}
-      {
+      {filteredRewards.length === 0 ? (
+        <div className="text-center py-12 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <Sparkle size={48} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" aria-hidden="true" />
+          <p className="text-lg font-semibold text-text-muted dark:text-gray-400 mb-2">
+            {filter === 'inactive' ? t('noInactiveRewards') : t('noRewards')}
+          </p>
+          <p className="text-sm text-text-muted dark:text-gray-500 mb-4">
+            {t('emptyDescription')}
+          </p>
+          <button
+            type="button"
+            onClick={handleNew}
+            className="px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-white font-semibold text-sm shadow-md transition-all inline-flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            <Plus size={18} weight="bold" aria-hidden="true" />
+            {t('createFirstButton')}
+          </button>
+        </div>
+      ) : (
         Object.entries(groupedRewards).map(([category, categoryRewards]) => (
           <div key={category}>
             <h2 className="text-xl font-bold text-text-main dark:text-white mb-4">
@@ -165,7 +190,7 @@ export default function RewardList({ rewards, rewardPurchases, exchangeRate = DE
             </div>
           </div>
         ))
-      }
+      )}
 
       {/* Reward Form Dialog */}
       <RewardFormDialog

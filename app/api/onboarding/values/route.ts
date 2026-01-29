@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { saveFamilyValues } from '@/lib/services/onboarding';
 import { NextResponse } from 'next/server';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function POST(request: Request) {
   try {
@@ -47,11 +48,8 @@ export async function POST(request: Request) {
       success: true,
       count: savedValues.length,
     }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error saving family values:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to save family values' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

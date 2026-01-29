@@ -38,7 +38,9 @@
     "deleteConfirm": "Are you sure you want to remove {name}? This will delete all their data.",
     "avatar": "Avatar",
     "viewAsChild": "View as Child",
+    "editChild": "Edit Child",
     "questPoints": "Quest Points",
+    "pointsDisplay": "{points} QP",
     "memberSince": "Member since {date}",
     "ageGroups": {
       "4-6": "4-6 years",
@@ -159,9 +161,11 @@
     "shareText": "I'd like you to join our family on EarnQuest! Click the link to get started.",
     "expiresOn": "This link expires on {date}.",
     "done": "Done",
-    "createFailed": "Failed to create invitation"
+    "createFailed": "Failed to create invitation",
+    "copyFailed": "Failed to copy"
   },
   "pinToggle": {
+    "loading": "Loading settings...",
     "title": "Require PIN for Children",
     "descriptionEnabled": "Children must enter a 4-digit PIN to access their dashboard",
     "descriptionDisabled": "Children can access their dashboard without a PIN",
@@ -222,6 +226,7 @@
     }
   },
   "deviceConnection": {
+    "loading": "Loading code...",
     "copyCode": "Copy code",
     "instructions": {
       "childDevice": "Your child can enter this code when opening the app on their device",

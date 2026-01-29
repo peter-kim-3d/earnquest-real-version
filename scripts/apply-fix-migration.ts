@@ -45,8 +45,8 @@ async function applyFix() {
         }
 
         console.log('\n✅ Migration applied successfully!');
-    } catch (err: any) {
-        console.error('❌ Error:', err.message);
+    } catch (err: unknown) {
+        console.error('❌ Error:', err instanceof Error ? err.message : String(err));
         process.exit(1);
     }
 }

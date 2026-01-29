@@ -9,6 +9,7 @@ import DashboardStats from '@/components/dashboard/DashboardStats';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import TransactionHistory from '@/components/parent/TransactionHistory';
 import { getAuthUserWithProfile } from '@/lib/supabase/cached-queries';
+import type { TaskOverride } from '@/lib/types/queries';
 
 export default async function ParentDashboardPage({
   params,
@@ -110,16 +111,18 @@ export default async function ParentDashboardPage({
       .order('purchased_at', { ascending: true }),
   ]);
 
-  const children = childrenResult.data as any[] | null;
-  const pendingCompletions = pendingCompletionsResult.data as any[] | null;
-  const recentCompletions = recentCompletionsResult.data as any[] | null;
-  const activeTasks = activeTasksResult.data as any[] | null;
-  const overrides = overridesResult.data as any[] | null;
-  const pendingTickets = pendingTicketsResult.data as any[] | null;
-  const allActiveTickets = allActiveTicketsResult.data as any[] | null;
+  // Type assertions for Supabase query results
+  // These match the component prop types expected by child components
+  const children = childrenResult.data;
+  const pendingCompletions = pendingCompletionsResult.data;
+  const recentCompletions = recentCompletionsResult.data;
+  const activeTasks = activeTasksResult.data;
+  const overrides = overridesResult.data as TaskOverride[] | null;
+  const pendingTickets = pendingTicketsResult.data;
+  const allActiveTickets = allActiveTicketsResult.data;
 
   // Filter for non-screen rewards (item/experience) that need parent fulfillment
-  const activeTickets = (allActiveTickets || []).filter((ticket: any) => {
+  const activeTickets = (allActiveTickets || []).filter((ticket: { reward?: { category?: string } }) => {
     const category = ticket.reward?.category;
     return category === 'item' || category === 'experience';
   });

@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     return success({ child }, 'Child created successfully');
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Create child error:', error);
     return errors.internalError();
   }

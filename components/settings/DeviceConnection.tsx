@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Copy, Check, RefreshCw, Smartphone } from '@/components/ui/ClientIcons';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
@@ -21,11 +21,7 @@ export default function DeviceConnection() {
   const [fetchingCode, setFetchingCode] = useState(true);
   const [showRegenerateDialog, setShowRegenerateDialog] = useState(false);
 
-  useEffect(() => {
-    fetchJoinCode();
-  }, []);
-
-  const fetchJoinCode = async () => {
+  const fetchJoinCode = useCallback(async () => {
     setFetchingCode(true);
     try {
       const res = await fetch('/api/family/join-code');
@@ -41,7 +37,11 @@ export default function DeviceConnection() {
     } finally {
       setFetchingCode(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    fetchJoinCode();
+  }, [fetchJoinCode]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(joinCode);
@@ -81,7 +81,8 @@ export default function DeviceConnection() {
     <div className="space-y-4">
       {fetchingCode ? (
         <div className="flex items-center justify-center py-8">
-          <RefreshCw className="h-6 w-6 animate-spin text-primary" />
+          <RefreshCw className="h-6 w-6 motion-safe:animate-spin text-primary" aria-hidden="true" />
+          <span className="sr-only">{t('loading')}</span>
         </div>
       ) : (
         <>
@@ -92,14 +93,15 @@ export default function DeviceConnection() {
             </code>
 
             <button
+              type="button"
               onClick={handleCopy}
-              className="h-14 w-14 flex items-center justify-center rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all"
-              title={t('copyCode')}
+              aria-label={t('copyCode')}
+              className="h-14 w-14 flex items-center justify-center rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               {copied ? (
-                <Check className="h-5 w-5 text-green-600" />
+                <Check className="h-5 w-5 text-green-600" aria-hidden="true" />
               ) : (
-                <Copy className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                <Copy className="h-5 w-5 text-gray-600 dark:text-gray-400" aria-hidden="true" />
               )}
             </button>
           </div>
@@ -118,11 +120,13 @@ export default function DeviceConnection() {
 
           {/* Regenerate Button */}
           <button
+            type="button"
             onClick={handleRegenerateClick}
             disabled={loading}
-            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2 text-sm font-medium text-text-main dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-busy={loading}
+            className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2 text-sm font-medium text-text-main dark:text-white disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${loading ? 'motion-safe:animate-spin' : ''}`} aria-hidden="true" />
             {loading ? t('generating') : t('generateNewCode')}
           </button>
         </>
@@ -141,7 +145,7 @@ export default function DeviceConnection() {
           </DialogHeader>
           <div className="py-4">
             <div className="flex items-start gap-3 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
-              <span className="text-lg">⚠️</span>
+              <span className="text-lg" aria-hidden="true">⚠️</span>
               <div className="flex-1">
                 <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-1">
                   {t('regenerateDialog.warningTitle')}
@@ -154,15 +158,18 @@ export default function DeviceConnection() {
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
             <button
+              type="button"
               onClick={() => setShowRegenerateDialog(false)}
-              className="px-6 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold transition-all"
+              className="px-6 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               {t('cancel')}
             </button>
             <button
+              type="button"
               onClick={handleConfirmRegenerate}
               disabled={loading}
-              className="px-6 py-2 rounded-lg bg-primary hover:bg-primary/90 text-black font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-busy={loading}
+              className="px-6 py-2 rounded-lg bg-primary hover:bg-primary/90 text-black font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               {loading ? t('generating') : t('generateNewCode')}
             </button>

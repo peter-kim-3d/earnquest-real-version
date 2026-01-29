@@ -62,7 +62,7 @@ export function CardPreview({
             text-center
           `}
         >
-          <div className="text-6xl mb-4">{selectedTheme?.icon}</div>
+          <div className="text-6xl mb-4" aria-hidden="true">{selectedTheme?.icon}</div>
           <h4 className="text-2xl font-bold text-white mb-2">
             {t('thankYou', { name: recipientName })}
           </h4>
@@ -103,8 +103,9 @@ export function CardPreview({
           {quickPrompts.map((prompt) => (
             <button
               key={prompt}
+              type="button"
               onClick={() => handleQuickPrompt(prompt)}
-              className="text-xs px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-600 hover:border-primary-kindness hover:bg-primary-kindness/10 transition-colors text-gray-700 dark:text-gray-300"
+              className="text-xs px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-600 hover:border-primary-kindness hover:bg-primary-kindness/10 transition-colors text-gray-700 dark:text-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-kindness focus-visible:ring-offset-2"
               disabled={isSending}
             >
               {prompt}
@@ -117,16 +118,17 @@ export function CardPreview({
       <Button
         onClick={onSend}
         disabled={!message.trim() || isSending}
+        aria-busy={isSending}
         className="w-full bg-primary-kindness hover:bg-primary-kindness/90 text-white text-lg py-6 rounded-xl shadow-lg disabled:opacity-50"
       >
         {isSending ? (
           <>
-            <Sparkles className="w-5 h-5 mr-2 animate-spin" />
+            <Sparkles className="w-5 h-5 mr-2 motion-safe:animate-spin" aria-hidden="true" />
             {t('sendingGratitude')}
           </>
         ) : (
           <>
-            <Sparkles className="w-5 h-5 mr-2" />
+            <Sparkles className="w-5 h-5 mr-2" aria-hidden="true" />
             {t('sendGratitude')}
           </>
         )}

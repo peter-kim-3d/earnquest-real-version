@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 /**
  * GET /api/screen-time
@@ -71,10 +72,10 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ budget });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Screen time GET error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }
@@ -201,10 +202,10 @@ export async function PATCH(request: NextRequest) {
     }
 
     return NextResponse.json({ budget });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Screen time PATCH error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }

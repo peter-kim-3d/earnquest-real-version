@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Camera, Plus, X, Trash2 } from 'lucide-react';
+import { Camera, Plus, X, Trash2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { AppIcon } from '@/components/ui/AppIcon';
@@ -75,7 +75,7 @@ export default function AddChildPage() {
     };
 
     checkExistingChildren();
-  }, [router]);
+  }, [router, locale]);
 
   const handleNameChange = (id: string, name: string) => {
     setChildren(children.map(child =>
@@ -159,7 +159,7 @@ export default function AddChildPage() {
 
       // Navigate to next step
       router.push(`/${locale}/onboarding/select-style?childId=${firstChildId}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to add children:', error);
       toast.error(t('addFailed'));
     } finally {
@@ -179,11 +179,11 @@ export default function AddChildPage() {
   return (
     <div className="w-full max-w-4xl flex flex-col gap-6">
       {/* Main Card */}
-      <div className="bg-white dark:bg-card-dark rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-8 md:p-12 animate-fade-in-up">
+      <div className="bg-white dark:bg-card-dark rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-8 md:p-12 motion-safe:animate-fade-in-up">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4">
-            <AppIcon name="face" size={32} weight="duotone" className="text-primary" />
+            <AppIcon name="face" size={32} weight="duotone" className="text-primary" aria-hidden="true" />
           </div>
           <h1 className="text-text-main dark:text-white tracking-tight text-3xl font-bold leading-tight mb-2">
             {t('title')}
@@ -206,16 +206,17 @@ export default function AddChildPage() {
                 <button
                   type="button"
                   onClick={() => handleRemove(child.id)}
-                  className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                  aria-label={t('removeChild')}
+                  className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
                 >
-                  <Trash2 className="h-5 w-5" />
+                  <Trash2 className="h-5 w-5" aria-hidden="true" />
                 </button>
               )}
 
               {/* Child Number Badge */}
               <div className="mb-4">
                 <span className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary text-sm font-bold rounded-full">
-                  <AppIcon name="face" size={16} weight="duotone" />
+                  <AppIcon name="face" size={16} weight="duotone" aria-hidden="true" />
                   {t('childNumber', { number: index + 1 })}
                 </span>
               </div>
@@ -243,7 +244,7 @@ export default function AddChildPage() {
                         }`}
                     />
                     {hasSubmitted && !child.name.trim() && (
-                      <p className="mt-1 text-xs text-red-500 font-medium">
+                      <p className="mt-1 text-xs text-red-500 font-medium" role="alert">
                         {t('nameRequired')}
                       </p>
                     )}
@@ -269,7 +270,7 @@ export default function AddChildPage() {
                         }`}
                     />
                     {hasSubmitted && !child.birthdate && (
-                      <p className="mt-1 text-xs text-red-500 font-medium">
+                      <p className="mt-1 text-xs text-red-500 font-medium" role="alert">
                         {t('birthdateRequired')}
                       </p>
                     )}
@@ -291,7 +292,7 @@ export default function AddChildPage() {
                     </div>
                     <div className="text-right">
                       <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-lg">
-                        <span className="text-2xl">{getAgeGroupLabel(child.ageGroup).emoji}</span>
+                        <span className="text-2xl" aria-hidden="true">{getAgeGroupLabel(child.ageGroup).emoji}</span>
                         <div className="text-left">
                           <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">
                             {t('ageGroupLabel')}
@@ -312,9 +313,9 @@ export default function AddChildPage() {
           <button
             type="button"
             onClick={handleAddAnother}
-            className="w-full flex items-center justify-center gap-2 h-12 px-6 bg-transparent border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary hover:bg-primary/5 text-text-muted dark:text-gray-400 hover:text-primary text-sm font-bold rounded-lg transition-all group"
+            className="w-full flex items-center justify-center gap-2 h-12 px-6 bg-transparent border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary hover:bg-primary/5 text-text-muted dark:text-gray-400 hover:text-primary text-sm font-bold rounded-lg transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
-            <Plus className="h-5 w-5 group-hover:scale-110 transition-transform" />
+            <Plus className="h-5 w-5 group-hover:scale-110 transition-transform" aria-hidden="true" />
             {t('addAnother')}
           </button>
 
@@ -325,8 +326,10 @@ export default function AddChildPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center h-12 px-6 bg-primary hover:bg-primary/90 text-black text-base font-bold rounded-lg transition-colors shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-busy={loading}
+            className="w-full flex items-center justify-center gap-2 h-12 px-6 bg-primary hover:bg-primary/90 text-black text-base font-bold rounded-lg transition-colors shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
+            {loading && <Loader2 className="h-5 w-5 motion-safe:animate-spin" aria-hidden="true" />}
             {loading ? tCommon('status.saving') : t('saveAndContinue', { count: children.length })}
           </button>
         </form>

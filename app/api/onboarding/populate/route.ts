@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { populateTasksAndRewards } from '@/lib/services/onboarding';
 import { PresetKey, ModuleKey, AgeGroup } from '@/lib/types/task';
 import { NextResponse } from 'next/server';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function POST(request: Request) {
   try {
@@ -81,8 +82,8 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error populating tasks/rewards:', error);
-    return NextResponse.json({ error: error.message || 'Failed to populate tasks and rewards' }, { status: 500 });
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

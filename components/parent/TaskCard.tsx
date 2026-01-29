@@ -17,6 +17,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import ConfirmDialog from '@/components/ui/confirm-dialog';
 
+/** Task metadata stored in JSONB column */
+interface TaskMetadata {
+  color?: string;
+  source?: {
+    templateKey?: string;
+  };
+}
+
 type Task = {
   id: string;
   name: string;
@@ -30,6 +38,7 @@ type Task = {
   image_url: string | null;
   archived_at: string | null;
   child_id: string | null;
+  metadata?: TaskMetadata;
 };
 
 type Assignee = {
@@ -82,7 +91,7 @@ export default function TaskCard({
       }
 
       router.refresh();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error toggling task:', error);
       toast.error(t('card.updateFailed'));
     } finally {
@@ -108,7 +117,7 @@ export default function TaskCard({
       }
 
       router.refresh();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error deleting task:', error);
       toast.error(t('card.deleteFailed'));
     } finally {
@@ -136,7 +145,7 @@ export default function TaskCard({
       }
 
       router.refresh();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Error ${action}ing task:`, error);
       toast.error(t('card.updateFailed'));
     } finally {
@@ -146,7 +155,7 @@ export default function TaskCard({
 
   const getCategoryColor = (category: string) => {
     // Check if task has custom color in metadata
-    if ((task as any).metadata?.color) {
+    if (task.metadata?.color) {
       return ''; // Allow custom color to take precedence via style
     }
 
@@ -181,7 +190,7 @@ export default function TaskCard({
     }
   };
 
-  const customColor = (task as any).metadata?.color;
+  const customColor = task.metadata?.color;
 
   return (
     <div
@@ -193,19 +202,21 @@ export default function TaskCard({
 
 
       {/* Icon/Image Header */}
-      <div
-        className={`aspect-video ${task.image_url ? '' : `bg-gradient-to-br ${!customColor ? getCategoryColor(task.category) : ''}`} p-6 flex items-center justify-center relative cursor-pointer overflow-hidden`}
-        style={customColor && !task.image_url ? { background: customColor } : {}}
+      <button
+        type="button"
         onClick={isSelectionMode ? onToggleSelect : onEdit}
+        className={`aspect-video w-full ${task.image_url ? '' : `bg-gradient-to-br ${!customColor ? getCategoryColor(task.category) : ''}`} p-6 flex items-center justify-center relative cursor-pointer overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset`}
+        style={customColor && !task.image_url ? { background: customColor } : {}}
+        aria-label={isSelectionMode ? (isSelected ? t('deselectTask') : t('selectTask')) : t('card.edit')}
       >
         {/* Selection Overlay */}
         {isSelectionMode && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10 transition-all">
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10 transition-all" role="checkbox" aria-checked={isSelected}>
             <div className={`h-8 w-8 rounded-full border-2 flex items-center justify-center transition-all ${isSelected
               ? 'bg-primary border-primary scale-110'
               : 'bg-white/20 border-white hover:bg-white/30'
               }`}>
-              {isSelected && <Checks size={20} weight="bold" className="text-white" />}
+              {isSelected && <Checks size={20} weight="bold" className="text-white" aria-hidden="true" />}
             </div>
           </div>
         )}
@@ -219,7 +230,7 @@ export default function TaskCard({
             className="object-cover"
           />
         ) : (
-          <AppIcon name={task.icon} size={48} className="text-white" />
+          <AppIcon name={task.icon} size={48} className="text-white" aria-hidden="true" />
         )}
 
         {/* Assignee Badge */}
@@ -251,13 +262,13 @@ export default function TaskCard({
                   </div>
                 );
               })()}
-              <span className="text-xs font-medium text-white max-w-20 truncate">
+              <span className="text-xs font-medium text-white max-w-20 truncate" title={assignee.name}>
                 {assignee.name}
               </span>
             </div>
           ) : (
             <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/30 backdrop-blur-sm border border-white/10">
-              <Users size={14} className="text-white" />
+              <Users size={14} className="text-white" aria-hidden="true" />
               <span className="text-xs font-medium text-white">{t('card.shared')}</span>
             </div>
           )}
@@ -269,29 +280,33 @@ export default function TaskCard({
             <span className="text-xs font-semibold text-white">{t('card.inactive')}</span>
           </div>
         )}
-      </div>
+      </button>
 
       {/* Content */}
       <div className="p-4">
         <div className="flex items-start justify-between mb-2">
-          <h3
-            className="text-lg font-bold text-text-main dark:text-white flex-1 line-clamp-2 cursor-pointer hover:text-primary transition-colors"
+          <button
+            type="button"
             onClick={isSelectionMode ? undefined : onEdit}
+            disabled={isSelectionMode}
+            className="text-lg font-bold text-text-main dark:text-white flex-1 line-clamp-2 cursor-pointer hover:text-primary transition-colors text-left focus:outline-none focus-visible:text-primary focus-visible:underline disabled:cursor-default disabled:hover:text-text-main dark:disabled:hover:text-white"
           >
             {task.name}
-          </h3>
+          </button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
+                type="button"
                 disabled={loading}
-                className="h-11 w-11 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center transition-colors disabled:opacity-50"
+                aria-label={t('card.moreOptions')}
+                className="min-h-[44px] min-w-[44px] rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
-                <DotsThreeVertical size={20} className="text-text-muted dark:text-gray-400" />
+                <DotsThreeVertical size={20} className="text-text-muted dark:text-gray-400" aria-hidden="true" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={onEdit}>
-                <PencilSimple size={16} className="mr-2" />
+                <PencilSimple size={16} className="mr-2" aria-hidden="true" />
                 {t('card.edit')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleToggleActive}>
@@ -300,19 +315,19 @@ export default function TaskCard({
               <DropdownMenuItem onClick={handleArchive}>
                 {task.archived_at ? (
                   <>
-                    <ArrowCounterClockwise size={16} className="mr-2" />
+                    <ArrowCounterClockwise size={16} className="mr-2" aria-hidden="true" />
                     {t('card.unarchive')}
                   </>
                 ) : (
                   <>
-                    <Archive size={16} className="mr-2" />
+                    <Archive size={16} className="mr-2" aria-hidden="true" />
                     {t('card.archive')}
                   </>
                 )}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleDelete} className="text-red-600 dark:text-red-400">
-                <Trash size={16} className="mr-2" />
+                <Trash size={16} className="mr-2" aria-hidden="true" />
                 {t('card.delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -329,7 +344,7 @@ export default function TaskCard({
         <div className="space-y-2 mb-4">
           <div className="flex items-center justify-between text-sm">
             <span className="text-text-muted dark:text-gray-500">{t('card.points')}</span>
-            <span className="font-bold text-primary">{task.points} QP</span>
+            <span className="font-bold text-primary tabular-nums">{task.points} QP</span>
           </div>
           <div className="flex items-center justify-between text-sm">
             <span className="text-text-muted dark:text-gray-500">{t('card.frequency')}</span>
@@ -351,7 +366,7 @@ export default function TaskCard({
             {completionCount > 0 && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-text-muted dark:text-gray-500">{t('card.completed30d')}</span>
-                <span className="font-bold text-green-600 dark:text-green-400">
+                <span className="font-bold text-green-600 dark:text-green-400 tabular-nums">
                   {completionCount}×
                 </span>
               </div>
@@ -360,10 +375,10 @@ export default function TaskCard({
             {pendingCount > 0 && (
               <div className="flex items-center justify-between text-sm bg-orange-50 dark:bg-orange-900/20 p-2 rounded-lg">
                 <span className="text-orange-700 dark:text-orange-300 font-medium flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
+                  <span className="h-2 w-2 rounded-full bg-orange-500 motion-safe:animate-pulse" aria-hidden="true" />
                   {t('card.needsApproval')}
                 </span>
-                <span className="font-bold text-orange-700 dark:text-orange-300">
+                <span className="font-bold text-orange-700 dark:text-orange-300 tabular-nums">
                   {pendingCount}
                 </span>
               </div>

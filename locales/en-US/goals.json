@@ -18,7 +18,8 @@
     "completed": "Completed"
   },
   "childFilter": {
-    "all": "All Children"
+    "all": "All Children",
+    "label": "Filter by child"
   },
   "childGoals": "{name}'s Goals",
   "completedStatus": "Completed!",
@@ -75,7 +76,8 @@
     "save": "Save Goal",
     "saving": "Saving...",
     "update": "Update Goal",
-    "delete": "Delete Goal",
+    "edit": "Edit goal",
+    "delete": "Delete goal",
     "deposit": "Deposit",
     "withdraw": "Withdraw",
     "complete": "Mark Complete"
@@ -105,10 +107,17 @@
   },
   "card": {
     "progress": "Progress",
+    "progressLabel": "Goal progress: {current} of {target} XP ({percent}%)",
     "saved": "saved",
     "remaining": "remaining",
     "weeksToGo": "~{weeks} weeks to go",
-    "almostThere": "Almost there!"
+    "almostThere": "Almost there!",
+    "goalAchieved": "Goal Achieved!",
+    "depositPoints": "Deposit Points",
+    "xpAvailable": "{points} XP available",
+    "earnMoreToDeposit": "Earn more points to deposit",
+    "xpToMilestone": "{points} XP to {percentage}% bonus (+{bonus} XP)",
+    "targetUpdated": "Target was updated ({count, plural, one {# change} other {# changes}})"
   },
   "deposit": {
     "title": "Deposit to Goal",
@@ -132,7 +141,9 @@
     "cancel": "Cancel",
     "depositing": "Depositing...",
     "depositXp": "Deposit {amount} XP",
-    "deposit": "Deposit"
+    "deposit": "Deposit",
+    "currentProgressLabel": "Current progress: {current} of {target} XP ({percent}%)",
+    "previewProgressLabel": "After deposit: {current} of {target} XP ({percent}%)"
   },
   "client": {
     "availableToDeposit": "Available to Deposit",

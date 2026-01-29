@@ -32,6 +32,9 @@
     "noTasksDescription": "승인 대기 중인 할 일이 없습니다. 아이들이 할 일을 완료하면 여기에 표시됩니다.",
     "new": "{count}개 새로운",
     "selectAll": "전체 선택",
+    "deselectAll": "전체 선택 해제",
+    "selectTask": "할 일 선택",
+    "deselectTask": "할 일 선택 해제",
     "approving": "승인 중...",
     "approveTasks": "{count}개 할 일 승인",
     "tasksApproved": "할 일 승인됨",
@@ -47,6 +50,7 @@
     "by": "{name}",
     "submitted": "{time}에 제출됨",
     "confirmComplete": "완료 확인",
+    "approving": "승인 중...",
     "requestFix": "수정 요청",
     "minutesAgo": "{count}분 전",
     "hoursAgo": "{count}시간 전",
@@ -101,7 +105,8 @@
     "showMore": "더 보기",
     "loadFailed": "거래 내역을 불러오지 못했습니다",
     "today": "오늘",
-    "yesterday": "어제"
+    "yesterday": "어제",
+    "loading": "거래 내역을 불러오는 중..."
   },
   "children": {
     "viewProfile": "프로필 보기",
@@ -130,7 +135,9 @@
     "off": "(비활성)",
     "removeTask": "할 일 제거",
     "enableTask": "할 일 활성화",
-    "disableTask": "할 일 비활성화"
+    "disableTask": "할 일 비활성화",
+    "impersonateFailed": "아이 화면으로 전환하지 못했습니다",
+    "progressLabel": "주간 진행률: {goal} XP 중 {current} XP ({percent}%)"
   },
   "childProfile": {
     "title": "{name}의 프로필",
@@ -150,6 +157,7 @@
     "currentBalance": "현재 잔액",
     "ofWeeklyGoal": "주간 목표 중",
     "weeklyGoalProgress": "주간 목표 진행률",
+    "progressLabel": "주간 목표 진행률: {goal} XP 중 {current} XP ({percent}%)",
     "lifetimeEarned": "총 획득",
     "trustStreak": "신뢰 연속",
     "days": "{count}일",
@@ -205,6 +213,8 @@
       "taskVisible": "할 일이 다시 보입니다",
       "taskHidden": "이 아이에게 할 일이 숨겨졌습니다",
       "taskUpdateFailed": "할 일 업데이트에 실패했습니다"
-    }
+    },
+    "enableTask": "할 일 활성화",
+    "disableTask": "할 일 비활성화"
   }
 }

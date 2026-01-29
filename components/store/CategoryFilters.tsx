@@ -35,10 +35,13 @@ export default function CategoryFilters() {
     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
       {categoryIds.map((categoryId) => (
         <button
+          type="button"
           key={categoryId}
           onClick={() => handleCategoryChange(categoryId)}
+          aria-pressed={activeCategory === categoryId}
           className={`
             flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm whitespace-nowrap transition-all shrink-0
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
             ${
               activeCategory === categoryId
                 ? 'bg-primary text-white shadow-lg shadow-primary/30'
@@ -46,7 +49,7 @@ export default function CategoryFilters() {
             }
           `}
         >
-          <AppIcon name={categoryIcons[categoryId]} size={16} weight="duotone" />
+          <AppIcon name={categoryIcons[categoryId]} size={16} weight="duotone" aria-hidden="true" />
           {t(categoryId)}
         </button>
       ))}

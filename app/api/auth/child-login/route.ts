@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
+import { SESSION_COOKIE_MAX_AGE_SECONDS } from '@/lib/constants';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function POST(request: NextRequest) {
   try {
@@ -74,7 +76,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: SESSION_COOKIE_MAX_AGE_SECONDS,
       path: '/',
     });
 
@@ -86,11 +88,8 @@ export async function POST(request: NextRequest) {
         ageGroup: child.age_group,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Child login error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

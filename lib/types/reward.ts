@@ -132,7 +132,7 @@ export interface RewardPurchase {
 
   // Relations (when joined)
   rewards?: Reward;
-  children?: any;
+  children?: { id: string; name: string; family_id: string };
 }
 
 // ============================================================================

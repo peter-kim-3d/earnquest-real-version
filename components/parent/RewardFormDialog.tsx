@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ImageIcon, Palette } from 'lucide-react';
+import { ImageIcon, Palette, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import RewardIconPicker from '@/components/rewards/RewardIconPicker';
 import DefaultRewardImagePicker from '@/components/rewards/DefaultRewardImagePicker';
 import TaskImageUpload from '@/components/tasks/TaskImageUpload';
 import { getRewardIconById } from '@/lib/reward-icons';
+import { getErrorMessage } from '@/lib/utils/error';
 import {
   calculatePointsFromDollars,
   dollarsToCents,
@@ -25,6 +26,12 @@ import {
   getExchangeRateLabel,
 } from '@/lib/utils/exchange-rate';
 import { useLocale } from 'next-intl';
+
+/** Reward settings stored in JSONB column */
+interface RewardSettings {
+  color?: string;
+  [key: string]: unknown;
+}
 
 type Reward = {
   id: string;
@@ -38,6 +45,7 @@ type Reward = {
   icon: string | null;
   image_url: string | null;
   real_value_cents?: number | null;
+  settings?: RewardSettings;
 };
 
 interface RewardFormDialogProps {
@@ -84,7 +92,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
         icon: reward.icon || 'gift',
         image_url: reward.image_url || null,
         is_active: reward.is_active,
-        color: (reward as any).settings?.color || '',
+        color: reward.settings?.color || '',
         dollarValue: reward.real_value_cents ? (reward.real_value_cents / 100).toString() : '',
       });
       setImageMode(reward.image_url ? 'image' : 'icon');
@@ -149,7 +157,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
           ...dataWithoutExtras,
           real_value_cents: realValueCents,
           settings: {
-            ...(reward as any)?.settings,
+            ...reward?.settings,
             ...(color ? { color } : {}),
           },
         }),
@@ -162,9 +170,9 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
 
       router.refresh();
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error saving reward:', error);
-      toast.error(t('dialog.saveFailed'), { description: error.message || t('toast.error') });
+      toast.error(t('dialog.saveFailed'), { description: getErrorMessage(error) });
     } finally {
       setLoading(false);
     }
@@ -202,7 +210,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
               className={hasSubmitted && !formData.name.trim() ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
             {hasSubmitted && !formData.name.trim() && (
-              <p className="text-sm text-red-500 font-medium">{t('form.nameRequired')}</p>
+              <p className="text-sm text-red-500 font-medium" role="alert">{t('form.nameRequired')}</p>
             )}
           </div>
 
@@ -218,6 +226,9 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
               className="min-h-20"
               maxLength={500}
             />
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-right">
+              {formData.description.length}/500
+            </p>
           </div>
 
           {/* Icon/Image Selection */}
@@ -229,25 +240,27 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
               <button
                 type="button"
                 onClick={() => setImageMode('icon')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+                aria-pressed={imageMode === 'icon'}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 min-h-[44px] rounded-md text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                   imageMode === 'icon'
                     ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                <Palette className="w-4 h-4" />
+                <Palette className="w-4 h-4" aria-hidden="true" />
                 {t('form.chooseIcon')}
               </button>
               <button
                 type="button"
                 onClick={() => setImageMode('image')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+                aria-pressed={imageMode === 'image'}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 min-h-[44px] rounded-md text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                   imageMode === 'image'
                     ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                <ImageIcon className="w-4 h-4" />
+                <ImageIcon className="w-4 h-4" aria-hidden="true" />
                 {t('form.uploadImage')}
               </button>
             </div>
@@ -258,7 +271,7 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
                 <button
                   type="button"
                   onClick={() => setShowIconPicker(true)}
-                  className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800/50"
+                  className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 >
                   {(() => {
                     const selectedIcon = getRewardIconById(formData.icon);
@@ -302,9 +315,10 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, image_url: null })}
+                      aria-label={t('form.removeImage')}
                       className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-xs font-bold hover:bg-red-600"
                     >
-                      ✕
+                      <span aria-hidden="true">✕</span>
                     </button>
                   </div>
                 )}
@@ -314,9 +328,9 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
                   <button
                     type="button"
                     onClick={() => setShowDefaultImagePicker(true)}
-                    className="h-[88px] px-4 py-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800/50 flex flex-col items-center justify-center"
+                    className="h-[88px] px-4 py-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-primary transition-colors bg-gray-50 dark:bg-gray-800/50 flex flex-col items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                   >
-                    <span className="text-2xl mb-1">🖼️</span>
+                    <span className="text-2xl mb-1" aria-hidden="true">🖼️</span>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('form.defaultImages')}</span>
                   </button>
                   <div className="h-[88px]">
@@ -361,7 +375,8 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
                   key={cat.value}
                   type="button"
                   onClick={() => setFormData({ ...formData, category: cat.value, icon: cat.icon })}
-                  className={`p-3 rounded-xl border-2 transition-all text-left ${formData.category === cat.value
+                  aria-pressed={formData.category === cat.value}
+                  className={`p-3 rounded-xl border-2 transition-all text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${formData.category === cat.value
                     ? 'border-primary bg-primary/5'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
@@ -377,10 +392,16 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
                   'bg-orange-50 text-orange-900 dark:bg-orange-900/20 dark:text-orange-100'
               }`}>
               <p className="font-semibold mb-1">
-                {formData.category === 'screen' ? `⏱️ ${t('categoryInfo.screen.title')}` :
-                  formData.category === 'autonomy' ? `⚡ ${t('categoryInfo.autonomy.title')}` :
-                    formData.category === 'savings' ? `💰 ${t('categoryInfo.savings.title')}` :
-                      `🎁 ${t('categoryInfo.experience.title')}`}
+                <span aria-hidden="true">
+                  {formData.category === 'screen' ? '⏱️ ' :
+                    formData.category === 'autonomy' ? '⚡ ' :
+                      formData.category === 'savings' ? '💰 ' :
+                        formData.category === 'item' ? '🛍️ ' : '🎁 '}
+                </span>
+                {formData.category === 'screen' ? t('categoryInfo.screen.title') :
+                  formData.category === 'autonomy' ? t('categoryInfo.autonomy.title') :
+                    formData.category === 'savings' ? t('categoryInfo.savings.title') :
+                      t('categoryInfo.experience.title')}
               </p>
               <p className="opacity-90 leading-relaxed">
                 {formData.category === 'screen' ? t('categoryInfo.screen.description') :
@@ -495,8 +516,10 @@ export default function RewardFormDialog({ reward, isOpen, onClose, existingRewa
             <Button
               type="submit"
               disabled={loading}
+              aria-busy={loading}
               className="flex-1 bg-primary hover:bg-primary/90"
             >
+              {loading && <Loader2 className="h-4 w-4 mr-2 motion-safe:animate-spin" aria-hidden="true" />}
               {loading ? t('actions.saving') : reward ? t('actions.update') : t('actions.create')}
             </Button>
           </div>

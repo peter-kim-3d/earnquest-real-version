@@ -1,22 +1,25 @@
 import { createClient } from '@/lib/supabase/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { CreateFamilyParams, FamilySettings } from '@/lib/types/family';
+import {
+  JOIN_CODE_CHARS,
+  JOIN_CODE_LENGTH,
+  JOIN_CODE_MAX_ATTEMPTS,
+  DEFAULT_AUTO_APPROVAL_HOURS,
+  DEFAULT_SCREEN_BUDGET_WEEKLY_MINUTES,
+} from '@/lib/constants';
 
-export interface CreateFamilyParams {
-  name?: string;
-  timezone?: string;
-  language?: string;
-}
+// Re-export for backward compatibility
+export type { CreateFamilyParams } from '@/lib/types/family';
 
 /**
- * Generates a unique 6-character join code
+ * Generates a unique join code
  * Uses uppercase alphanumeric excluding confusing characters (I, O, L, 0, 1)
  */
-async function generateUniqueJoinCode(supabase: any): Promise<string> {
-  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-  const maxAttempts = 100;
-
-  for (let attempts = 0; attempts < maxAttempts; attempts++) {
-    const code = Array.from({ length: 6 }, () =>
-      chars[Math.floor(Math.random() * chars.length)]
+async function generateUniqueJoinCode(supabase: SupabaseClient): Promise<string> {
+  for (let attempts = 0; attempts < JOIN_CODE_MAX_ATTEMPTS; attempts++) {
+    const code = Array.from({ length: JOIN_CODE_LENGTH }, () =>
+      JOIN_CODE_CHARS[Math.floor(Math.random() * JOIN_CODE_CHARS.length)]
     ).join('');
 
     // Check if code already exists
@@ -43,18 +46,20 @@ export async function createFamily(params?: CreateFamilyParams) {
   // Generate unique join code
   const joinCode = await generateUniqueJoinCode(supabase);
 
+  const defaultSettings: FamilySettings = {
+    timezone: params?.timezone || 'America/New_York',
+    language: params?.language || 'en-US',
+    autoApprovalHours: DEFAULT_AUTO_APPROVAL_HOURS,
+    screenBudgetWeeklyMinutes: DEFAULT_SCREEN_BUDGET_WEEKLY_MINUTES,
+    requireChildPin: false,
+  };
+
   const { data: family, error } = await supabase
     .from('families')
     .insert({
       name: params?.name || 'My Family',
       join_code: joinCode,
-      settings: {
-        timezone: params?.timezone || 'America/New_York',
-        language: params?.language || 'en-US',
-        autoApprovalHours: 24,
-        screenBudgetWeeklyMinutes: 300,
-        requireChildPin: false,
-      },
+      settings: defaultSettings,
     })
     .select()
     .single();
@@ -92,7 +97,7 @@ export async function getFamily(familyId: string) {
  */
 export async function updateFamilySettings(
   familyId: string,
-  settings: Record<string, any>
+  settings: FamilySettings
 ) {
   const supabase = await createClient();
 

@@ -43,7 +43,7 @@ export default async function Home({
           >
             <div className="relative z-10">
               <div className="mb-4 inline-flex items-center justify-center p-4 bg-primary/10 rounded-full">
-                <UserCircle size={48} className="text-primary" />
+                <UserCircle size={48} className="text-primary" aria-hidden="true" />
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-text-main dark:text-white mb-3">
                 {t('landing.parentCard.title')}
@@ -53,7 +53,7 @@ export default async function Home({
               </p>
               <div className="inline-flex items-center gap-2 text-primary font-bold group-hover:gap-4 transition-all">
                 {t('landing.parentCard.cta')}
-                <ArrowRight size={20} weight="bold" />
+                <ArrowRight size={20} weight="bold" aria-hidden="true" />
               </div>
             </div>
             {/* Gradient background on hover */}
@@ -68,7 +68,7 @@ export default async function Home({
           >
             <div className="relative z-10">
               <div className="mb-4 inline-flex items-center justify-center p-4 bg-blue-500/10 rounded-full">
-                <Heart size={48} className="text-blue-500" />
+                <Heart size={48} className="text-blue-500" aria-hidden="true" />
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-text-main dark:text-white mb-3">
                 {t('landing.kidCard.title')}
@@ -78,7 +78,7 @@ export default async function Home({
               </p>
               <div className="inline-flex items-center gap-2 text-blue-500 font-bold group-hover:gap-4 transition-all">
                 {t('landing.kidCard.cta')}
-                <ArrowRight size={20} weight="bold" />
+                <ArrowRight size={20} weight="bold" aria-hidden="true" />
               </div>
             </div>
             {/* Gradient background on hover */}

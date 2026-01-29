@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { SupabaseClient, User } from '@supabase/supabase-js';
 
 /**
  * Standardized API response helpers.
@@ -70,9 +71,9 @@ export const errors = {
  * });
  */
 export function withErrorHandler<T>(
-  handler: (request: Request, context?: any) => Promise<NextResponse<T>>
+  handler: (request: Request, context?: unknown) => Promise<NextResponse<T>>
 ) {
-  return async (request: Request, context?: any): Promise<NextResponse<T | ErrorResponse>> => {
+  return async (request: Request, context?: unknown): Promise<NextResponse<T | ErrorResponse>> => {
     try {
       return await handler(request, context);
     } catch (err) {
@@ -81,4 +82,61 @@ export function withErrorHandler<T>(
       return errors.internalError(message) as NextResponse<T | ErrorResponse>;
     }
   };
+}
+
+/**
+ * Get user's family_id from the users table.
+ * This is a common operation used in many API routes.
+ *
+ * @param supabase - Supabase client
+ * @param userId - User ID to look up
+ * @returns Object with familyId or error response
+ */
+export async function getUserFamilyId(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<{ familyId: string } | { error: NextResponse<ErrorResponse> }> {
+  const { data: userProfile, error: profileError } = await supabase
+    .from('users')
+    .select('family_id')
+    .eq('id', userId)
+    .single();
+
+  if (profileError || !userProfile) {
+    return { error: errors.notFound('User profile') };
+  }
+
+  if (!userProfile.family_id) {
+    return { error: errors.badRequest('User is not associated with a family') };
+  }
+
+  return { familyId: userProfile.family_id };
+}
+
+/**
+ * Authenticate user and get their family_id in one call.
+ * Combines auth check and family_id lookup for common API route pattern.
+ *
+ * @param supabase - Supabase client
+ * @returns Object with user and familyId, or error response
+ */
+export async function authenticateAndGetFamily(
+  supabase: SupabaseClient
+): Promise<{ user: User; familyId: string } | { error: NextResponse<ErrorResponse> }> {
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return { error: errors.unauthorized() };
+  }
+
+  const result = await getUserFamilyId(supabase, user.id);
+
+  if ('error' in result) {
+    return result;
+  }
+
+  return { user, familyId: result.familyId };
 }

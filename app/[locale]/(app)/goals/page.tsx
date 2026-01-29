@@ -69,8 +69,8 @@ export default async function GoalsManagementPage({
       .single(),
   ]);
 
-  const children = (childrenResult.data || []) as { id: string; name: string }[];
-  const goals = (goalsResult.data || []) as any[];
+  const children = childrenResult.data || [];
+  const goals = goalsResult.data || [];
   const weeklyEarnings = weeklyTransactionsResult.data?.reduce((sum, tx) => sum + tx.amount, 0) || 350;
   const exchangeRate = (familyResult.data?.point_exchange_rate || DEFAULT_EXCHANGE_RATE) as ExchangeRate;
 
@@ -96,7 +96,7 @@ export default async function GoalsManagementPage({
         <div className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3 mb-2">
             <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Target size={24} className="text-primary" />
+              <Target size={24} className="text-primary" aria-hidden="true" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
               {t('stats.activeGoals')}
@@ -110,7 +110,7 @@ export default async function GoalsManagementPage({
         <div className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3 mb-2">
             <div className="h-10 w-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
-              <Trophy size={24} className="text-yellow-600 dark:text-yellow-400" />
+              <Trophy size={24} className="text-yellow-600 dark:text-yellow-400" aria-hidden="true" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
               {t('stats.completed')}
@@ -124,7 +124,7 @@ export default async function GoalsManagementPage({
         <div className="rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3 mb-2">
             <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-              <TrendUp size={24} className="text-green-600 dark:text-green-400" />
+              <TrendUp size={24} className="text-green-600 dark:text-green-400" aria-hidden="true" />
             </div>
             <h3 className="text-sm font-semibold text-text-muted dark:text-gray-400 uppercase tracking-wider">
               {t('stats.totalSaved')}

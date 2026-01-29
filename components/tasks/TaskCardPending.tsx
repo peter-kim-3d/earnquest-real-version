@@ -2,6 +2,7 @@
 
 import { Clock } from 'lucide-react';
 import { AppIcon } from '@/components/ui/AppIcon';
+import { useTranslations } from 'next-intl';
 
 type Task = {
   id: string;
@@ -24,6 +25,8 @@ interface TaskCardPendingProps {
 }
 
 export default function TaskCardPending({ task, completion }: TaskCardPendingProps) {
+  const t = useTranslations('child.tasks');
+
   // Category colors
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -46,11 +49,11 @@ export default function TaskCardPending({ task, completion }: TaskCardPendingPro
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
 
     if (diffInMinutes < 60) {
-      return `${diffInMinutes}m ago`;
+      return t('time.minutesAgo', { count: diffInMinutes });
     } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)}h ago`;
+      return t('time.hoursAgo', { count: Math.floor(diffInMinutes / 60) });
     } else {
-      return `${Math.floor(diffInMinutes / 1440)}d ago`;
+      return t('time.daysAgo', { count: Math.floor(diffInMinutes / 1440) });
     }
   };
 
@@ -61,7 +64,7 @@ export default function TaskCardPending({ task, completion }: TaskCardPendingPro
           {/* Icon & Content */}
           <div className="flex items-start gap-4 flex-1">
             {/* Icon */}
-            <div className={`${getCategoryColor(task.category)} rounded-xl p-3 shrink-0 opacity-60`}>
+            <div className={`${getCategoryColor(task.category)} rounded-xl p-3 shrink-0 opacity-60`} aria-hidden="true">
               <AppIcon name={task.icon || 'task_alt'} size={24} weight="duotone" />
             </div>
 
@@ -82,7 +85,7 @@ export default function TaskCardPending({ task, completion }: TaskCardPendingPro
                 </span>
                 {/* Time */}
                 <span className="text-xs text-text-muted dark:text-gray-500">
-                  Submitted {formatTime(completion.requested_at)}
+                  {t('submitted')} {formatTime(completion.requested_at)}
                 </span>
               </div>
             </div>
@@ -91,7 +94,7 @@ export default function TaskCardPending({ task, completion }: TaskCardPendingPro
           {/* Points Badge */}
           <div className="shrink-0">
             <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
-              <span className="text-sm font-bold">
+              <span className="text-sm font-bold tabular-nums">
                 +{task.points} XP
               </span>
             </div>
@@ -100,9 +103,9 @@ export default function TaskCardPending({ task, completion }: TaskCardPendingPro
 
         {/* Status Badge */}
         <div className="mt-4 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-          <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
           <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">
-            Parent Checking...
+            {t('parentChecking')}
           </span>
         </div>
       </div>

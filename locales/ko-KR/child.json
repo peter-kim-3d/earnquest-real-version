@@ -63,6 +63,12 @@
       "afterSchool": "학교 끝나고",
       "evening": "저녁에 해요",
       "anytime": "언제든지"
+    },
+    "submitted": "제출함",
+    "time": {
+      "minutesAgo": "{count}분 전",
+      "hoursAgo": "{count}시간 전",
+      "daysAgo": "{count}일 전"
     }
   },
   "store": {
@@ -102,7 +108,8 @@
       "locked": "잠김",
       "screenLimitReached": "스크린 한도 도달",
       "buyNow": "지금 구매",
-      "min": "분"
+      "min": "분",
+      "savingsProgress": "저축 진행률: {cost} QP 중 {percent}% 모음"
     },
     "wallet": {
       "title": "내 지갑",
@@ -121,7 +128,9 @@
       "starting": "시작 중...",
       "startTimer": "타이머 시작",
       "weeklyLimitReached": "주간 한도 도달",
-      "dailyLimitReached": "일일 한도 도달"
+      "dailyLimitReached": "일일 한도 도달",
+      "dailyProgress": "일일 스크린 타임: {total} 중 {used} 사용",
+      "weeklyProgress": "주간 스크린 타임: {total} 중 {used} 사용"
     }
   },
   "tickets": {
@@ -165,7 +174,9 @@
       "okay": "확인",
       "timeWellSpent": "잘 보낸 시간! 🎮",
       "failedToComplete": "완료 실패",
-      "tapMinimize": "위 버튼을 눌러 최소화"
+      "tapMinimize": "위 버튼을 눌러 최소화",
+      "minimize": "타이머 최소화",
+      "maximize": "타이머 최대화"
     },
     "card": {
       "waitingForParent": "부모님 대기 중",
@@ -181,7 +192,9 @@
       "cancelTicket": "티켓 취소",
       "canceling": "취소 중...",
       "approveUse": "사용 승인",
+      "approving": "승인 중...",
       "markAsGiven": "제공 완료",
+      "fulfilling": "처리 중...",
       "cancelDialog": {
         "title": "티켓을 취소할까요?",
         "description": "정말 이 티켓을 취소하시겠어요? 포인트가 환불됩니다.",
@@ -219,6 +232,7 @@
     "dayStreak": "연속 일수",
     "keepGoing": "계속 도전해봐!",
     "weeklyGoal": "주간 목표",
+    "weeklyGoalProgress": "주간 목표 진행률: {goal} XP 중 {current} XP ({percent}%)",
     "xpLeftToGoal": "목표까지 {points} XP 남음",
     "goalReached": "목표 달성! 🎉",
     "proTip": "꿀팁",

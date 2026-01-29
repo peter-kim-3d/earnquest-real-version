@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Coins, Info, WarningCircle } from '@phosphor-icons/react/dist/ssr';
+import { Coins, Info, WarningCircle, CircleNotch } from '@phosphor-icons/react/dist/ssr';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -67,7 +67,7 @@ export default function ExchangeRateSettings({ currentRate }: ExchangeRateSettin
       setShowConfirmDialog(false);
       toast.success(t('toast.updated'));
       router.refresh();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating exchange rate:', error);
       toast.error(t('toast.updateFailed'));
     } finally {
@@ -81,7 +81,7 @@ export default function ExchangeRateSettings({ currentRate }: ExchangeRateSettin
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Coins size={24} className="text-primary" />
+            <Coins size={24} className="text-primary" aria-hidden="true" />
             {t('title')}
           </CardTitle>
           <CardDescription>{t('description')}</CardDescription>
@@ -89,13 +89,13 @@ export default function ExchangeRateSettings({ currentRate }: ExchangeRateSettin
         <CardContent className="space-y-4">
           {/* Info box */}
           <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <Info size={20} className="text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+            <Info size={20} className="text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" aria-hidden="true" />
             <p className="text-sm text-blue-700 dark:text-blue-300">{t('info')}</p>
           </div>
 
           {/* Reference note - important guidance */}
           <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
-            <WarningCircle size={20} className="text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+            <WarningCircle size={20} className="text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" aria-hidden="true" />
             <p className="text-sm text-amber-700 dark:text-amber-300">{t('referenceNote')}</p>
           </div>
 
@@ -104,8 +104,10 @@ export default function ExchangeRateSettings({ currentRate }: ExchangeRateSettin
             {EXCHANGE_RATE_OPTIONS.map((option) => (
               <button
                 key={option.value}
+                type="button"
                 onClick={() => handleRateSelect(option.value)}
-                className={`flex items-center justify-between p-4 rounded-lg border-2 transition-all ${
+                aria-pressed={selectedRate === option.value}
+                className={`flex items-center justify-between p-4 rounded-lg border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                   selectedRate === option.value
                     ? 'border-primary bg-primary/5'
                     : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -147,7 +149,7 @@ export default function ExchangeRateSettings({ currentRate }: ExchangeRateSettin
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <WarningCircle size={24} className="text-yellow-500" />
+              <WarningCircle size={24} className="text-yellow-500" aria-hidden="true" />
               {t('confirm.title')}
             </DialogTitle>
             <DialogDescription>{t('confirm.description')}</DialogDescription>
@@ -173,7 +175,8 @@ export default function ExchangeRateSettings({ currentRate }: ExchangeRateSettin
             <Button variant="outline" onClick={() => setShowConfirmDialog(false)} disabled={isLoading}>
               {t('confirm.cancel')}
             </Button>
-            <Button onClick={handleConfirmChange} disabled={isLoading}>
+            <Button onClick={handleConfirmChange} disabled={isLoading} aria-busy={isLoading}>
+              {isLoading && <CircleNotch size={16} className="mr-2 motion-safe:animate-spin" aria-hidden="true" />}
               {isLoading ? t('confirm.updating') : t('confirm.confirm')}
             </Button>
           </DialogFooter>

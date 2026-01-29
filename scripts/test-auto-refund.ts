@@ -247,8 +247,8 @@ async function testAutoRefund() {
         const error = await response.json();
         console.log(`⚠️  API returned ${response.status}: ${error.error}`);
       }
-    } catch (e: any) {
-      console.log(`⚠️  Could not reach API: ${e.message}`);
+    } catch (e: unknown) {
+      console.log(`⚠️  Could not reach API: ${e instanceof Error ? e.message : String(e)}`);
       console.log('   (This is OK if the server is not running)');
     }
 
@@ -284,8 +284,8 @@ async function testAutoRefund() {
     console.log('\n🚀 Auto-refund cron job is ready!');
     console.log('   Vercel will run it hourly at: /api/cron/auto-refunds\n');
 
-  } catch (error: any) {
-    console.error('\n❌ Test failed with error:', error.message);
+  } catch (error: unknown) {
+    console.error('\n❌ Test failed with error:', error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }

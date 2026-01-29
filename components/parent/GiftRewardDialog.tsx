@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Gift, X, Check } from '@phosphor-icons/react/dist/ssr';
+import { Gift, X, Check, CircleNotch } from '@phosphor-icons/react/dist/ssr';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { getErrorMessage } from '@/lib/utils/error';
 import {
   Dialog,
   DialogContent,
@@ -90,11 +91,9 @@ export default function GiftRewardDialog({
 
       handleClose();
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Gift error:', error);
-      toast.error(t('gift.failed'), {
-        description: error.message || tCommon('errors.tryAgain'),
-      });
+      toast.error(t('gift.failed'), { description: getErrorMessage(error) });
     } finally {
       setLoading(false);
     }
@@ -122,7 +121,7 @@ export default function GiftRewardDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold text-text-main dark:text-white">
-            <Gift size={24} weight="fill" className="text-primary" />
+            <Gift size={24} weight="fill" className="text-primary" aria-hidden="true" />
             {t('gift.title')}
           </DialogTitle>
           <DialogDescription className="text-text-muted dark:text-gray-400">
@@ -173,10 +172,12 @@ export default function GiftRewardDialog({
             <div className="grid grid-cols-2 gap-3">
               {familyChildren.map((child) => (
                 <button
+                  type="button"
                   key={child.id}
                   onClick={() => setSelectedChildId(child.id)}
+                  aria-pressed={selectedChildId === child.id}
                   className={`
-                    relative p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-2
+                    relative p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
                     ${selectedChildId === child.id
                       ? 'border-primary bg-primary/5 shadow-md'
                       : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
@@ -186,7 +187,7 @@ export default function GiftRewardDialog({
                   {/* Selection indicator */}
                   {selectedChildId === child.id && (
                     <div className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-primary flex items-center justify-center">
-                      <Check size={14} weight="bold" className="text-white" />
+                      <Check size={14} weight="bold" className="text-white" aria-hidden="true" />
                     </div>
                   )}
 
@@ -230,37 +231,36 @@ export default function GiftRewardDialog({
               placeholder={t('gift.messagePlaceholder')}
               rows={2}
               maxLength={500}
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-text-main dark:text-white placeholder-text-muted dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-text-main dark:text-white placeholder-text-muted dark:placeholder-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary resize-none"
             />
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-right mt-1">
+              {message.length}/500
+            </p>
           </div>
         </div>
 
         <DialogFooter className="gap-2 sm:gap-0">
           <button
+            type="button"
             onClick={handleClose}
             disabled={loading}
-            className="px-6 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold transition-all disabled:opacity-50"
+            className="px-6 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold transition-all disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2"
           >
             {tCommon('buttons.cancel')}
           </button>
           <button
+            type="button"
             onClick={handleGift}
             disabled={loading || !selectedChildId}
-            className="px-6 py-3 rounded-lg bg-primary hover:bg-primary/90 text-black font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            aria-busy={loading}
+            className="px-6 py-3 rounded-lg bg-primary hover:bg-primary/90 text-black font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             {loading ? (
-              <>
-                <span className="animate-spin">
-                  <Gift size={18} weight="fill" />
-                </span>
-                {t('gift.sending')}
-              </>
+              <CircleNotch size={18} className="motion-safe:animate-spin" aria-hidden="true" />
             ) : (
-              <>
-                <Gift size={18} weight="fill" />
-                {t('gift.send')}
-              </>
+              <Gift size={18} weight="fill" aria-hidden="true" />
             )}
+            {loading ? t('gift.sending') : t('gift.send')}
           </button>
         </DialogFooter>
       </DialogContent>

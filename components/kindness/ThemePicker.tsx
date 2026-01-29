@@ -1,6 +1,7 @@
 'use client';
 
 import { Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export type CardTheme = 'cosmic' | 'nature' | 'super_hero' | 'love';
 
@@ -44,14 +45,16 @@ interface ThemePickerProps {
 }
 
 export function ThemePicker({ selectedTheme, onSelect }: ThemePickerProps) {
+  const t = useTranslations('kindness.themePicker');
+
   return (
     <div className="space-y-4">
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-          Pick a vibe
+          {t('title')}
         </h3>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Choose the card theme that fits best
+          {t('subtitle')}
         </p>
       </div>
 
@@ -61,10 +64,14 @@ export function ThemePicker({ selectedTheme, onSelect }: ThemePickerProps) {
 
           return (
             <button
+              type="button"
               key={theme.id}
               onClick={() => onSelect(theme.id)}
+              aria-pressed={isSelected}
+              aria-label={`${theme.name} theme${isSelected ? ' (selected)' : ''}`}
               className={`
                 relative group rounded-2xl border-2 transition-all overflow-hidden
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-kindness focus-visible:ring-offset-2
                 ${isSelected
                   ? 'border-primary-kindness scale-105'
                   : 'border-gray-200 dark:border-gray-700 hover:border-primary-kindness/50 hover:scale-105'
@@ -73,12 +80,12 @@ export function ThemePicker({ selectedTheme, onSelect }: ThemePickerProps) {
             >
               {isSelected && (
                 <div className="absolute top-2 right-2 z-10 w-6 h-6 bg-primary-kindness rounded-full flex items-center justify-center">
-                  <Check className="w-4 h-4 text-white" />
+                  <Check className="w-4 h-4 text-white" aria-hidden="true" />
                 </div>
               )}
 
               <div className={`${theme.gradient} p-8 h-32 flex items-center justify-center`}>
-                <span className="text-5xl">{theme.icon}</span>
+                <span className="text-5xl" aria-hidden="true">{theme.icon}</span>
               </div>
 
               <div className="p-3 bg-white dark:bg-gray-800">

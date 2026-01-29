@@ -32,8 +32,8 @@ async function verifyColumns() {
       }
     }
 
-  } catch (error: any) {
-    console.error('\n❌ Error:', error.message);
+  } catch (error: unknown) {
+    console.error('\n❌ Error:', error instanceof Error ? error.message : String(error));
   }
 }
 

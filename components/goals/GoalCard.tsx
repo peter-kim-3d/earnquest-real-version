@@ -9,6 +9,7 @@ import { MilestoneBonuses } from '@/lib/types/goal';
 import { getAllMilestones, getProgressToNextMilestone, hasMilestones } from '@/lib/utils/milestones';
 import DepositModal from './DepositModal';
 import MilestoneModal from './MilestoneModal';
+import { useTranslations } from 'next-intl';
 
 interface Goal {
   id: string;
@@ -47,6 +48,7 @@ export default function GoalCard({
   onDeposit,
   onRefresh,
 }: GoalCardProps) {
+  const t = useTranslations('goals.card');
   const [isDepositOpen, setIsDepositOpen] = useState(false);
   const [isDepositing, setIsDepositing] = useState(false);
   const [milestoneModal, setMilestoneModal] = useState<{
@@ -99,7 +101,7 @@ export default function GoalCard({
       }
 
       onRefresh?.();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Deposit error:', error);
     } finally {
       setIsDepositing(false);
@@ -125,6 +127,7 @@ export default function GoalCard({
                     ? 'bg-yellow-200 dark:bg-yellow-800'
                     : 'bg-primary/10'
                 }`}
+                aria-hidden="true"
               >
                 {goal.is_completed ? (
                   <Trophy
@@ -133,7 +136,7 @@ export default function GoalCard({
                     className="text-yellow-600 dark:text-yellow-400"
                   />
                 ) : (
-                  <Target size={28} weight="duotone" className="text-primary" />
+                  <Target size={28} weight="duotone" className="text-primary" aria-hidden="true" />
                 )}
               </div>
               <div>
@@ -149,7 +152,7 @@ export default function GoalCard({
           </div>
 
           {goal.description && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2" title={goal.description}>
               {goal.description}
             </p>
           )}
@@ -158,7 +161,14 @@ export default function GoalCard({
         {/* Progress */}
         <div className="px-4 pb-4">
           {/* Progress bar */}
-          <div className="relative h-4 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden mb-2">
+          <div
+            className="relative h-4 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden mb-2"
+            role="progressbar"
+            aria-valuenow={goal.current_points}
+            aria-valuemin={0}
+            aria-valuemax={goal.target_points}
+            aria-label={t('progressLabel', { current: goal.current_points.toLocaleString(), target: goal.target_points.toLocaleString(), percent: Math.round(progress) })}
+          >
             <div
               className={`absolute inset-y-0 left-0 rounded-full transition-all duration-500 ${
                 goal.is_completed
@@ -166,6 +176,7 @@ export default function GoalCard({
                   : 'bg-gradient-to-r from-primary to-green-500'
               }`}
               style={{ width: `${progress}%` }}
+              aria-hidden="true"
             />
             {/* Shimmer effect - respects prefers-reduced-motion */}
             <div
@@ -174,6 +185,7 @@ export default function GoalCard({
                 backgroundSize: '200% 100%',
                 animation: 'shimmer 2s infinite',
               }}
+              aria-hidden="true"
             />
           </div>
 
@@ -209,9 +221,9 @@ export default function GoalCard({
                     }`}
                   >
                     {milestone.isCompleted ? (
-                      <CheckCircle size={14} weight="fill" />
+                      <CheckCircle size={14} weight="fill" aria-hidden="true" />
                     ) : (
-                      <Circle size={14} />
+                      <Circle size={14} aria-hidden="true" />
                     )}
                     <span>{milestone.percentage}%</span>
                   </div>
@@ -219,9 +231,11 @@ export default function GoalCard({
               </div>
               {nextMilestoneProgress && !goal.is_completed && (
                 <p className="text-xs text-primary mt-1">
-                  {nextMilestoneProgress.pointsToMilestone.toLocaleString()} XP to{' '}
-                  {nextMilestoneProgress.milestone.percentage}% bonus (+
-                  {nextMilestoneProgress.milestone.bonusPoints} XP)
+                  {t('xpToMilestone', {
+                    points: nextMilestoneProgress.pointsToMilestone.toLocaleString(),
+                    percentage: nextMilestoneProgress.milestone.percentage,
+                    bonus: nextMilestoneProgress.milestone.bonusPoints
+                  })}
                 </p>
               )}
             </div>
@@ -232,20 +246,21 @@ export default function GoalCard({
         <div className="px-4 pb-4">
           {goal.is_completed ? (
             <div className="flex items-center justify-center gap-2 py-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-              <Trophy size={20} className="text-yellow-600 dark:text-yellow-400" />
+              <Trophy size={20} className="text-yellow-600 dark:text-yellow-400" aria-hidden="true" />
               <span className="font-bold text-yellow-700 dark:text-yellow-300">
-                Goal Achieved!
+                {t('goalAchieved')}
               </span>
             </div>
           ) : (
             <Button
+              type="button"
               onClick={() => setIsDepositOpen(true)}
               disabled={availableBalance <= 0}
               className="w-full bg-primary hover:bg-primary/90"
             >
-              <PiggyBank size={18} className="mr-2" />
-              Deposit Points
-              <ArrowRight size={16} className="ml-auto" />
+              <PiggyBank size={18} className="mr-2" aria-hidden="true" />
+              {t('depositPoints')}
+              <ArrowRight size={16} className="ml-auto" aria-hidden="true" />
             </Button>
           )}
 
@@ -253,8 +268,8 @@ export default function GoalCard({
           {!goal.is_completed && (
             <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
               {availableBalance > 0
-                ? `${availableBalance.toLocaleString()} XP available`
-                : 'Earn more points to deposit'}
+                ? t('xpAvailable', { points: availableBalance.toLocaleString() })
+                : t('earnMoreToDeposit')}
             </p>
           )}
         </div>
@@ -263,8 +278,7 @@ export default function GoalCard({
         {goal.change_log && goal.change_log.length > 0 && (
           <div className="px-4 pb-3 pt-2 border-t border-gray-100 dark:border-gray-700">
             <p className="text-xs text-gray-400 dark:text-gray-500">
-              Target was updated ({goal.change_log.length} change
-              {goal.change_log.length > 1 ? 's' : ''})
+              {t('targetUpdated', { count: goal.change_log.length })}
             </p>
           </div>
         )}

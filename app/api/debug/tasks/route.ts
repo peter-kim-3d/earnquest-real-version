@@ -41,7 +41,7 @@ export async function GET() {
     .select('*');
 
   // Get v_child_today_tasks for each child
-  const viewResults: any = {};
+  const viewResults: Record<string, unknown[] | null> = {};
   if (children) {
     for (const child of children) {
       const { data: viewTasks } = await supabase

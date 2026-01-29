@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { getErrorMessage } from '@/lib/utils/error';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +22,8 @@ interface Child {
   name: string;
   age_group: string;
   avatar_url: string | null;
+  birth_year?: number;
+  pin_code?: string;
 }
 
 interface ChildFormDialogProps {
@@ -48,13 +52,9 @@ export function ChildFormDialog({
       setName(child.name);
       // Determine birth year from age_group if not available (approximate) or use existing field if added
       // Ideally we should have birth_year in Child type. For now, we'll try to use it if passed.
-      setBirthYear((child as any).birth_year?.toString() || '');
-      // Try to get PIN if available in child object (needs fetch update) or default empty to not overwrite blindly?
-      // For security, maybe we don't show the old PIN or show placeholder?
-      // If we don't have it, let's leave blank to indicate "Unchanged" unless user types?
-      // Actually simpler: just assume we might have it or default '0000'.
-      // If the parent wants to change it, they type a new one.
-      setPinCode((child as any).pin_code || '');
+      setBirthYear(child.birth_year?.toString() || '');
+      // If PIN is available, use it; otherwise leave empty for new entry
+      setPinCode(child.pin_code || '');
     } else {
       setName('');
       setBirthYear('');
@@ -140,9 +140,9 @@ export function ChildFormDialog({
       toast.success(child ? t('updated') : t('added'));
       onSuccess();
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Save child error:', error);
-      toast.error(error.message || t('saveFailed'));
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -203,7 +203,7 @@ export function ChildFormDialog({
                 </div>
                 <div className="text-right">
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-lg">
-                    <span className="text-2xl">{ageGroupInfo.emoji}</span>
+                    <span className="text-2xl" aria-hidden="true">{ageGroupInfo.emoji}</span>
                     <div className="text-left">
                       <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">{t('ageGroupLabel')}</p>
                       <p className="text-sm font-bold text-primary">{ageGroupInfo.label}</p>
@@ -250,8 +250,10 @@ export function ChildFormDialog({
             <Button
               type="submit"
               disabled={loading}
+              aria-busy={loading}
               className="bg-primary hover:bg-primary/90 text-white"
             >
+              {loading && <Loader2 className="h-4 w-4 mr-2 motion-safe:animate-spin" aria-hidden="true" />}
               {loading ? t('saving') : child ? t('update') : t('addChild')}
             </Button>
           </div>

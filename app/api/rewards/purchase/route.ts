@@ -1,53 +1,19 @@
 import { createClient } from '@/lib/supabase/server';
-import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-
-// Create admin client for child session (bypasses RLS)
-function getAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return createAdminClient(url, key, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-}
+import { checkParentOrChildAuth, verifyChildIdMatch } from '@/lib/api/child-auth';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
 
     // Check for parent auth OR child session
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    // If no parent auth, check for child session cookie
-    let isChildSession = false;
-    let childSessionData: { childId: string; familyId: string } | null = null;
-
-    if (!user) {
-      const cookieStore = await cookies();
-      const childSessionCookie = cookieStore.get('child_session');
-
-      if (childSessionCookie) {
-        try {
-          childSessionData = JSON.parse(childSessionCookie.value);
-          if (childSessionData?.childId && childSessionData?.familyId) {
-            isChildSession = true;
-          }
-        } catch {
-          // Invalid cookie
-        }
-      }
-
-      if (!isChildSession) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
+    const authResult = await checkParentOrChildAuth(supabase);
+    if (!authResult.success) {
+      return authResult.error;
     }
 
-    // Use admin client for child session (bypasses RLS)
-    const dbClient = isChildSession ? (getAdminClient() || supabase) : supabase;
+    const { isChildSession, childSessionData, dbClient } = authResult.result;
 
     const body = await request.json();
     const { rewardId, childId } = body;
@@ -60,12 +26,8 @@ export async function POST(request: Request) {
     }
 
     // If child session, verify childId matches session
-    if (isChildSession && childSessionData && childId !== childSessionData.childId) {
-      return NextResponse.json(
-        { error: 'Unauthorized: childId mismatch' },
-        { status: 403 }
-      );
-    }
+    const mismatchError = verifyChildIdMatch(childId, childSessionData, isChildSession);
+    if (mismatchError) return mismatchError;
 
     // Use the database RPC function to handle the purchase
     const { data, error } = await dbClient.rpc('purchase_reward', {
@@ -118,11 +80,9 @@ export async function POST(request: Request) {
       newBalance: data.new_balance,
       purchaseId: data.purchase_id,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in reward purchase:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    const errorMessage = getErrorMessage(error);
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

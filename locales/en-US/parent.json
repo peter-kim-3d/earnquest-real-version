@@ -32,6 +32,9 @@
     "noTasksDescription": "No tasks waiting for approval. When your children complete tasks, they'll appear here for review.",
     "new": "{count} New",
     "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "selectTask": "Select task",
+    "deselectTask": "Deselect task",
     "approving": "Approving...",
     "approveTasks": "Approve {count, plural, one {# Task} other {# Tasks}}",
     "tasksApproved": "Tasks Approved",
@@ -47,6 +50,7 @@
     "by": "by {name}",
     "submitted": "Submitted {time}",
     "confirmComplete": "Confirm Complete",
+    "approving": "Approving...",
     "requestFix": "Request Fix",
     "minutesAgo": "{count}m ago",
     "hoursAgo": "{count}h ago",
@@ -101,7 +105,8 @@
     "showMore": "Show More",
     "loadFailed": "Failed to load transaction history",
     "today": "Today",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "loading": "Loading transactions..."
   },
   "children": {
     "viewProfile": "View Profile",
@@ -130,7 +135,9 @@
     "off": "(Off)",
     "removeTask": "Remove task",
     "enableTask": "Enable task",
-    "disableTask": "Disable task"
+    "disableTask": "Disable task",
+    "impersonateFailed": "Failed to switch to child view",
+    "progressLabel": "Weekly progress: {current} of {goal} XP ({percent}%)"
   },
   "childProfile": {
     "title": "{name}'s Profile",
@@ -150,6 +157,7 @@
     "currentBalance": "Current Balance",
     "ofWeeklyGoal": "of weekly goal",
     "weeklyGoalProgress": "Weekly Goal Progress",
+    "progressLabel": "Weekly goal progress: {current} of {goal} XP ({percent}%)",
     "lifetimeEarned": "Lifetime Earned",
     "trustStreak": "Trust Streak",
     "days": "{count} days",
@@ -205,6 +213,8 @@
       "taskVisible": "Task visible again",
       "taskHidden": "Task hidden for this child",
       "taskUpdateFailed": "Failed to update task"
-    }
+    },
+    "enableTask": "Enable task",
+    "disableTask": "Disable task"
   }
 }

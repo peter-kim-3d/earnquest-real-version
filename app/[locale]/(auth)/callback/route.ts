@@ -48,7 +48,7 @@ export async function GET(
             return NextResponse.redirect(`${requestUrl.origin}/${locale}/dashboard`);
           }
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Error checking user profile:', err);
         // Continue to onboarding if check fails
       }

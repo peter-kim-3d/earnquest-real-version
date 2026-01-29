@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Clock, Sparkles, Minimize2, Maximize2, Pause, Play } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { SCREEN_TIME_SAVE_INTERVAL_MS } from '@/lib/constants';
+import { getErrorMessage } from '@/lib/utils/error';
 
 interface ScreenTimeTimerProps {
   purchaseId: string;
@@ -17,9 +19,6 @@ interface ScreenTimeTimerProps {
   initialPausedSeconds?: number;
   onComplete?: () => void;
 }
-
-// Save progress every 10 seconds
-const SAVE_INTERVAL_MS = 10000;
 
 export default function ScreenTimeTimer({
   purchaseId,
@@ -95,6 +94,138 @@ export default function ScreenTimeTimer({
     }
   }, [purchaseId, childId, getCurrentElapsedSeconds, isPaused]);
 
+  // Sound functions (defined before useEffects that use them)
+  const playBeepSound = useCallback(() => {
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+      // Create oscillator for beep sound
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      // Configure sound (3 beeps)
+      oscillator.frequency.value = 800; // Hz
+      gainNode.gain.value = 0.3;
+
+      oscillator.start(audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      oscillator.stop(audioContext.currentTime + 0.3);
+
+      // Second beep
+      const osc2 = audioContext.createOscillator();
+      const gain2 = audioContext.createGain();
+      osc2.connect(gain2);
+      gain2.connect(audioContext.destination);
+      osc2.frequency.value = 800;
+      gain2.gain.value = 0.3;
+      osc2.start(audioContext.currentTime + 0.4);
+      gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.7);
+      osc2.stop(audioContext.currentTime + 0.7);
+
+      // Third beep
+      const osc3 = audioContext.createOscillator();
+      const gain3 = audioContext.createGain();
+      osc3.connect(gain3);
+      gain3.connect(audioContext.destination);
+      osc3.frequency.value = 1000;
+      gain3.gain.value = 0.3;
+      osc3.start(audioContext.currentTime + 0.8);
+      gain3.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.2);
+      osc3.stop(audioContext.currentTime + 1.2);
+    } catch (err) {
+      console.log('Could not play beep sound:', err);
+    }
+  }, []);
+
+  const playAlarmSound = useCallback(() => {
+    try {
+      // Try to play notification sound from public folder
+      if (!audioRef.current) {
+        audioRef.current = new Audio('/sounds/timer-complete.mp3');
+      }
+      audioRef.current.play().catch(() => {
+        // If file doesn't exist, generate beep sound with Web Audio API
+        playBeepSound();
+      });
+    } catch {
+      // Fallback to beep sound
+      playBeepSound();
+    }
+  }, [playBeepSound]);
+
+  const handleTimerComplete = useCallback(() => {
+    // Play alarm sound
+    playAlarmSound();
+
+    // Show confirmation dialog
+    setShowConfirmation(true);
+    setAutoCloseSeconds(30);
+  }, [playAlarmSound]);
+
+  const completeScreenTime = useCallback(async () => {
+    // Prevent duplicate calls
+    if (isCompleting || hasCompletedRef.current) return;
+
+    hasCompletedRef.current = true;
+    setIsCompleting(true);
+
+    try {
+      const response = await fetch(`/api/tickets/${purchaseId}/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ childId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // If ticket is already used/completed, silently succeed (race condition)
+        if (data.error && typeof data.error === 'string' && data.error.includes('not in use')) {
+          console.log('Ticket already completed, treating as success');
+          toast.success(t('screenTimeComplete'), {
+            description: t('timeWellSpent'),
+          });
+
+          // Call onComplete callback for optimistic UI update
+          if (onComplete) {
+            onComplete();
+          }
+
+          router.refresh();
+          return;
+        }
+
+        throw new Error(data.error || 'Failed to complete screen time');
+      }
+
+      toast.success(t('screenTimeComplete'), {
+        description: t('timeWellSpent'),
+      });
+
+      // Call onComplete callback for optimistic UI update
+      if (onComplete) {
+        onComplete();
+      }
+
+      // Refresh server data in background
+      router.refresh();
+    } catch (error: unknown) {
+      // Only show error if it's not the "already completed" case
+      const errorMsg = getErrorMessage(error);
+      if (!errorMsg.includes('not in use')) {
+        console.error('Complete screen time error:', error);
+        toast.error(t('failedToComplete'), {
+          description: errorMsg || 'Please refresh the page.',
+        });
+      }
+    } finally {
+      setIsCompleting(false);
+    }
+  }, [childId, isCompleting, onComplete, purchaseId, router, t]);
+
   // Pause handler
   const handlePause = async () => {
     if (isPauseLoading || isPaused) return;
@@ -118,9 +249,9 @@ export default function ScreenTimeTimer({
       setIsPaused(true);
 
       toast.success(t('pause'));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Pause error:', error);
-      toast.error(error.message || 'Failed to pause');
+      toast.error(getErrorMessage(error));
     } finally {
       setIsPauseLoading(false);
     }
@@ -154,9 +285,9 @@ export default function ScreenTimeTimer({
       setTimeRemaining(remaining);
 
       toast.success(t('resume'));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Resume error:', error);
-      toast.error(error.message || 'Failed to resume');
+      toast.error(getErrorMessage(error));
     } finally {
       setIsPauseLoading(false);
     }
@@ -222,7 +353,7 @@ export default function ScreenTimeTimer({
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [calculateRemaining, saveProgress, isPaused]);
+  }, [calculateRemaining, saveProgress, isPaused, handleTimerComplete]);
 
   // Main timer effect
   useEffect(() => {
@@ -246,8 +377,8 @@ export default function ScreenTimeTimer({
       const remaining = calculateRemaining();
       setTimeRemaining(remaining);
 
-      // Periodically save progress (every SAVE_INTERVAL_MS)
-      if (Date.now() - lastSaveRef.current >= SAVE_INTERVAL_MS) {
+      // Periodically save progress (every SCREEN_TIME_SAVE_INTERVAL_MS)
+      if (Date.now() - lastSaveRef.current >= SCREEN_TIME_SAVE_INTERVAL_MS) {
         saveProgress();
       }
 
@@ -266,7 +397,7 @@ export default function ScreenTimeTimer({
         saveProgress();
       }
     };
-  }, [calculateRemaining, saveProgress, isPaused]);
+  }, [calculateRemaining, saveProgress, isPaused, handleTimerComplete]);
 
   // Auto-close confirmation after 30 seconds
   useEffect(() => {
@@ -284,137 +415,7 @@ export default function ScreenTimeTimer({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [showConfirmation]);
-
-  const handleTimerComplete = () => {
-    // Play alarm sound
-    playAlarmSound();
-
-    // Show confirmation dialog
-    setShowConfirmation(true);
-    setAutoCloseSeconds(30);
-  };
-
-  const playAlarmSound = () => {
-    try {
-      // Try to play notification sound from public folder
-      if (!audioRef.current) {
-        audioRef.current = new Audio('/sounds/timer-complete.mp3');
-      }
-      audioRef.current.play().catch(() => {
-        // If file doesn't exist, generate beep sound with Web Audio API
-        playBeepSound();
-      });
-    } catch {
-      // Fallback to beep sound
-      playBeepSound();
-    }
-  };
-
-  const playBeepSound = () => {
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-
-      // Create oscillator for beep sound
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      // Configure sound (3 beeps)
-      oscillator.frequency.value = 800; // Hz
-      gainNode.gain.value = 0.3;
-
-      oscillator.start(audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-      oscillator.stop(audioContext.currentTime + 0.3);
-
-      // Second beep
-      const osc2 = audioContext.createOscillator();
-      const gain2 = audioContext.createGain();
-      osc2.connect(gain2);
-      gain2.connect(audioContext.destination);
-      osc2.frequency.value = 800;
-      gain2.gain.value = 0.3;
-      osc2.start(audioContext.currentTime + 0.4);
-      gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.7);
-      osc2.stop(audioContext.currentTime + 0.7);
-
-      // Third beep
-      const osc3 = audioContext.createOscillator();
-      const gain3 = audioContext.createGain();
-      osc3.connect(gain3);
-      gain3.connect(audioContext.destination);
-      osc3.frequency.value = 1000;
-      gain3.gain.value = 0.3;
-      osc3.start(audioContext.currentTime + 0.8);
-      gain3.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.2);
-      osc3.stop(audioContext.currentTime + 1.2);
-    } catch (err) {
-      console.log('Could not play beep sound:', err);
-    }
-  };
-
-  const completeScreenTime = async () => {
-    // Prevent duplicate calls
-    if (isCompleting || hasCompletedRef.current) return;
-
-    hasCompletedRef.current = true;
-    setIsCompleting(true);
-
-    try {
-      const response = await fetch(`/api/tickets/${purchaseId}/complete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ childId }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // If ticket is already used/completed, silently succeed (race condition)
-        if (data.error && typeof data.error === 'string' && data.error.includes('not in use')) {
-          console.log('Ticket already completed, treating as success');
-          toast.success(t('screenTimeComplete'), {
-            description: t('timeWellSpent'),
-          });
-
-          // Call onComplete callback for optimistic UI update
-          if (onComplete) {
-            onComplete();
-          }
-
-          router.refresh();
-          return;
-        }
-
-        throw new Error(data.error || 'Failed to complete screen time');
-      }
-
-      toast.success(t('screenTimeComplete'), {
-        description: t('timeWellSpent'),
-      });
-
-      // Call onComplete callback for optimistic UI update
-      if (onComplete) {
-        onComplete();
-      }
-
-      // Refresh server data in background
-      router.refresh();
-    } catch (error: any) {
-      // Only show error if it's not the "already completed" case
-      if (!error.message?.includes('not in use')) {
-        console.error('Complete screen time error:', error);
-        toast.error(t('failedToComplete'), {
-          description: error.message || 'Please refresh the page.',
-        });
-      }
-    } finally {
-      setIsCompleting(false);
-    }
-  };
+  }, [showConfirmation, completeScreenTime]);
 
   const formatTime = (milliseconds: number) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -432,17 +433,19 @@ export default function ScreenTimeTimer({
 
     return (
       <button
+        type="button"
         onClick={isPaused ? handleResume : handlePause}
         disabled={isPauseLoading}
-        className={`${buttonPadding} rounded-full bg-white/20 hover:bg-white/30 transition-colors disabled:opacity-50`}
+        aria-busy={isPauseLoading}
+        className={`${buttonPadding} rounded-full bg-white/20 hover:bg-white/30 transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent`}
         aria-label={isPaused ? t('resume') : t('pause')}
       >
         {isPauseLoading ? (
-          <div className={`${iconSize} animate-spin rounded-full border-2 border-white border-t-transparent`} />
+          <div className={`${iconSize} motion-safe:animate-spin rounded-full border-2 border-white border-t-transparent`} aria-hidden="true" />
         ) : isPaused ? (
-          <Play className={iconSize} />
+          <Play className={iconSize} aria-hidden="true" />
         ) : (
-          <Pause className={iconSize} />
+          <Pause className={iconSize} aria-hidden="true" />
         )}
       </button>
     );
@@ -452,7 +455,7 @@ export default function ScreenTimeTimer({
   const PausedOverlay = () => (
     <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center rounded-xl">
       <div className="text-center">
-        <Pause className="h-12 w-12 mx-auto mb-2 opacity-80" />
+        <Pause className="h-12 w-12 mx-auto mb-2 opacity-80" aria-hidden="true" />
         <p className="text-lg font-bold">{t('pause')}</p>
       </div>
     </div>
@@ -464,7 +467,7 @@ export default function ScreenTimeTimer({
       {/* Header */}
       <div className="flex items-center justify-center gap-3 mb-6">
         <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-          <Sparkles className="h-8 w-8" />
+          <Sparkles className="h-8 w-8" aria-hidden="true" />
         </div>
       </div>
 
@@ -482,25 +485,35 @@ export default function ScreenTimeTimer({
 
       {/* Okay Button */}
       <button
+        type="button"
         onClick={completeScreenTime}
         disabled={isCompleting}
-        className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white text-orange-600 font-bold text-lg transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+        aria-busy={isCompleting}
+        className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-white text-orange-600 font-bold text-lg transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-orange-600"
       >
         {isCompleting ? (
           <>{t('processing')}</>
         ) : (
           <>
-            <Sparkles className="h-5 w-5" />
+            <Sparkles className="h-5 w-5" aria-hidden="true" />
             {t('okay')}
           </>
         )}
       </button>
 
       {/* Auto-close progress */}
-      <div className="mt-4 relative h-2 bg-white/20 rounded-full overflow-hidden">
+      <div
+        className="mt-4 relative h-2 bg-white/20 rounded-full overflow-hidden"
+        role="progressbar"
+        aria-valuenow={30 - autoCloseSeconds}
+        aria-valuemin={0}
+        aria-valuemax={30}
+        aria-label={t('autoClosingIn', { seconds: autoCloseSeconds })}
+      >
         <div
           className="absolute top-0 left-0 h-full bg-white transition-all duration-1000"
           style={{ width: `${((30 - autoCloseSeconds) / 30) * 100}%` }}
+          aria-hidden="true"
         />
       </div>
     </div>
@@ -512,7 +525,7 @@ export default function ScreenTimeTimer({
       {/* Header */}
       <div className="flex items-center justify-center gap-3 mb-6">
         <div className="h-20 w-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-          <Clock className="h-10 w-10" />
+          <Clock className="h-10 w-10" aria-hidden="true" />
         </div>
       </div>
 
@@ -537,30 +550,40 @@ export default function ScreenTimeTimer({
       </div>
 
       {/* Progress Bar */}
-      <div className="relative h-4 bg-white/20 rounded-full overflow-hidden mb-6">
+      <div
+        className="relative h-4 bg-white/20 rounded-full overflow-hidden mb-6"
+        role="progressbar"
+        aria-valuenow={Math.round(progress)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={t('remaining', { minutes: Math.ceil(timeRemaining / 60000) })}
+      >
         <div
           className={`absolute top-0 left-0 h-full bg-white transition-all duration-1000 ${isPaused ? 'opacity-50' : ''}`}
           style={{ width: `${progress}%` }}
+          aria-hidden="true"
         />
       </div>
 
       {/* Pause/Resume Button */}
       <div className="flex items-center justify-center gap-4 mb-4">
         <button
+          type="button"
           onClick={isPaused ? handleResume : handlePause}
           disabled={isPauseLoading}
-          className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/20 hover:bg-white/30 transition-colors disabled:opacity-50 font-semibold"
+          aria-busy={isPauseLoading}
+          className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/20 hover:bg-white/30 transition-colors disabled:opacity-50 font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
         >
           {isPauseLoading ? (
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            <div className="h-5 w-5 motion-safe:animate-spin rounded-full border-2 border-white border-t-transparent" aria-hidden="true" />
           ) : isPaused ? (
             <>
-              <Play className="h-5 w-5" />
+              <Play className="h-5 w-5" aria-hidden="true" />
               {t('resume')}
             </>
           ) : (
             <>
-              <Pause className="h-5 w-5" />
+              <Pause className="h-5 w-5" aria-hidden="true" />
               {t('pause')}
             </>
           )}
@@ -569,7 +592,7 @@ export default function ScreenTimeTimer({
 
       {/* Status */}
       <div className="flex items-center justify-center gap-2 text-lg text-white/90">
-        <Sparkles className="h-5 w-5" />
+        <Sparkles className="h-5 w-5" aria-hidden="true" />
         <span>{isPaused ? t('pause') : t('enjoyYourTime')}</span>
       </div>
     </div>
@@ -593,11 +616,12 @@ export default function ScreenTimeTimer({
         <div className="absolute top-4 right-4 flex gap-2">
           <PauseResumeButton />
           <button
+            type="button"
             onClick={() => setIsFullscreen(false)}
-            className="p-3 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-            aria-label="Minimize timer"
+            className="p-3 rounded-full bg-white/20 hover:bg-white/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            aria-label={t('minimize')}
           >
-            <Minimize2 className="h-6 w-6" />
+            <Minimize2 className="h-6 w-6" aria-hidden="true" />
           </button>
         </div>
 
@@ -621,7 +645,7 @@ export default function ScreenTimeTimer({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <Clock className="h-6 w-6" />
+            <Clock className="h-6 w-6" aria-hidden="true" />
           </div>
           <div>
             <h3 className="text-lg font-bold">{t('screenTimeActive')}</h3>
@@ -631,11 +655,12 @@ export default function ScreenTimeTimer({
         <div className="flex gap-2">
           <PauseResumeButton size="small" />
           <button
+            type="button"
             onClick={() => setIsFullscreen(true)}
-            className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-            aria-label="Maximize timer"
+            className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            aria-label={t('maximize')}
           >
-            <Maximize2 className="h-5 w-5" />
+            <Maximize2 className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -656,16 +681,24 @@ export default function ScreenTimeTimer({
       </div>
 
       {/* Progress Bar */}
-      <div className="relative h-3 bg-white/20 rounded-full overflow-hidden mb-4">
+      <div
+        className="relative h-3 bg-white/20 rounded-full overflow-hidden mb-4"
+        role="progressbar"
+        aria-valuenow={Math.round(progress)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={t('remaining', { minutes: Math.ceil(timeRemaining / 60000) })}
+      >
         <div
           className={`absolute top-0 left-0 h-full bg-white transition-all duration-1000 ${isPaused ? 'opacity-50' : ''}`}
           style={{ width: `${progress}%` }}
+          aria-hidden="true"
         />
       </div>
 
       {/* Status */}
       <div className="flex items-center justify-center gap-2 text-sm text-white/90">
-        <Sparkles className="h-4 w-4" />
+        <Sparkles className="h-4 w-4" aria-hidden="true" />
         <span>{isPaused ? t('pause') : t('enjoyYourTime')}</span>
       </div>
     </div>

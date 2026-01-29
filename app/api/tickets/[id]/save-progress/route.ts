@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function POST(
   request: NextRequest,
@@ -51,11 +52,8 @@ export async function POST(
       purchase_id: data.purchase_id,
       elapsed_seconds: data.elapsed_seconds,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Save progress error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

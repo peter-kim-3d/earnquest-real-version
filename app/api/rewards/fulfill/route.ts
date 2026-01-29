@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function POST(request: Request) {
   try {
@@ -68,10 +69,10 @@ export async function POST(request: Request) {
       success: true,
       message: 'Reward fulfilled successfully!',
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in reward fulfillment:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }

@@ -59,11 +59,12 @@ async function applyMigration() {
 
     console.log('✅ Migration applied successfully!');
 
-  } catch (error: any) {
-    if (error.code === 'ENOENT') {
+  } catch (error: unknown) {
+    const err = error as { code?: string; message?: string };
+    if (err.code === 'ENOENT') {
       console.error('❌ Migration file not found:', migrationPath);
     } else {
-      console.error('❌ Migration failed:', error.message);
+      console.error('❌ Migration failed:', err.message || String(error));
     }
 
     // Try to apply key parts individually

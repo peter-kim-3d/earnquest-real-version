@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { PIN_REGEX } from '@/lib/api/validation';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 export async function POST(request: Request) {
   try {
@@ -40,7 +42,7 @@ export async function POST(request: Request) {
     }
 
     // Validate passcode format
-    if (!/^\d{4}$/.test(passcode)) {
+    if (!PIN_REGEX.test(passcode)) {
       return NextResponse.json(
         { error: 'Passcode must be exactly 4 digits' },
         { status: 400 }
@@ -76,11 +78,8 @@ export async function POST(request: Request) {
       { success: true, message: 'Passcode updated successfully' },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating passcode:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to update passcode' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

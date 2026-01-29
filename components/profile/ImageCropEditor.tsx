@@ -63,7 +63,7 @@ export default function ImageCropEditor({
       {/* Zoom Controls */}
       <div className="mt-6 px-4">
         <div className="flex items-center gap-4">
-          <ZoomOut className="h-5 w-5 text-gray-500 flex-shrink-0" />
+          <ZoomOut className="h-5 w-5 text-gray-500 flex-shrink-0" aria-hidden="true" />
           <Slider
             value={[zoom]}
             onValueChange={(value) => setZoom(value[0])}
@@ -71,8 +71,9 @@ export default function ImageCropEditor({
             max={3}
             step={0.1}
             className="flex-1"
+            aria-label="Zoom level"
           />
-          <ZoomIn className="h-5 w-5 text-gray-500 flex-shrink-0" />
+          <ZoomIn className="h-5 w-5 text-gray-500 flex-shrink-0" aria-hidden="true" />
         </div>
         <p className="text-xs text-center text-gray-500 mt-2">
           Drag to reposition, use slider to zoom
@@ -87,7 +88,7 @@ export default function ImageCropEditor({
           onClick={onCancel}
           className="flex-1"
         >
-          <X className="h-4 w-4 mr-2" />
+          <X className="h-4 w-4 mr-2" aria-hidden="true" />
           Cancel
         </Button>
         <Button
@@ -95,7 +96,7 @@ export default function ImageCropEditor({
           onClick={handleConfirm}
           className="flex-1 bg-primary hover:bg-primary/90"
         >
-          <Check className="h-4 w-4 mr-2" />
+          <Check className="h-4 w-4 mr-2" aria-hidden="true" />
           Confirm
         </Button>
       </div>

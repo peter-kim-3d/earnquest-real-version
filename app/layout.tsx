@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getLocale } from 'next-intl/server';
 import './globals.css';
 import { ThemeProvider } from "@/components/theme-provider"
 
@@ -7,13 +8,17 @@ export const metadata: Metadata = {
   description: 'Growing habits, shining rewards',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  // Extract language code from locale (e.g., 'en-US' -> 'en', 'ko-KR' -> 'ko')
+  const lang = locale.split('-')[0];
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

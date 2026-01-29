@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { UserPlus, Copy, Check, Share } from '@/components/ui/ClientIcons';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { getErrorMessage } from '@/lib/utils/error';
 import {
   Dialog,
   DialogContent,
@@ -41,9 +42,9 @@ export default function InviteCoParent() {
 
       setInviteUrl(data.invitation.inviteUrl);
       setExpiresAt(data.invitation.expiresAt);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Invite error:', error);
-      toast.error(error.message || t('createFailed'));
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -57,7 +58,7 @@ export default function InviteCoParent() {
         toast.success(t('linkCopied'));
         setTimeout(() => setCopied(false), 2000);
       } catch {
-        toast.error('Failed to copy');
+        toast.error(t('copyFailed'));
       }
     }
   };
@@ -70,9 +71,10 @@ export default function InviteCoParent() {
           text: t('shareText'),
           url: inviteUrl,
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
         // User cancelled or share failed - ignore
-        if (error.name !== 'AbortError') {
+        const isAbortError = error instanceof Error && error.name === 'AbortError';
+        if (!isAbortError) {
           console.error('Share error:', error);
         }
       }
@@ -101,7 +103,7 @@ export default function InviteCoParent() {
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className="bg-primary hover:bg-primary/90 text-black font-semibold">
-          <UserPlus className="h-4 w-4 mr-2" />
+          <UserPlus className="h-4 w-4 mr-2" aria-hidden="true" />
           {t('button')}
         </Button>
       </DialogTrigger>
@@ -112,8 +114,8 @@ export default function InviteCoParent() {
         </DialogHeader>
 
         {loading ? (
-          <div className="py-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
+          <div className="py-8 text-center" role="status" aria-live="polite">
+            <div className="motion-safe:animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" aria-hidden="true" />
             <p className="text-text-muted dark:text-text-muted">{t('creating')}</p>
           </div>
         ) : inviteUrl ? (
@@ -137,11 +139,12 @@ export default function InviteCoParent() {
                   onClick={handleCopyLink}
                   className="shrink-0"
                   variant={copied ? 'default' : 'outline'}
+                  aria-label={copied ? t('copied') : t('copyLink')}
                 >
                   {copied ? (
-                    <Check className="h-4 w-4" />
+                    <Check className="h-4 w-4" aria-hidden="true" />
                   ) : (
-                    <Copy className="h-4 w-4" />
+                    <Copy className="h-4 w-4" aria-hidden="true" />
                   )}
                 </Button>
               </div>
@@ -156,7 +159,7 @@ export default function InviteCoParent() {
                   onClick={handleShare}
                   className="w-full bg-primary hover:bg-primary/90 text-black"
                 >
-                  <Share className="h-4 w-4 mr-2" />
+                  <Share className="h-4 w-4 mr-2" aria-hidden="true" />
                   {t('shareLink')}
                 </Button>
               )}
@@ -165,7 +168,7 @@ export default function InviteCoParent() {
                 variant="outline"
                 className="w-full"
               >
-                <Copy className="h-4 w-4 mr-2" />
+                <Copy className="h-4 w-4 mr-2" aria-hidden="true" />
                 {copied ? t('copied') : t('copyLink')}
               </Button>
               <Button

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getErrorMessage } from '@/lib/api/error-handler';
 
 /**
  * POST /api/cron/auto-refunds
@@ -72,10 +73,10 @@ export async function POST(request: NextRequest) {
       refundsProcessed: refundCount,
       timestamp: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Auto-refund cron error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }

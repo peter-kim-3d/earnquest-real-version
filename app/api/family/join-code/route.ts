@@ -10,6 +10,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { JOIN_CODE_CHARS, JOIN_CODE_LENGTH, JOIN_CODE_MAX_ATTEMPTS } from '@/lib/constants';
 
 /**
  * GET: Retrieve current family's join code
@@ -82,15 +83,13 @@ export async function POST() {
 
   // Generate new unique code
   // Using uppercase alphanumeric excluding confusing characters (I, O, L, 0, 1)
-  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
   let newCode: string;
   let attempts = 0;
-  const maxAttempts = 100;
 
-  while (attempts < maxAttempts) {
-    // Generate random 6-character code
-    newCode = Array.from({ length: 6 }, () =>
-      chars[Math.floor(Math.random() * chars.length)]
+  while (attempts < JOIN_CODE_MAX_ATTEMPTS) {
+    // Generate random code
+    newCode = Array.from({ length: JOIN_CODE_LENGTH }, () =>
+      JOIN_CODE_CHARS[Math.floor(Math.random() * JOIN_CODE_CHARS.length)]
     ).join('');
 
     // Check if code already exists
