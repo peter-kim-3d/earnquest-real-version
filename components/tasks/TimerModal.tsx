@@ -219,7 +219,12 @@ export default function TimerModal({
   // Reset when modal opens
   useEffect(() => {
     if (isOpen) {
-      if (initialState) {
+      // Only use initialState if it has valid remaining time (> 0)
+      const hasValidInitialState = initialState &&
+        initialState.remainingSeconds > 0 &&
+        initialState.totalSeconds > 0;
+
+      if (hasValidInitialState) {
         // Resume mode
         setAdjustedMinutes(Math.ceil(initialState.totalSeconds / 60));
         setTimeLeft(initialState.remainingSeconds);
