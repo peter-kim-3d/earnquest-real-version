@@ -14,7 +14,7 @@ interface CameraCaptureProps {
 export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
   const t = useTranslations('common.camera');
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const [hasMultipleCameras, setHasMultipleCameras] = useState(false);
 
@@ -29,13 +29,16 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
   };
 
   const stopCamera = useCallback(() => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
     }
-  }, [stream]);
+  }, []);
 
   const startCamera = useCallback(async () => {
+    // Stop any existing stream before starting a new one
+    stopCamera();
+
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -46,7 +49,7 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
         audio: false,
       });
 
-      setStream(mediaStream);
+      streamRef.current = mediaStream;
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -55,7 +58,7 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
       console.error('Camera access error:', error);
       toast.error(t('cameraError'));
     }
-  }, [facingMode, t]);
+  }, [facingMode, t, stopCamera]);
 
   useEffect(() => {
     startCamera();
@@ -64,7 +67,7 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
     return () => {
       stopCamera();
     };
-  }, [facingMode, startCamera, stopCamera]);
+  }, [startCamera, stopCamera]);
 
   const capturePhoto = () => {
     if (!videoRef.current) return;
