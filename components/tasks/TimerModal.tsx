@@ -179,10 +179,12 @@ export default function TimerModal({
 
   // Timer countdown logic using real time
   useEffect(() => {
-    if (isRunning && timeLeft > 0) {
-      // Record start time and initial time left
-      startTimeRef.current = Date.now();
-      pausedTimeLeftRef.current = timeLeft;
+    if (isRunning) {
+      // Only set start time if not already running (first start or resume)
+      if (startTimeRef.current === 0) {
+        startTimeRef.current = Date.now();
+        pausedTimeLeftRef.current = timeLeft;
+      }
 
       intervalRef.current = setInterval(() => {
         const now = Date.now();
@@ -194,6 +196,7 @@ export default function TimerModal({
         if (newTimeLeft === 0) {
           setIsRunning(false);
           setIsCompleted(true);
+          startTimeRef.current = 0;
           playAlarmSound();
           if (intervalRef.current) {
             clearInterval(intervalRef.current);
@@ -211,7 +214,7 @@ export default function TimerModal({
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning, playAlarmSound, timeLeft]);
+  }, [isRunning, playAlarmSound]);
 
   // Reset when modal opens
   useEffect(() => {
@@ -237,6 +240,8 @@ export default function TimerModal({
 
   const handlePause = () => {
     setIsRunning(false);
+    // Reset startTimeRef so resume will recalculate from current timeLeft
+    startTimeRef.current = 0;
     // Explicit save on pause
     if (onSave) {
       onSave({ remainingSeconds: timeLeft, totalSeconds: adjustedMinutes * 60 });
