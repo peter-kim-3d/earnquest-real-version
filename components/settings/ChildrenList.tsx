@@ -82,9 +82,13 @@ export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
                   />
 
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/${locale}/children/${child.id}`)}
+                      className="text-lg font-bold text-gray-900 dark:text-white hover:text-primary dark:hover:text-primary transition-colors text-left"
+                    >
                       {child.name}
-                    </h3>
+                    </button>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {getAgeGroupLabel(child.age_group)}
                     </p>
