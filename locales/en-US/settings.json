@@ -38,6 +38,7 @@
     "deleteConfirm": "Are you sure you want to remove {name}? This will delete all their data.",
     "avatar": "Avatar",
     "viewAsChild": "View as Child",
+    "viewInsights": "View Insights",
     "editChild": "Edit Child",
     "questPoints": "Quest Points",
     "pointsDisplay": "{points} QP",

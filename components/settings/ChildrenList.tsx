@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { Plus, PencilSimple as Edit2, Trophy, Eye } from '@/components/ui/ClientIcons';
+import { Plus, PencilSimple as Edit2, Trophy, Eye, ChartBar } from '@/components/ui/ClientIcons';
 import { ChildFormDialog } from './ChildFormDialog';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
 
@@ -82,13 +82,9 @@ export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
                   />
 
                   <div>
-                    <button
-                      type="button"
-                      onClick={() => router.push(`/${locale}/children/${child.id}`)}
-                      className="text-lg font-bold text-gray-900 dark:text-white hover:text-primary dark:hover:text-primary transition-colors text-left"
-                    >
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                       {child.name}
-                    </button>
+                    </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {getAgeGroupLabel(child.age_group)}
                     </p>
@@ -118,6 +114,15 @@ export function ChildrenList({ childrenData, familyId }: ChildrenListProps) {
                     aria-label={t('viewAsChild')}
                   >
                     <Eye className="w-4 h-4" aria-hidden="true" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => router.push(`/${locale}/children/${child.id}`)}
+                    className="h-10 w-10 hover:bg-purple-50 dark:hover:bg-purple-900/20 text-purple-600 dark:text-purple-400 focus-visible:ring-2 focus-visible:ring-purple-500"
+                    aria-label={t('viewInsights')}
+                  >
+                    <ChartBar className="w-4 h-4" aria-hidden="true" />
                   </Button>
                   <Button
                     variant="ghost"
