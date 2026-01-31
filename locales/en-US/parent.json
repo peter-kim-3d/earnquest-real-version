@@ -216,5 +216,19 @@
     },
     "enableTask": "Enable task",
     "disableTask": "Disable task"
+  },
+  "insights": {
+    "title": "Task Insights",
+    "fetchError": "Failed to load insights",
+    "noTasks": "No tasks assigned yet. Assign tasks to see insights.",
+    "completionRate": "Completion Rate",
+    "completionsCount": "{actual} of {expected} completions",
+    "bestTask": "Best Task",
+    "needsAttention": "Needs Attention",
+    "noCompletionsYet": "No completions yet",
+    "allOnTrack": "All tasks on track!",
+    "taskBreakdown": "Task Breakdown",
+    "taskRate": "{rate}% completion",
+    "periodNote": "Based on the last 30 days"
   }
 }

@@ -216,5 +216,19 @@
     },
     "enableTask": "할 일 활성화",
     "disableTask": "할 일 비활성화"
+  },
+  "insights": {
+    "title": "할 일 인사이트",
+    "fetchError": "인사이트를 불러오지 못했습니다",
+    "noTasks": "아직 할당된 할 일이 없습니다. 할 일을 할당하면 인사이트를 볼 수 있습니다.",
+    "completionRate": "완료율",
+    "completionsCount": "{expected}번 중 {actual}번 완료",
+    "bestTask": "최고 성과",
+    "needsAttention": "관심 필요",
+    "noCompletionsYet": "아직 완료 기록 없음",
+    "allOnTrack": "모든 할 일 순조로움!",
+    "taskBreakdown": "할 일별 현황",
+    "taskRate": "{rate}% 완료",
+    "periodNote": "지난 30일 기준"
   }
 }

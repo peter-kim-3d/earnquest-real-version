@@ -5,6 +5,7 @@ import ChildStats from '@/components/parent/ChildStats';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import ChildProfileTasks from '@/components/parent/ChildProfileTasks';
+import TaskInsights from '@/components/parent/TaskInsights';
 import { HISTORY_LOOKBACK_DAYS, TIME_MS } from '@/lib/constants';
 import type { PostgrestError } from '@supabase/supabase-js';
 
@@ -128,6 +129,9 @@ export default async function ChildProfilePage({
       <div className="space-y-8">
         {/* Child Stats */}
         <ChildStats child={child} />
+
+        {/* Task Insights */}
+        <TaskInsights childId={childId} />
 
         {/* Assigned Tasks */}
         <ChildProfileTasks

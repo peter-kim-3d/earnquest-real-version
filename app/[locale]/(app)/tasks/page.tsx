@@ -5,6 +5,7 @@ import TaskList from '@/components/parent/TaskList';
 import { Checks, CheckCircle, TrendUp, ListChecks } from '@/components/ui/ClientIcons';
 import { getAuthUserWithProfile } from '@/lib/supabase/cached-queries';
 import { HISTORY_LOOKBACK_DAYS, TIME_MS } from '@/lib/constants';
+import { DEFAULT_EXCHANGE_RATE, ExchangeRate } from '@/lib/utils/exchange-rate';
 
 export default async function TaskManagementPage({
   params,
@@ -26,7 +27,7 @@ export default async function TaskManagementPage({
   }
 
   // Parallelize all queries that depend on family_id
-  const [tasksResult, childrenResult, completionStatsResult] = await Promise.all([
+  const [tasksResult, childrenResult, completionStatsResult, familyResult] = await Promise.all([
     // Get all tasks for this family (exclude deleted)
     supabase
       .from('tasks')
@@ -49,11 +50,19 @@ export default async function TaskManagementPage({
       .eq('family_id', userProfile.family_id)
       .in('status', ['approved', 'auto_approved', 'pending_approval'])
       .gte('completed_at', new Date(Date.now() - HISTORY_LOOKBACK_DAYS * TIME_MS.DAY).toISOString()),
+
+    // Get family settings for exchange rate
+    supabase
+      .from('families')
+      .select('point_exchange_rate')
+      .eq('id', userProfile.family_id)
+      .single(),
   ]);
 
   const tasks = tasksResult.data;
   const children = childrenResult.data;
   const completionStats = completionStatsResult.data as { task_id: string; status: string }[] | null;
+  const exchangeRate = (familyResult.data?.point_exchange_rate || DEFAULT_EXCHANGE_RATE) as ExchangeRate;
 
   // Calculate completion count per task (approved/auto_approved)
   const taskCompletions = new Map<string, number>();
@@ -134,6 +143,7 @@ export default async function TaskManagementPage({
         taskCompletions={taskCompletions}
         pendingCounts={pendingCounts}
         childrenData={children || []}
+        exchangeRate={exchangeRate}
       />
 
       {/* Empty State */}

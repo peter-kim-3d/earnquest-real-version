@@ -15,8 +15,9 @@ import TaskImageUpload from '@/components/tasks/TaskImageUpload';
 import DefaultTaskImagePicker from '@/components/tasks/DefaultTaskImagePicker';
 import { getIconById } from '@/lib/task-icons';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { getErrorMessage } from '@/lib/utils/error';
+import { formatPointsAsDollars, getExchangeRateLabel, ExchangeRate, DEFAULT_EXCHANGE_RATE } from '@/lib/utils/exchange-rate';
 import type {
   TaskCategory,
   TaskTimeContext,
@@ -79,6 +80,7 @@ export interface TaskFormDialogProps {
   onClose: () => void;
   initialChildId?: string | null;
   availableChildren?: Child[]; // List of children for multi-select
+  exchangeRate?: ExchangeRate; // Exchange rate for showing dollar value
 }
 
 /** Form data state type with proper typing */
@@ -157,10 +159,11 @@ function createFormStateFromTask(task: TaskProps, initialChildId: string | null)
   };
 }
 
-export default function TaskFormDialog({ task, isOpen, onClose, initialChildId = null, availableChildren = [] }: TaskFormDialogProps) {
+export default function TaskFormDialog({ task, isOpen, onClose, initialChildId = null, availableChildren = [], exchangeRate = DEFAULT_EXCHANGE_RATE }: TaskFormDialogProps) {
   const router = useRouter();
   const t = useTranslations('tasks');
   const tCommon = useTranslations('common');
+  const locale = useLocale();
   const [loading, setLoading] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   // Track which children are selected (for task view, not child profile)
@@ -650,6 +653,13 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
               >
                 <span className="text-xl font-bold" aria-hidden="true">+</span>
               </button>
+            </div>
+            {/* Dollar Value Guide */}
+            <div className="text-center text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-lg py-2 px-3">
+              <span className="font-medium">≈ {formatPointsAsDollars(formData.points, exchangeRate, locale)}</span>
+              <span className="text-xs ml-2 text-gray-500 dark:text-gray-500">
+                ({getExchangeRateLabel(exchangeRate, locale)})
+              </span>
             </div>
           </div>
 

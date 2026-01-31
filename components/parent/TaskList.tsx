@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import TaskCard from './TaskCard';
 import ConfirmDialog from '@/components/ui/confirm-dialog';
 import { toast } from 'sonner';
+import { ExchangeRate, DEFAULT_EXCHANGE_RATE } from '@/lib/utils/exchange-rate';
 
 // Dynamic import for heavy dialog component
 const TaskFormDialog = dynamic(() => import('./TaskFormDialog'), {
@@ -40,9 +41,10 @@ interface TaskListProps {
   taskCompletions: Map<string, number>;
   pendingCounts?: Map<string, number>;
   childrenData: Child[];
+  exchangeRate?: ExchangeRate;
 }
 
-export default function TaskList({ tasks, taskCompletions, pendingCounts, childrenData = [] }: TaskListProps) {
+export default function TaskList({ tasks, taskCompletions, pendingCounts, childrenData = [], exchangeRate = DEFAULT_EXCHANGE_RATE }: TaskListProps) {
   const t = useTranslations('tasks');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -367,6 +369,7 @@ export default function TaskList({ tasks, taskCompletions, pendingCounts, childr
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
         availableChildren={childrenData}
+        exchangeRate={exchangeRate}
       />
 
       {/* Archive Confirm Dialog */}
