@@ -339,6 +339,7 @@ export const EvidenceSchema = z.object({
   timerCompleted: z.boolean().optional(),
   checklistState: z.array(z.boolean()).max(10, 'Checklist cannot have more than 10 items').optional(),
   note: z.string().max(500, 'Note must be 500 characters or less').optional(),
+  bonusMinutes: z.number().int().min(0).max(180).optional(), // Additional time via "Do More" feature
 });
 
 /**

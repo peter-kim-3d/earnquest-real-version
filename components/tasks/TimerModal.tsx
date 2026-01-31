@@ -12,7 +12,7 @@ interface TimerModalProps {
   points: number;
   initialState?: { remainingSeconds: number; totalSeconds: number };
   isOpen: boolean;
-  onComplete: () => void;
+  onComplete: (bonusMinutes?: number) => void;
   onCancel: () => void;
   onSave?: (state: { remainingSeconds: number; totalSeconds: number }) => void;
 }
@@ -267,7 +267,9 @@ export default function TimerModal({
 
   const handleComplete = () => {
     if (isCompleted) {
-      onComplete();
+      // Calculate bonus minutes (time added via "Do More")
+      const bonusMinutes = adjustedMinutes - timerMinutes;
+      onComplete(bonusMinutes > 0 ? bonusMinutes : undefined);
     }
   };
 

@@ -35,6 +35,7 @@ interface TaskCardProps {
   onComplete: (taskId: string, evidence?: {
     timerCompleted?: boolean;
     checklistState?: boolean[];
+    bonusMinutes?: number;
   }, instanceId?: string) => Promise<void>;
 }
 
@@ -94,11 +95,11 @@ export default function TaskCard({ task, childId, onComplete }: TaskCardProps) {
     }
   };
 
-  const handleTimerComplete = async () => {
+  const handleTimerComplete = async (bonusMinutes?: number) => {
     setShowTimer(false);
     setLoading(true);
     try {
-      await onComplete(task.id, { timerCompleted: true }, task.instance_id || undefined);
+      await onComplete(task.id, { timerCompleted: true, bonusMinutes }, task.instance_id || undefined);
       // Reset timer state
       if (childId) {
         setTimerState(null);

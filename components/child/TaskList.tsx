@@ -109,6 +109,7 @@ export default function TaskList({ tasks, completions, childId, childName }: Tas
     evidence?: {
       timerCompleted?: boolean;
       checklistState?: boolean[];
+      bonusMinutes?: number;
     },
     instanceId?: string
   ) => {

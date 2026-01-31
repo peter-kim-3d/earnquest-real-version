@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { CompleteTaskSchema, formatZodError } from '@/lib/validation/task';
 import { checkParentOrChildAuth, verifyChildIdMatch } from '@/lib/api/child-auth';
 import { getErrorMessage } from '@/lib/api/error-handler';
+import { POINTS_PER_MINUTE } from '@/lib/constants';
 
 /**
  * Calculate the start of "today" in the given timezone, returned as UTC ISO string.
@@ -276,6 +277,12 @@ export async function POST(request: Request) {
     let completedAt = null;
     let autoApproveAt = null;
 
+    // Calculate bonus points for timer tasks with "Do More" feature
+    let bonusPoints = 0;
+    if (task.approval_type === 'timer' && evidence?.bonusMinutes && evidence.bonusMinutes > 0) {
+      bonusPoints = Math.round(evidence.bonusMinutes * POINTS_PER_MINUTE);
+    }
+
     // Auto-approve for: auto, timer (completed), checklist (all checked)
     if (
       task.approval_type === 'auto' ||
@@ -283,7 +290,7 @@ export async function POST(request: Request) {
       task.approval_type === 'checklist'
     ) {
       initialStatus = 'auto_approved';
-      pointsAwarded = task.points;
+      pointsAwarded = task.points + bonusPoints;
       approvedAt = new Date().toISOString();
       completedAt = new Date().toISOString();
       autoApproveAt = null;
@@ -334,13 +341,18 @@ export async function POST(request: Request) {
 
     // If auto-approved, add points immediately
     if (initialStatus === 'auto_approved') {
+      const totalPoints = task.points + bonusPoints;
+      const description = bonusPoints > 0
+        ? `${task.name} completed (+${bonusPoints} bonus for extra time)`
+        : `${task.name} completed`;
+
       const { error: pointsError } = await dbClient.rpc('add_points', {
         p_child_id: childId,
-        p_amount: task.points,
+        p_amount: totalPoints,
         p_type: 'task_completion',
         p_reference_type: 'task_completion',
         p_reference_id: completion.id,
-        p_description: `${task.name} completed`,
+        p_description: description,
       });
 
       if (pointsError) {
