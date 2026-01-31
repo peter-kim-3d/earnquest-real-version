@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, ImageIcon, Palette, Loader2 } from 'lucide-react';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
@@ -29,7 +29,6 @@ import {
   MIN_TASK_POINTS,
   MAX_TASK_POINTS,
   POINTS_STEP,
-  POINTS_PER_MINUTE,
   DEFAULT_TIMER_MINUTES,
   MIN_TIMER_MINUTES,
   MAX_TIMER_MINUTES,
@@ -238,31 +237,8 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
     }
   }, [isOpen, initialChildId, task?.id, availableChildrenIds]);
 
-  // v2: Auto-calculate points for timer tasks (only when timer_minutes changes, not when points change)
-  // This allows users to manually adjust points after auto-calculation
-  const prevTimerMinutesRef = useRef(formData.timer_minutes);
-  const prevApprovalTypeRef = useRef(formData.approval_type);
-
-  useEffect(() => {
-    if (formData.approval_type === 'timer') {
-      // Only auto-calculate when timer_minutes changes or when switching to timer mode
-      const timerMinutesChanged = prevTimerMinutesRef.current !== formData.timer_minutes;
-      const switchedToTimer = prevApprovalTypeRef.current !== 'timer';
-
-      if (timerMinutesChanged || switchedToTimer) {
-        const calculatedPoints = Math.round(formData.timer_minutes * POINTS_PER_MINUTE);
-        // Round to nearest step
-        const roundedPoints = Math.round(calculatedPoints / POINTS_STEP) * POINTS_STEP;
-        // Ensure minimum points
-        const finalPoints = Math.max(MIN_TASK_POINTS, roundedPoints);
-
-        setFormData(prev => ({ ...prev, points: finalPoints }));
-      }
-    }
-
-    prevTimerMinutesRef.current = formData.timer_minutes;
-    prevApprovalTypeRef.current = formData.approval_type;
-  }, [formData.timer_minutes, formData.approval_type]);
+  // Note: Auto-calculate points for timer tasks was removed per user request.
+  // Users now manually set points for all task types including timer tasks.
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
