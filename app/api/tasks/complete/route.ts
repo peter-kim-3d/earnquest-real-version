@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import { CompleteTaskSchema, formatZodError } from '@/lib/validation/task';
 import { checkParentOrChildAuth, verifyChildIdMatch } from '@/lib/api/child-auth';
 import { getErrorMessage } from '@/lib/api/error-handler';
-import { POINTS_PER_MINUTE } from '@/lib/constants';
 
 /**
  * Calculate the start of "today" in the given timezone, returned as UTC ISO string.
@@ -277,10 +276,12 @@ export async function POST(request: Request) {
     let completedAt = null;
     let autoApproveAt = null;
 
-    // Calculate bonus points for timer tasks with "Do More" feature
-    let bonusPoints = 0;
-    if (task.approval_type === 'timer' && evidence?.bonusMinutes && evidence.bonusMinutes > 0) {
-      bonusPoints = Math.round(evidence.bonusMinutes * POINTS_PER_MINUTE);
+    // Calculate extra points for timer tasks with "Do More" feature
+    // Uses the task's points-per-minute rate: task.points / task.timer_minutes
+    let extraPoints = 0;
+    if (task.approval_type === 'timer' && task.timer_minutes && evidence?.bonusMinutes && evidence.bonusMinutes > 0) {
+      const pointsPerMinute = task.points / task.timer_minutes;
+      extraPoints = Math.round(evidence.bonusMinutes * pointsPerMinute);
     }
 
     // Auto-approve for: auto, timer (completed), checklist (all checked)
@@ -290,7 +291,7 @@ export async function POST(request: Request) {
       task.approval_type === 'checklist'
     ) {
       initialStatus = 'auto_approved';
-      pointsAwarded = task.points + bonusPoints;
+      pointsAwarded = task.points + extraPoints;
       approvedAt = new Date().toISOString();
       completedAt = new Date().toISOString();
       autoApproveAt = null;
@@ -341,9 +342,9 @@ export async function POST(request: Request) {
 
     // If auto-approved, add points immediately
     if (initialStatus === 'auto_approved') {
-      const totalPoints = task.points + bonusPoints;
-      const description = bonusPoints > 0
-        ? `${task.name} completed (+${bonusPoints} bonus for extra time)`
+      const totalPoints = task.points + extraPoints;
+      const description = extraPoints > 0
+        ? `${task.name} completed (+${extraPoints} extra)`
         : `${task.name} completed`;
 
       const { error: pointsError } = await dbClient.rpc('add_points', {

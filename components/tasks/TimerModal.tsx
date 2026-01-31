@@ -415,7 +415,7 @@ export default function TimerModal({
                   className="w-full"
                 >
                   <RotateCcw className="h-4 w-4 mr-2" aria-hidden="true" />
-                  {t('doMore', { minutes: 5, points: Math.round(5 * 1.5) })}
+                  {t('doMore', { minutes: 5, points: Math.round(5 * (points / timerMinutes)) })}
                 </Button>
               </div>
             )}
