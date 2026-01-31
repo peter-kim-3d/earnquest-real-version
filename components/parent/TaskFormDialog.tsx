@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, ImageIcon, Palette, Loader2 } from 'lucide-react';
 import AvatarDisplay from '@/components/profile/AvatarDisplay';
@@ -238,20 +238,31 @@ export default function TaskFormDialog({ task, isOpen, onClose, initialChildId =
     }
   }, [isOpen, initialChildId, task?.id, availableChildrenIds]);
 
-  // v2: Auto-calculate points for timer tasks
+  // v2: Auto-calculate points for timer tasks (only when timer_minutes changes, not when points change)
+  // This allows users to manually adjust points after auto-calculation
+  const prevTimerMinutesRef = useRef(formData.timer_minutes);
+  const prevApprovalTypeRef = useRef(formData.approval_type);
+
   useEffect(() => {
     if (formData.approval_type === 'timer') {
-      const calculatedPoints = Math.round(formData.timer_minutes * POINTS_PER_MINUTE);
-      // Round to nearest step
-      const roundedPoints = Math.round(calculatedPoints / POINTS_STEP) * POINTS_STEP;
-      // Ensure minimum points
-      const finalPoints = Math.max(MIN_TASK_POINTS, roundedPoints);
+      // Only auto-calculate when timer_minutes changes or when switching to timer mode
+      const timerMinutesChanged = prevTimerMinutesRef.current !== formData.timer_minutes;
+      const switchedToTimer = prevApprovalTypeRef.current !== 'timer';
 
-      if (finalPoints !== formData.points) {
+      if (timerMinutesChanged || switchedToTimer) {
+        const calculatedPoints = Math.round(formData.timer_minutes * POINTS_PER_MINUTE);
+        // Round to nearest step
+        const roundedPoints = Math.round(calculatedPoints / POINTS_STEP) * POINTS_STEP;
+        // Ensure minimum points
+        const finalPoints = Math.max(MIN_TASK_POINTS, roundedPoints);
+
         setFormData(prev => ({ ...prev, points: finalPoints }));
       }
     }
-  }, [formData.timer_minutes, formData.approval_type, formData.points]);
+
+    prevTimerMinutesRef.current = formData.timer_minutes;
+    prevApprovalTypeRef.current = formData.approval_type;
+  }, [formData.timer_minutes, formData.approval_type]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
